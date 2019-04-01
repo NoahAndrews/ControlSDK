@@ -1,6 +1,6 @@
 package org.btelman.control.sdk.demo
 
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 
 class DemoActivity : AppCompatActivity() {
