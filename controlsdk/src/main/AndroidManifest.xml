@@ -1,2 +1,27 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.btelman.controlsdk"/>
+          package="org.btelman.controlsdk">
+    <permission android:name="org.btelman.controlsdk.INSECURE_COMM"
+                android:protectionLevel="normal"
+                android:description="@string/insecure_comms_permission"/>
+    <permission android:name="org.btelman.controlsdk.SECURE_COMM"
+                android:protectionLevel="dangerous"
+                android:description="@string/secure_comms_permission_details"/>
+    <permission android:name="org.btelman.controlsdk.SEND_DATA"
+                android:protectionLevel="dangerous"
+                android:description="@string/secure_comms_permission_details"/>
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+</manifest>

@@ -38,4 +38,12 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.2'
     testImplementation test
     androidTestImplementation androidTest
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    def coroutines_version = "1.2.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+}
+repositories {
+    mavenCentral()
 }
