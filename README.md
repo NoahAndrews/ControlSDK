@@ -5,3 +5,24 @@ Control API for Android devices to control IoT devices, electronics boards (Ardu
 # Work In Progress
 
 Code in here at the moment is not ready for release
+
+This is the end goal of this project.
+
+[ControlSDK Flow (PDF)](docs/ControlSDK.pdf)
+
+# Use cases
+
+## Telepresence through any service easily.
+
+- Custom app handles credentials to service
+
+- Main app controls the motors, sensors, TTS, and can stream video from itself if supported.
+
+## remote control of wireless devices
+
+- Custom app contains virtual joystick or a way to plug in an actual controller, with bluetooth or through USB
+
+- ControlSDK app can handle controlling motors
+
+- Custom app can communicate with another device with the ControlSDK. In this scenario, 
+the ControlSDK on the main device will relay data to the second device.
