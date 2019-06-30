@@ -23,7 +23,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 /**
- * The main LetsRobot control service.
+ * The main ControlSDK control service.
  * This handles the lifecycle and communication to components that come from outside the sdk
  */
 class ControlSDKService : Service(), ComponentEventListener {
@@ -35,7 +35,7 @@ class ControlSDKService : Service(), ComponentEventListener {
      * Target we publish for clients to send messages to MessageHandler.
      */
     private lateinit var mMessenger: Messenger
-    private var handlerThread : HandlerThread = HandlerThread("LetsRobotControl").also { it.start() }
+    private var handlerThread : HandlerThread = HandlerThread("ControlSDK-main").also { it.start() }
 
     val handler = object : Handler(handlerThread.looper) {
         override fun handleMessage(msg: Message) {
@@ -89,7 +89,7 @@ class ControlSDKService : Service(), ComponentEventListener {
         val hide = PendingIntent.getBroadcast(this,
                 System.currentTimeMillis().toInt(), intentHide, PendingIntent.FLAG_CANCEL_CURRENT)
         val notification = NotificationCompat.Builder(this, CONTROL_SERVICE)
-                .setContentTitle("LetsRobot Controller")
+                .setContentTitle("Control SDK")
                 .setContentText("App is running in the background.")
                 .addAction(R.drawable.ic_power_settings_new_black_24dp, "Terminate app", hide)
                 .setSmallIcon(R.drawable.ic_settings_remote_black_24dp)

@@ -12,7 +12,7 @@ import org.btelman.controlsdk.interfaces.IComponent
 import org.btelman.controlsdk.interfaces.IControlSdkApi
 
 /**
- * Binder for LetsRobot Service that allows us to put all of the communication code in one class
+ * Binder for ControlSDK Service that allows us to put all of the communication code in one class
  */
 class ControlSDKServiceApi private constructor(
         anyContext: Context,
