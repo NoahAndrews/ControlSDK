@@ -219,7 +219,7 @@ class ControlSDKService : Service(), ComponentEventListener {
      * Disables components, blocking the service messaging thread until complete
      */
     fun disable(){
-        Toast.makeText(applicationContext, "Stopping LetRobot Controller", Toast.LENGTH_SHORT).show()
+        Toast.makeText(applicationContext, "Stopping ControlSDK", Toast.LENGTH_SHORT).show()
         runBlocking {
             activeComponentList.forEach{
                 it.disable().await()
