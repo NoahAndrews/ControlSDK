@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">ControlSDK</string>
+    <string name="title_controlsdk_streaming">ControlSDK Streaming Library</string>
+    <string name="title_controlsdk_tts">ControlSDK Text To Speech Integration</string>
+    <string name="title_controlsdk_hardware">Control SDK Hardware Integration</string>
 </resources>

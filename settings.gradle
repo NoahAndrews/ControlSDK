@@ -1,1 +1,1 @@
-include ':app', ':controlsdk-core'
+include ':app', ':controlsdk_core', ':controlsdk_streaming', ':controlsdk_tts', ':controlsdk_hardware'
