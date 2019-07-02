@@ -1,4 +1,4 @@
-package org.btelman.controlsdk;
+package org.btelman.controlsdk.streaming;
 
 import android.content.Context;
 import androidx.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("org.btelman.controlsdk.test", appContext.getPackageName());
+        assertEquals("org.btelman.controlsdk.streaming.test", appContext.getPackageName());
     }
 }

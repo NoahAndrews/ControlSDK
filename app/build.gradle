@@ -28,9 +28,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    dynamicFeatures = [":controlsdk_streaming", ":controlsdk_tts", ":controlsdk_hardware"]
-
-
 }
 
 dependencies {
@@ -47,4 +44,8 @@ dependencies {
     testImplementation test
     androidTestImplementation androidTest
     implementation project(':controlsdk_core')
+    implementation project(':controlsdk_hardware')
+    implementation project(':controlsdk_networking')
+    implementation project(':controlsdk_streaming')
+    implementation project(':controlsdk_tts')
 }

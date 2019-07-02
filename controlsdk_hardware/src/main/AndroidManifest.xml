@@ -1,11 +1,2 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:dist="http://schemas.android.com/apk/distribution"
-          package="org.btelman.controlsdk.hardware">
-    <dist:module
-            dist:onDemand="true"
-            dist:instant="false"
-            dist:title="@string/title_controlsdk_hardware">
-        <dist:fusing dist:include="true"/>
-    </dist:module>
-</manifest>
-
+          package="org.btelman.controlsdk.hardware"/>
