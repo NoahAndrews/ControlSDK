@@ -1,9 +1,9 @@
 ext.repos = ['mavenCentral']
 
-ext.androidTest = [
-        "junit:junit:4.12",
-]
 ext.test = [
+        "junit:junit:4.12"
+]
+ext.androidTest = [
         'androidx.test:runner:1.2.0',
         'androidx.test.espresso:espresso-core:3.2.0',
 ]
