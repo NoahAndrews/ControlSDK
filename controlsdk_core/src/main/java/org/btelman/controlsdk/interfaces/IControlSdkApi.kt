@@ -26,12 +26,12 @@ interface IControlSdkApi {
     /**
      * Attach a custom component to the lifecycle. Must call reset() for changes to take effect
      */
-    fun attachToLifecycle(component: ComponentHolder)
+    fun attachToLifecycle(component: ComponentHolder<*>)
 
     /**
      * detach a custom component from the lifecycle. Must call reset() for changes to take effect
      */
-    fun detachFromLifecycle(component: ComponentHolder)
+    fun detachFromLifecycle(component: ComponentHolder<*>)
 
     /**
      * Subscribe to status events.

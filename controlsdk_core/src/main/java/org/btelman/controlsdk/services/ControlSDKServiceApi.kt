@@ -70,11 +70,11 @@ class ControlSDKServiceApi private constructor(
         sendStateUnsafe(ControlSDKService.RESET)
     }
 
-    override fun attachToLifecycle(component: ComponentHolder) {
+    override fun attachToLifecycle(component: ComponentHolder<*>) {
         sendStateUnsafe(ControlSDKService.ATTACH_COMPONENT, component)
     }
 
-    override fun detachFromLifecycle(component: ComponentHolder) {
+    override fun detachFromLifecycle(component: ComponentHolder<*>) {
         sendStateUnsafe(ControlSDKService.DETACH_COMPONENT, component)
     }
 

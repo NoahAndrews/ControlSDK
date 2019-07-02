@@ -27,7 +27,7 @@ import kotlin.collections.ArrayList
  */
 class ControlSDKService : Service(), ComponentEventListener {
     private var running = false
-    private val componentList = ArrayList<ComponentHolder>()
+    private val componentList = ArrayList<ComponentHolder<*>>()
     private val activeComponentList = ArrayList<IComponent>()
 
     /**
@@ -44,12 +44,12 @@ class ControlSDKService : Service(), ComponentEventListener {
                 STOP ->
                     disable()
                 ATTACH_COMPONENT -> {
-                    (msg.obj as? ComponentHolder)?.let {
+                    (msg.obj as? ComponentHolder<*>)?.let {
                         addToLifecycle(it)
                     }
                 }
                 DETACH_COMPONENT -> {
-                    (msg.obj as? ComponentHolder)?.let {
+                    (msg.obj as? ComponentHolder<*>)?.let {
                         removeFromLifecycle(it)
                     }
                 }
@@ -165,12 +165,12 @@ class ControlSDKService : Service(), ComponentEventListener {
         componentList.clear()
     }
 
-    private fun addToLifecycle(component: ComponentHolder) {
+    private fun addToLifecycle(component: ComponentHolder<*>) {
         if(!componentList.contains(component))
             componentList.add(component)
     }
 
-    private fun removeFromLifecycle(component: ComponentHolder) {
+    private fun removeFromLifecycle(component: ComponentHolder<*>) {
         componentList.remove(component)
     }
 
@@ -206,8 +206,7 @@ class ControlSDKService : Service(), ComponentEventListener {
         activeComponentList.clear()
         componentList.forEach { holder ->
             try {
-                val component : Component = holder.clazz.newInstance()
-                component.onInitializeComponent(applicationContext, holder.data)
+                val component = ControlSDKService.instantiateComponent(applicationContext, holder)
                 activeComponentList.add(component)
             }catch (e : Exception){
                 e.printStackTrace()
@@ -276,5 +275,11 @@ class ControlSDKService : Service(), ComponentEventListener {
         const val SERVICE_STATUS_BROADCAST = "org.btelman.controlsdk.ServiceStatus"
         const val SERVICE_STOP_BROADCAST = "org.btelman.controlsdk.request.stop"
         lateinit var logLevel: LogLevel
+
+        fun instantiateComponent(applicationContext: Context?, holder: ComponentHolder<*>) : Component{
+            val component : Component = holder.clazz.newInstance()
+            component.onInitializeComponent(applicationContext, holder.data)
+            return component
+        }
     }
 }
