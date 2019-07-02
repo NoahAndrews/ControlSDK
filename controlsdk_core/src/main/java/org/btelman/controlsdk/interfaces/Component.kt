@@ -1,6 +1,7 @@
 package org.btelman.controlsdk.interfaces
 
 import android.content.Context
+import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
@@ -20,11 +21,18 @@ import kotlin.coroutines.resumeWithException
  * Runs on its own threads, as long as this.handler is used
  * Ex. can be used as an interface for LEDs based off of control messages
  */
-abstract class Component(val context: Context) : IComponent{
+abstract class Component : IComponent{
     protected var eventDispatcher : ComponentEventListener? = null
     private var handlerThread = HandlerThread(
             javaClass.simpleName
     ).also { it.start() }
+
+    /**
+     * Constructor that the service will use to start the component. For custom actions, please use onInitializeComponent
+     */
+    @Suppress("ConvertSecondaryConstructorToPrimary")
+    constructor()
+
     protected val handler = Handler(handlerThread.looper){
         handleMessage(it)
     }
@@ -143,6 +151,13 @@ abstract class Component(val context: Context) : IComponent{
         val newMessage = Message.obtain(message)
         newMessage.target = handler
         newMessage.sendToTarget()
+    }
+
+    /**
+     * Used to retrieve Context and provide an initialization bundle
+     */
+    open fun onInitializeComponent(applicationContext: Context?, bundle : Bundle?) {
+
     }
 
     companion object {

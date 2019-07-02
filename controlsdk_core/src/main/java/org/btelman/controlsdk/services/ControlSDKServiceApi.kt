@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import org.btelman.controlsdk.enums.Operation
+import org.btelman.controlsdk.interfaces.ComponentHolder
 import org.btelman.controlsdk.interfaces.IComponent
 import org.btelman.controlsdk.interfaces.IControlSdkApi
 
@@ -69,11 +70,11 @@ class ControlSDKServiceApi private constructor(
         sendStateUnsafe(ControlSDKService.RESET)
     }
 
-    override fun attachToLifecycle(component: IComponent) {
+    override fun attachToLifecycle(component: ComponentHolder) {
         sendStateUnsafe(ControlSDKService.ATTACH_COMPONENT, component)
     }
 
-    override fun detachFromLifecycle(component: IComponent) {
+    override fun detachFromLifecycle(component: ComponentHolder) {
         sendStateUnsafe(ControlSDKService.DETACH_COMPONENT, component)
     }
 

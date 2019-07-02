@@ -8,12 +8,15 @@ import org.btelman.controlsdk.enums.ComponentType
  * Base methods that any component requires
  */
 interface IComponent{
+
     /**
      * Enables the component asynchronously, and will return the result to a listening co-routine
      */
     fun enable() : Deferred<Boolean>
+
     /**
-     * Disables the component asynchronously, and will return the result to a listening co-routine
+     * Disables the component asynchronously, and will return the result to a listening co-routine.
+     * Treat this like the component is being destroyed
      */
     fun disable() : Deferred<Boolean>
 

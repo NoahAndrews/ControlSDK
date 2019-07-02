@@ -15,10 +15,9 @@ import kotlinx.coroutines.runBlocking
 import org.btelman.controlsdk.R
 import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.enums.LogLevel
-import org.btelman.controlsdk.interfaces.ComponentEventListener
-import org.btelman.controlsdk.interfaces.ComponentEventObject
-import org.btelman.controlsdk.interfaces.IComponent
+import org.btelman.controlsdk.interfaces.*
 import org.btelman.controlsdk.utils.InlineBroadcastReceiver
+import java.lang.Exception
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -28,7 +27,7 @@ import kotlin.collections.ArrayList
  */
 class ControlSDKService : Service(), ComponentEventListener {
     private var running = false
-    private val componentList = ArrayList<IComponent>()
+    private val componentList = ArrayList<ComponentHolder>()
     private val activeComponentList = ArrayList<IComponent>()
 
     /**
@@ -45,12 +44,12 @@ class ControlSDKService : Service(), ComponentEventListener {
                 STOP ->
                     disable()
                 ATTACH_COMPONENT -> {
-                    (msg.obj as? IComponent)?.let {
+                    (msg.obj as? ComponentHolder)?.let {
                         addToLifecycle(it)
                     }
                 }
                 DETACH_COMPONENT -> {
-                    (msg.obj as? IComponent)?.let {
+                    (msg.obj as? ComponentHolder)?.let {
                         removeFromLifecycle(it)
                     }
                 }
@@ -166,12 +165,12 @@ class ControlSDKService : Service(), ComponentEventListener {
         componentList.clear()
     }
 
-    private fun addToLifecycle(component: IComponent) {
+    private fun addToLifecycle(component: ComponentHolder) {
         if(!componentList.contains(component))
             componentList.add(component)
     }
 
-    private fun removeFromLifecycle(component: IComponent) {
+    private fun removeFromLifecycle(component: ComponentHolder) {
         componentList.remove(component)
     }
 
@@ -185,8 +184,7 @@ class ControlSDKService : Service(), ComponentEventListener {
         val componentListener : ComponentEventListener = this
         runBlocking {
             Toast.makeText(applicationContext, "Starting LetRobot Controller", Toast.LENGTH_SHORT).show()
-            activeComponentList.clear()
-            activeComponentList.addAll(componentList)
+            instantiateComponents()
             val list = ArrayList<Deferred<Boolean>>()
 
             //enable all of our components
@@ -204,6 +202,19 @@ class ControlSDKService : Service(), ComponentEventListener {
         }
     }
 
+    private fun instantiateComponents() {
+        activeComponentList.clear()
+        componentList.forEach { holder ->
+            try {
+                val component : Component = holder.clazz.newInstance()
+                component.onInitializeComponent(applicationContext, holder.data)
+                activeComponentList.add(component)
+            }catch (e : Exception){
+                e.printStackTrace()
+            }
+        }
+    }
+
     /**
      * Disables components, blocking the service messaging thread until complete
      */
@@ -214,6 +225,7 @@ class ControlSDKService : Service(), ComponentEventListener {
                 it.disable().await()
                 it.setEventListener(null)
             }
+            activeComponentList.clear()
             setState(false)
         }
     }
