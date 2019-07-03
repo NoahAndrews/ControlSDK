@@ -166,7 +166,7 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
     fun enable(){
         val componentListener : ComponentEventListener = this
         runBlocking {
-            Toast.makeText(applicationContext, "Starting LetRobot Controller", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, "Starting ControlSDK", Toast.LENGTH_SHORT).show()
             instantiateComponents()
             val list = ArrayList<Deferred<Boolean>>()
 
