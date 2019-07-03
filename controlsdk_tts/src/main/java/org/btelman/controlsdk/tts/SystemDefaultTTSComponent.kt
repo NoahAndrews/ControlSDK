@@ -7,6 +7,8 @@ import android.speech.tts.TextToSpeech
 import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.models.ComponentEventObject
 import java.util.*
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 /**
  * Uses the System TTS system. This uses whatever the default engine is set to
@@ -21,11 +23,16 @@ class SystemDefaultTTSComponent : TTSBaseComponent() {
     }
 
     override fun enableInternal() {
-        ttobj = TextToSpeech(context, TextToSpeech.OnInitListener {})
+        val latch = CountDownLatch(1)
+        ttobj = TextToSpeech(context, TextToSpeech.OnInitListener {
+            latch.countDown()
+        })
+        latch.await(4, TimeUnit.SECONDS)
     }
 
     override fun disableInternal() {
         ttobj?.shutdown()
+        ttobj = null
     }
 
     fun speakText(tts : TTSObject){
