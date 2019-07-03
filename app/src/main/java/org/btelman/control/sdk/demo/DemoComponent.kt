@@ -17,10 +17,17 @@ class DemoComponent : Component() {
     }
 
     override fun enableInternal() {
-        eventDispatcher?.handleMessage(ComponentEventObject(ComponentType.TTS, EVENT_MAIN, TTSBaseComponent.TTSObject(TTSBaseComponent.TTS_OK
-            , TTSBaseComponent.COMMAND_PITCH, shouldFlush = false), this))
-        eventDispatcher?.handleMessage(ComponentEventObject(ComponentType.TTS, EVENT_MAIN, TTSBaseComponent.TTSObject(TTSBaseComponent.TTS_DISCONNECTED
-            , TTSBaseComponent.COMMAND_PITCH, shouldFlush = false), this))
+        handler.post {
+            eventDispatcher?.handleMessage(ComponentEventObject(ComponentType.TTS, EVENT_MAIN,
+                TTSBaseComponent.TTSObject(TTSBaseComponent.TTS_OK), this))
+            eventDispatcher?.handleMessage(ComponentEventObject(ComponentType.TTS, EVENT_MAIN,
+                TTSBaseComponent.TTSObject(TTSBaseComponent.TTS_DISCONNECTED
+                    , TTSBaseComponent.COMMAND_PITCH, shouldFlush = false), this))
+            eventDispatcher?.handleMessage(ComponentEventObject(ComponentType.TTS, EVENT_MAIN,
+                TTSBaseComponent.TTSObject("Lorem Ipsum"), this))
+            eventDispatcher?.handleMessage(ComponentEventObject(ComponentType.TTS, EVENT_MAIN,
+                TTSBaseComponent.TTSObject("Longer message that says more things"), this))
+        }
     }
 
     override fun disableInternal() {
