@@ -8,4 +8,6 @@
     <string name="secure_comms_permission_details">Trust this app with potentially sensitive
         info that gets broadcasted</string>
     <string name="send_data_permissions_details">Allow app to send data to ControlSDK</string>
+    <string name="appBackgrounded">App is running in the background.</string>
+    <string name="terminateApp">Terminate app</string>
 </resources>

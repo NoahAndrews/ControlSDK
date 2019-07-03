@@ -2,7 +2,6 @@ package org.btelman.controlsdk.services
 
 import android.app.PendingIntent
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.os.*
 import android.widget.Toast
@@ -86,13 +85,13 @@ class ControlSDKService : Service(), ComponentEventListener {
      * Setup the foreground service notification
      */
     private fun setupForeground() {
-        val intentHide = Intent(ControlSDKService.SERVICE_STOP_BROADCAST)
+        val intentHide = Intent(SERVICE_STOP_BROADCAST)
         val hide = PendingIntent.getBroadcast(this,
                 System.currentTimeMillis().toInt(), intentHide, PendingIntent.FLAG_CANCEL_CURRENT)
         val notification = NotificationCompat.Builder(this, CONTROL_SERVICE)
-                .setContentTitle("Control SDK")
-                .setContentText("App is running in the background.")
-                .addAction(R.drawable.ic_power_settings_new_black_24dp, "Terminate app", hide)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText(getString(R.string.appBackgrounded))
+                .addAction(R.drawable.ic_power_settings_new_black_24dp, getString(R.string.terminateApp), hide)
                 .setSmallIcon(R.drawable.ic_settings_remote_black_24dp)
         startForeground(Random().nextInt(), notification.build())
     }
@@ -208,7 +207,7 @@ class ControlSDKService : Service(), ComponentEventListener {
         activeComponentList.clear()
         componentList.forEach { holder ->
             try {
-                val component = ControlSDKService.instantiateComponent(applicationContext, holder)
+                val component = Component.instantiate(applicationContext, holder)
                 activeComponentList.add(component)
             }catch (e : Exception){
                 e.printStackTrace()
@@ -255,11 +254,5 @@ class ControlSDKService : Service(), ComponentEventListener {
         const val SERVICE_STATUS_BROADCAST = "org.btelman.controlsdk.ServiceStatus"
         const val SERVICE_STOP_BROADCAST = "org.btelman.controlsdk.request.stop"
         lateinit var logLevel: LogLevel
-
-        fun instantiateComponent(applicationContext: Context?, holder: ComponentHolder<*>) : Component {
-            val component : Component = holder.clazz.newInstance()
-            component.onInitializeComponent(applicationContext, holder.data)
-            return component
-        }
     }
 }

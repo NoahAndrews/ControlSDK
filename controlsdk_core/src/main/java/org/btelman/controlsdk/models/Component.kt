@@ -171,5 +171,11 @@ abstract class Component : IComponent {
         const val STATUS_EVENT = 0
         const val EVENT_MAIN = 1
         const val MESSAGE_TIMEOUT = 2
+
+        fun instantiate(applicationContext: Context?, holder: ComponentHolder<*>) : Component {
+            val component : Component = holder.clazz.newInstance()
+            component.onInitializeComponent(applicationContext, holder.data)
+            return component
+        }
     }
 }
