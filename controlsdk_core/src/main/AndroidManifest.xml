@@ -1,4 +1,4 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
           package="org.btelman.controlsdk">
     <permission android:name="org.btelman.controlsdk.INSECURE_COMM"
                 android:protectionLevel="normal"
@@ -24,4 +24,9 @@
 
     <uses-feature android:name="android.hardware.camera" android:required="false"/>
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+
+    <application android:usesCleartextTraffic="true"
+                 tools:targetApi="m">
+        <service android:name=".services.ControlSDKService" />
+    </application>
 </manifest>

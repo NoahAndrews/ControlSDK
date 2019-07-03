@@ -6,5 +6,5 @@ package org.btelman.controlsdk.enums
 enum class Operation {
     NOT_OK,
     LOADING,
-    OK
+    OK,
 }
