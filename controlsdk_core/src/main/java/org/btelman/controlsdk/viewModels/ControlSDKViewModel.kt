@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import org.btelman.controlsdk.enums.Operation
 import org.btelman.controlsdk.interfaces.IControlSdkApi
-import org.btelman.controlsdk.services.ControlSDKServiceApi
+import org.btelman.controlsdk.services.ControlSDKServiceConnection
 
 /**
  * ViewModel to handle ControlSDK controller logic,
@@ -51,7 +51,7 @@ class ControlSDKViewModel : ViewModel(){
         fun getObject(activity: FragmentActivity) : ControlSDKViewModel {
             return ViewModelProviders.of(activity).get(ControlSDKViewModel::class.java).also {
                 if (it.api == null) {
-                    it.api = ControlSDKServiceApi.getNewInstance(activity).also { api ->
+                    it.api = ControlSDKServiceConnection.getNewInstance(activity).also { api ->
                         api.connectToService()
                     }
                 }

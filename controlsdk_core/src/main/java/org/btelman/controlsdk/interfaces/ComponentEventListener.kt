@@ -1,6 +1,7 @@
 package org.btelman.controlsdk.interfaces
 
 import org.btelman.controlsdk.enums.ComponentType
+import org.btelman.controlsdk.models.ComponentEventObject
 import java.util.*
 
 interface ComponentEventListener : EventListener{

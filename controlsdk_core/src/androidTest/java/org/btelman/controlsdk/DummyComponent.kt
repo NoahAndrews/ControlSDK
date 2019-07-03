@@ -3,8 +3,8 @@ package org.btelman.controlsdk
 import android.content.Context
 import android.os.Bundle
 import org.btelman.controlsdk.enums.ComponentType
-import org.btelman.controlsdk.interfaces.Component
-import org.btelman.controlsdk.interfaces.ComponentHolder
+import org.btelman.controlsdk.models.Component
+import org.btelman.controlsdk.models.ComponentHolder
 
 /**
  * Created by Brendon on 7/1/2019.
@@ -32,7 +32,7 @@ class DummyComponent : Component() {
 
     companion object{
         data class Builder(val arg1 : String, val arg2: Int){
-            fun build() : ComponentHolder<DummyComponent>{
+            fun build() : ComponentHolder<DummyComponent> {
                 val bundle = Bundle()
                 bundle.putString(ARG1_KEY, arg1)
                 bundle.putInt(ARG2_KEY, arg2)

@@ -2,6 +2,7 @@ package org.btelman.controlsdk.interfaces
 
 import androidx.lifecycle.LiveData
 import org.btelman.controlsdk.enums.Operation
+import org.btelman.controlsdk.models.ComponentHolder
 
 /**
  * Interface for communicating with the robot service

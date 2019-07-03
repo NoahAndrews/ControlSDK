@@ -8,14 +8,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import org.btelman.controlsdk.enums.Operation
-import org.btelman.controlsdk.interfaces.ComponentHolder
-import org.btelman.controlsdk.interfaces.IComponent
 import org.btelman.controlsdk.interfaces.IControlSdkApi
+import org.btelman.controlsdk.models.ComponentHolder
 
 /**
  * Binder for ControlSDK Service that allows us to put all of the communication code in one class
  */
-class ControlSDKServiceApi private constructor(
+class ControlSDKServiceConnection private constructor(
         anyContext: Context,
         private val context : Context = anyContext.applicationContext
 ) : ServiceConnection, IControlSdkApi {
@@ -137,7 +136,7 @@ class ControlSDKServiceApi private constructor(
 
     companion object {
         fun getNewInstance(context: Context) : IControlSdkApi{
-            return ControlSDKServiceApi(context)
+            return ControlSDKServiceConnection(context)
         }
     }
 }

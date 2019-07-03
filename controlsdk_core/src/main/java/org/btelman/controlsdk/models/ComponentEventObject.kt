@@ -1,4 +1,4 @@
-package org.btelman.controlsdk.interfaces
+package org.btelman.controlsdk.models
 
 import org.btelman.controlsdk.enums.ComponentType
 import java.util.*

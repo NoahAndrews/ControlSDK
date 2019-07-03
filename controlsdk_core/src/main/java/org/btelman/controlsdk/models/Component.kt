@@ -1,4 +1,4 @@
-package org.btelman.controlsdk.interfaces
+package org.btelman.controlsdk.models
 
 import android.content.Context
 import android.os.Bundle
@@ -10,6 +10,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.btelman.controlsdk.enums.ComponentStatus
+import org.btelman.controlsdk.interfaces.ComponentEventListener
+import org.btelman.controlsdk.interfaces.IComponent
 import org.btelman.controlsdk.services.ControlSDKService
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
@@ -21,7 +23,7 @@ import kotlin.coroutines.resumeWithException
  * Runs on its own threads, as long as this.handler is used
  * Ex. can be used as an interface for LEDs based off of control messages
  */
-abstract class Component : IComponent{
+abstract class Component : IComponent {
     protected var eventDispatcher : ComponentEventListener? = null
     private var handlerThread = HandlerThread(
             javaClass.simpleName
@@ -43,7 +45,8 @@ abstract class Component : IComponent{
         set(value) {
             if(_status == value) return //Only set state if changed
             _status = value
-            eventDispatcher?.handleMessage(getType(), Component.STATUS_EVENT, status, this)
+            eventDispatcher?.handleMessage(getType(),
+                STATUS_EVENT, status, this)
         }
 
     init {

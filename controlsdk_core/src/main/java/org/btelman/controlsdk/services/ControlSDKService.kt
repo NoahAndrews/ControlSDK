@@ -1,7 +1,5 @@
 package org.btelman.controlsdk.services
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
@@ -15,9 +13,13 @@ import kotlinx.coroutines.runBlocking
 import org.btelman.controlsdk.R
 import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.enums.LogLevel
-import org.btelman.controlsdk.interfaces.*
+import org.btelman.controlsdk.interfaces.ComponentEventListener
+import org.btelman.controlsdk.interfaces.IComponent
+import org.btelman.controlsdk.models.Component
+import org.btelman.controlsdk.models.ComponentEventObject
+import org.btelman.controlsdk.models.ComponentHolder
 import org.btelman.controlsdk.utils.InlineBroadcastReceiver
-import java.lang.Exception
+import org.btelman.controlsdk.utils.NotificationUtil
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -65,17 +67,17 @@ class ControlSDKService : Service(), ComponentEventListener {
     }
 
     private var stopListenerReceiver: InlineBroadcastReceiver? = null
-    private lateinit var mNotificationManager: NotificationManager
 
     override fun onCreate() {
-        mNotificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         stopListenerReceiver = InlineBroadcastReceiver(SERVICE_STOP_BROADCAST){ _, _ ->
             stopService()
             System.exit(0)
         }.also {
             it.register(this)
         }
-        tryCreateNotificationChannel()
+        NotificationUtil.tryCreateNotificationChannel(this,
+            getString(R.string.channel_name),
+            getString(R.string.channel_description))
         setupForeground()
         handler.obtainMessage(RESET).sendToTarget()
     }
@@ -242,28 +244,6 @@ class ControlSDKService : Service(), ComponentEventListener {
         )
     }
 
-    private fun tryCreateNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            //visible to user
-            val name = applicationContext.getString(R.string.channel_name)
-            //visible to user
-            val description = applicationContext.getString(R.string.channel_description)
-            val importance = NotificationManager.IMPORTANCE_LOW
-            //create a notification channel
-            val mChannel = NotificationChannel(CONTROL_SERVICE, name, importance)
-            mChannel.description = description
-            mChannel.enableLights(false)
-            mChannel.setSound(null, null)
-            mChannel.setShowBadge(false)
-            mChannel.enableVibration(false)
-            try {
-                mNotificationManager.createNotificationChannel(mChannel)
-            } catch (e: IllegalArgumentException) {
-                e.printStackTrace()
-            }
-        }
-    }
-
     companion object {
         const val START = 1
         const val STOP = 2
@@ -276,7 +256,7 @@ class ControlSDKService : Service(), ComponentEventListener {
         const val SERVICE_STOP_BROADCAST = "org.btelman.controlsdk.request.stop"
         lateinit var logLevel: LogLevel
 
-        fun instantiateComponent(applicationContext: Context?, holder: ComponentHolder<*>) : Component{
+        fun instantiateComponent(applicationContext: Context?, holder: ComponentHolder<*>) : Component {
             val component : Component = holder.clazz.newInstance()
             component.onInitializeComponent(applicationContext, holder.data)
             return component
