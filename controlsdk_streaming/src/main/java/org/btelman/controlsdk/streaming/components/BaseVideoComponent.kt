@@ -11,14 +11,18 @@ import org.btelman.controlsdk.streaming.models.StreamInfo
  *
  * Other classes will extend this for connectivity with specific integrations
  */
-class BaseVideoComponent : Component() {
+abstract class BaseVideoComponent : Component() {
     var streamInfo : StreamInfo? = null
+    var processor : BaseVideoProcessor? = null
+    var retriever : BaseVideoRetriever? = null
 
     override fun onInitializeComponent(applicationContext: Context?, bundle: Bundle?) {
         super.onInitializeComponent(applicationContext, bundle)
         bundle?.let {
             streamInfo = StreamInfo.fromBundle(it)
         } ?: throw IllegalArgumentException("Must use StreamInfo Bundle")
+        processor = VideoProcessorFactory.findProcessor(bundle)
+        processor ?: throw IllegalArgumentException("unable to resolve video processor")
     }
 
     override fun enableInternal() {
