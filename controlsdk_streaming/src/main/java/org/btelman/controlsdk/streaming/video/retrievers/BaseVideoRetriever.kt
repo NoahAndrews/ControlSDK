@@ -1,4 +1,4 @@
-package org.btelman.controlsdk.streaming.components
+package org.btelman.controlsdk.streaming.video.retrievers
 
 /**
  * Base class for retrieving frames to send to the video processor

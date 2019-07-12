@@ -1,4 +1,4 @@
-package org.btelman.controlsdk.streaming.components
+package org.btelman.controlsdk.streaming.video.processors
 
 /**
  * Process frames via FFmpeg

@@ -1,6 +1,7 @@
-package org.btelman.controlsdk.streaming.components
+package org.btelman.controlsdk.streaming.factories
 
 import android.os.Bundle
+import org.btelman.controlsdk.streaming.video.processors.BaseVideoProcessor
 
 /**
  * Handles creating the BaseVideoProcessor instance or putting the class in the main bundle

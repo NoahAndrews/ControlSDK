@@ -4,7 +4,10 @@ import android.content.Context
 import android.os.Bundle
 import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.models.Component
+import org.btelman.controlsdk.streaming.factories.VideoProcessorFactory
 import org.btelman.controlsdk.streaming.models.StreamInfo
+import org.btelman.controlsdk.streaming.video.processors.BaseVideoProcessor
+import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
 
 /**
  * Component that will handle the core of the video streaming.
