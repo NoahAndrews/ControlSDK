@@ -31,7 +31,7 @@ abstract class BaseVideoComponent : Component() {
     }
 
     override fun enableInternal() {
-        processor.enable(context?.get()!!, streamInfo)
+        processor.enable(context!!, streamInfo)
         retriever.enable(streamInfo)
         push(DO_FRAME)
     }

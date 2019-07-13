@@ -15,11 +15,9 @@ import java.util.concurrent.TimeUnit
  */
 class SystemDefaultTTSComponent : TTSBaseComponent() {
     private var ttobj: TextToSpeech? = null
-    private var context : Context? = null
 
     override fun onInitializeComponent(applicationContext: Context?, bundle: Bundle?) {
         super.onInitializeComponent(applicationContext, bundle)
-        context = applicationContext
     }
 
     override fun enableInternal() {

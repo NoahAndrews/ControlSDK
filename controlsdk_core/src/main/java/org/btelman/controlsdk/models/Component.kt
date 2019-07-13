@@ -13,7 +13,6 @@ import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.interfaces.ComponentEventListener
 import org.btelman.controlsdk.interfaces.IComponent
 import org.btelman.controlsdk.services.ControlSDKService
-import java.lang.ref.WeakReference
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -25,7 +24,7 @@ import kotlin.coroutines.resumeWithException
  * Ex. can be used as an interface for LEDs based off of control messages
  */
 abstract class Component : IComponent {
-    protected var context: WeakReference<Context?>? = null
+    protected var context: Context? = null
     protected var eventDispatcher : ComponentEventListener? = null
     private var handlerThread = HandlerThread(
             javaClass.simpleName
@@ -162,7 +161,7 @@ abstract class Component : IComponent {
      * Used to retrieve Context and provide an initialization bundle
      */
     open fun onInitializeComponent(applicationContext: Context?, bundle : Bundle?) {
-        context = WeakReference(applicationContext)
+        context = applicationContext
     }
 
     companion object {
