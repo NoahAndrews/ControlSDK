@@ -31,7 +31,7 @@ object VideoOutputStreamUtil {
     private fun processBitmap(outputStream: OutputStream, packet: ImageDataPacket): Boolean {
         return (packet.b as? Bitmap)?.compress(
             Bitmap.CompressFormat.JPEG,
-            100, outputStream) ?: false
+            100, outputStream) ?: false //TODO change quality?
     }
 
     private fun processByteArray(outputStream: OutputStream, it: ImageDataPacket) : Boolean{
@@ -42,7 +42,7 @@ object VideoOutputStreamUtil {
             ImageFormat.NV21 -> {
                 it.r?.let { rect ->
                     val im = YuvImage(it.b as ByteArray, it.format, rect.width(), rect.height(), null)
-                    return im.compressToJpeg(rect, 100, outputStream)
+                    return im.compressToJpeg(rect, 100, outputStream) //TODO change quality?
                 }
             }
             else -> {
