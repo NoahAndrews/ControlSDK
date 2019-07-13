@@ -16,7 +16,7 @@ import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
  *
  * Other classes will extend this for connectivity with specific integrations
  */
-abstract class BaseVideoComponent : Component() {
+open class VideoComponent : Component() {
     lateinit var streamInfo : StreamInfo
     lateinit var processor : BaseVideoProcessor
     lateinit var retriever : BaseVideoRetriever
