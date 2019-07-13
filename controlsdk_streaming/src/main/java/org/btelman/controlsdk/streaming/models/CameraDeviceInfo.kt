@@ -11,8 +11,6 @@ import android.os.Bundle
  *   See {@link MediaRecorder.AudioSource}
  */
 data class CameraDeviceInfo (var camera: String, var audio : Int = MediaRecorder.AudioSource.DEFAULT){
-
-
     fun toBundle() : Bundle{
         return addToExistingBundle(Bundle())
     }
@@ -34,9 +32,11 @@ data class CameraDeviceInfo (var camera: String, var audio : Int = MediaRecorder
         }
 
         @Throws(NullPointerException::class)
-        fun fromBundle(bundle: Bundle): CameraDeviceInfo {
-            return CameraDeviceInfo(bundle.getString("camera")!!,
-                bundle.getInt("audio"))
+        fun fromBundle(bundle: Bundle): CameraDeviceInfo? {
+            return bundle.getString("camera")?.let {camera ->
+                CameraDeviceInfo(camera,
+                    bundle.getInt("audio"))
+            } //?: null
         }
     }
 }

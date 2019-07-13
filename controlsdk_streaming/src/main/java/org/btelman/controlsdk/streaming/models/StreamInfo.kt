@@ -32,14 +32,22 @@ data class StreamInfo(val endpoint : String,
 
     companion object{
         @Throws(NullPointerException::class)
-        fun fromBundle(bundle : Bundle) : StreamInfo{
-            return StreamInfo(bundle.getString("endpoint")!!,
-                bundle.getInt("width"),
-                bundle.getInt("height"),
-                bundle.getInt("bitrate"),
-                bundle.getInt("framerate"),
-                Orientation.forValue(bundle.getInt("orientation"))!!,
-                CameraDeviceInfo.fromBundle(bundle.getBundle("deviceInfo")!!))
+        fun fromBundle(bundle : Bundle) : StreamInfo?{
+            val endpoint = bundle.getString("endpoint") ?: return null
+            val width = bundle.getInt("width")
+            val height = bundle.getInt("height")
+            val bitrate = bundle.getInt("bitrate")
+            val framerate = bundle.getInt("framerate")
+            val orientation = Orientation.forValue(bundle.getInt("orientation")) ?: return null
+            val cameraDeviceInfo = bundle.getBundle("deviceInfo")?.let {
+                CameraDeviceInfo.fromBundle(it)
+            } ?: return null
+
+            return StreamInfo(endpoint, width, height, bitrate, framerate, orientation, cameraDeviceInfo)
+        }
+
+        fun validateFields(vararg vals : Any?){
+
         }
     }
 }
