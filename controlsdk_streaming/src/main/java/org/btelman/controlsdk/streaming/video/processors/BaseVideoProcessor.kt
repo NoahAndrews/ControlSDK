@@ -1,6 +1,7 @@
 package org.btelman.controlsdk.streaming.video.processors
 
-import android.graphics.Bitmap
+import android.content.Context
+import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
 
 /**
@@ -8,7 +9,7 @@ import org.btelman.controlsdk.streaming.models.StreamInfo
  */
 abstract class BaseVideoProcessor{
 
-    open fun enable(streamInfo: StreamInfo){
+    open fun enable(context: Context, streamInfo: StreamInfo){
 
     }
 
@@ -16,6 +17,5 @@ abstract class BaseVideoProcessor{
 
     }
 
-    abstract fun processFrame(data : Array<Byte>) : Boolean
-    abstract fun processFrame(bitmap : Bitmap) : Boolean
+    abstract fun processData(packet: ImageDataPacket)
 }
