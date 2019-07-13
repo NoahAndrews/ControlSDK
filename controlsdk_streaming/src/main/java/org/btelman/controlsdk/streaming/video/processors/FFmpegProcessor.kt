@@ -1,10 +1,7 @@
 package org.btelman.controlsdk.streaming.video.processors
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.ImageFormat
 import android.graphics.Rect
-import android.graphics.YuvImage
 import android.util.Log
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler
@@ -12,6 +9,7 @@ import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunnin
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
+import org.btelman.controlsdk.streaming.utils.VideoOutputStreamUtil
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -44,38 +42,11 @@ class FFmpegProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler {
                 tryBootFFmpeg(packet.r)
             }
             try {
-                process?.let { _process ->
-                    (packet.b as? ByteArray)?.let { _ ->
-                        processByteArray(_process, packet)
-                    } ?: (packet.b as? Bitmap)?.compress(Bitmap.CompressFormat.JPEG,
-                        100, _process.outputStream)
-                }
+                VideoOutputStreamUtil.sendImageDataToProcess(process, packet)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
-    }
-
-    private fun processByteArray(_process: Process, it: ImageDataPacket) : Boolean{
-        val props = streamInfo ?: return false
-        try {
-            when (it.format) {
-                ImageFormat.JPEG -> {
-                    _process.outputStream.write(it.b as ByteArray)
-                }
-                ImageFormat.NV21 -> {
-                    val im = YuvImage(it.b as ByteArray, it.format, props.width, props.height, null)
-                    it.r?.let { rect ->
-                        return im.compressToJpeg(rect, 100, _process.outputStream)
-                    }
-                }
-                else -> {
-                }
-            }
-        } catch (e: Exception) {
-            return false
-        }
-        return true
     }
 
     /**

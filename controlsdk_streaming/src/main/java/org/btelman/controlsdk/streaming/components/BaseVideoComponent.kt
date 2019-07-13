@@ -31,7 +31,7 @@ abstract class BaseVideoComponent : Component() {
     }
 
     override fun enableInternal() {
-        processor.enable(streamInfo)
+        processor.enable(context?.get()!!, streamInfo)
         retriever.enable(streamInfo)
         push(DO_FRAME)
     }
@@ -50,7 +50,7 @@ abstract class BaseVideoComponent : Component() {
     }
 
     open fun fetchFrame() {
-        processor.processFrame(retriever.grabBitmap())
+        processor.processData(retriever.grabImageData())
         push(DO_FRAME)
     }
 

@@ -1,6 +1,6 @@
 package org.btelman.controlsdk.streaming.video.retrievers
 
-import android.graphics.Bitmap
+import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
 
 /**
@@ -15,6 +15,5 @@ abstract class BaseVideoRetriever {
 
     }
 
-    abstract fun grabFrameByteArray() : Array<Byte>
-    abstract fun grabBitmap() : Bitmap
+    abstract fun grabImageData() : ImageDataPacket
 }
