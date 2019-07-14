@@ -115,7 +115,6 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
                 val buffer = it.planes[0].buffer
                 val imageBytes = ByteArray(buffer.remaining())
                 buffer.get(imageBytes)
-                //push(imageBytes, ImageFormat.JPEG, null)
                 val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                 latestPackage = ImageDataPacket(bitmap)
             }
@@ -136,9 +135,6 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
             val texture = mStManager?.surfaceTexture!!
             texture.setDefaultBufferSize(height, width)
             mPreviewBuilder = mCameraDevice!!.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
-
-            //val previewSurface = Surface(texture)
-            //mPreviewBuilder!!.addTarget(previewSurface)
             mPreviewBuilder!!.addTarget(reader?.surface!!)
 
             mCameraDevice!!.createCaptureSession(listOf(/*previewSurface, */reader?.surface),
@@ -158,13 +154,6 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
         }
 
     }
-/*
-    class CaptureCallback : CameraCaptureSession.CaptureCallback() {
-        override fun onCaptureCompleted(session: CameraCaptureSession, request: CaptureRequest, result: TotalCaptureResult) {
-            super.onCaptureCompleted(session, request, result)
-            Log.d(TAG, "onCaptureCompleted")
-        }
-    }*/
 
     /**
      * Update the camera preview. [.startPreview] needs to be called in advance.

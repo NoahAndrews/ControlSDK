@@ -108,12 +108,6 @@ class FFmpegProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler {
         val props = streamInfo ?: return
         successCounter = 0
         status = ComponentStatus.CONNECTING
-        /*var xres = props.width
-        var yres = props.height
-        r?.let {
-            xres = r.width()
-            yres = r.height()
-        }*/
 
         val rotationOption = props.orientation.ordinal //leave blank
         val builder = StringBuilder()
