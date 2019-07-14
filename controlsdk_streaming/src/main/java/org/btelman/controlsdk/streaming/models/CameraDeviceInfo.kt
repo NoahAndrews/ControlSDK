@@ -31,6 +31,10 @@ data class CameraDeviceInfo (var camera: String, var audio : Int = MediaRecorder
             return CameraDeviceInfo("/dev/camera$id")
         }
 
+        fun getCameraId(value : String) : Int{
+            return value.substringAfter("/dev/camera", "0").toInt()
+        }
+
         @Throws(NullPointerException::class)
         fun fromBundle(bundle: Bundle): CameraDeviceInfo? {
             return bundle.getString("camera")?.let {camera ->

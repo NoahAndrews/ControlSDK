@@ -3,6 +3,7 @@ package org.btelman.controlsdk.streaming.video.retrievers.api16
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.hardware.Camera
+import org.btelman.controlsdk.streaming.models.CameraDeviceInfo
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.SurfaceTextureVideoRetriever
@@ -53,7 +54,11 @@ class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Camera.Pr
     override fun setupCamera(streamInfo : StreamInfo?){ //TODO actually use resolution from here?
         //TODO use StreamInfo camera id
         camera ?: run {
-            camera = Camera.open()
+            val cameraId = streamInfo?.deviceInfo?.camera?.let {
+                CameraDeviceInfo.getCameraId(it)
+            } ?: 0
+            
+            camera = Camera.open(cameraId)
             camera?.setDisplayOrientation(90)
         }
         camera?.let {
