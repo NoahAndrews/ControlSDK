@@ -25,7 +25,7 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
     private var width = 0
     private var height = 0
 
-    val reader : ImageReader? = null
+    var reader : ImageReader? = null
 
     private var mPreviewBuilder: CaptureRequest.Builder? = null
     /**
@@ -66,7 +66,7 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
         startBackgroundThread()
         width = streamInfo?.width ?: 640
         height = streamInfo?.height ?: 640
-        ImageReader.newInstance(width, height, ImageFormat.JPEG, 10)
+        reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 10)
         reader?.setOnImageAvailableListener(this, mBackgroundHandler)
         val manager = context!!.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         try {
@@ -87,6 +87,7 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
 
     override fun releaseCamera() {
         stopBackgroundThread()
+        reader?.close()
     }
 
     private var latestPackage : ImageDataPacket? = null
@@ -140,7 +141,7 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
             //mPreviewBuilder!!.addTarget(previewSurface)
             mPreviewBuilder!!.addTarget(reader?.surface!!)
 
-            mCameraDevice!!.createCaptureSession(listOf(/*previewSurface, */reader.surface),
+            mCameraDevice!!.createCaptureSession(listOf(/*previewSurface, */reader?.surface),
                     object : CameraCaptureSession.StateCallback() {
 
                         override fun onConfigured(@NonNull session: CameraCaptureSession) {
