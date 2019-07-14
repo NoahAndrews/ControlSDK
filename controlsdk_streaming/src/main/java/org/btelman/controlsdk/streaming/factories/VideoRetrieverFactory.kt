@@ -10,7 +10,7 @@ object VideoRetrieverFactory {
     fun findRetriever(bundle: Bundle): BaseVideoRetriever? {
         getClassFromBundle(bundle)?.let {
             (it as? Class<*>)?.let {clazz ->
-                if(clazz.isAssignableFrom(BaseVideoRetriever::class.java)){
+                if(BaseVideoRetriever::class.java.isAssignableFrom(clazz)){
                     return clazz.newInstance() as BaseVideoRetriever
                 }
             }

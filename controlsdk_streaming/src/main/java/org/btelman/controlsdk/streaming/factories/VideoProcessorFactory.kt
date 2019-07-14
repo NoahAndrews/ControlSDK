@@ -9,9 +9,9 @@ import org.btelman.controlsdk.streaming.video.processors.FFmpegProcessor
  */
 object VideoProcessorFactory {
     fun findProcessor(bundle: Bundle): BaseVideoProcessor? {
-        bundle.getSerializable("videoProcessorClass")?.let {
+        getClassFromBundle(bundle)?.let {
             (it as? Class<*>)?.let {clazz ->
-                if(clazz.isAssignableFrom(BaseVideoProcessor::class.java)){
+                if(BaseVideoProcessor::class.java.isAssignableFrom(clazz)){
                     return clazz.newInstance() as BaseVideoProcessor
                 }
             }
@@ -21,6 +21,10 @@ object VideoProcessorFactory {
 
     fun <T : BaseVideoProcessor> putClassInBundle(clazz: Class<T>, bundle: Bundle){
         bundle.putSerializable("videoProcessorClass", clazz)
+    }
+
+    fun getClassFromBundle(bundle: Bundle) : Class<*>?{
+        return bundle.getSerializable("videoProcessorClass") as? Class<*>
     }
 
     val DEFAULT = FFmpegProcessor::class.java
