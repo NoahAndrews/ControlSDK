@@ -1,13 +1,12 @@
 package org.btelman.controlsdk.streaming.factories
 
 import android.os.Bundle
-import org.btelman.controlsdk.streaming.models.CameraDeviceInfo
+import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
 import org.btelman.controlsdk.streaming.video.retrievers.api16.Camera1SurfaceTextureComponent
 import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2SurfaceTextureComponent
 
 object VideoRetrieverFactory {
-
     fun findRetriever(bundle: Bundle): BaseVideoRetriever? {
         getClassFromBundle(bundle)?.let {
             (it as? Class<*>)?.let {clazz ->
@@ -16,15 +15,15 @@ object VideoRetrieverFactory {
                 }
             }
         }
-        CameraDeviceInfo.fromBundle(bundle)?.also {
+        StreamInfo.fromBundle(bundle)?.also {streamInfo ->
             when {
-                it.camera.contains("/dev/video") -> TODO("USB Camera retriever class")
-                it.camera.contains("/dev/camera") -> return if(Camera2SurfaceTextureComponent.isSupported()){
+                streamInfo.deviceInfo.camera.contains("/dev/video") -> TODO("USB Camera retriever class")
+                streamInfo.deviceInfo.camera.contains("/dev/camera") -> return if(Camera2SurfaceTextureComponent.isSupported()){
                     Camera2SurfaceTextureComponent()
                 } else{
                     Camera1SurfaceTextureComponent()
                 }
-                it.camera.contains("http") -> TODO("Camera stream from other device")
+                streamInfo.deviceInfo.camera.contains("http") -> TODO("Camera stream from other device")
             }
         }
         return DEFAULT.newInstance()
