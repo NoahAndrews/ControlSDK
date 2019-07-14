@@ -21,6 +21,10 @@ data class CameraDeviceInfo (var camera: String, var audio : Int = MediaRecorder
         return bundle
     }
 
+    fun getCameraId() : Int{
+        return camera.substringAfter("/dev/camera", "0").toInt()
+    }
+
     companion object{
         /**
          * Use the same DeviceInfo constructor by using /dev/camera#,
@@ -29,10 +33,6 @@ data class CameraDeviceInfo (var camera: String, var audio : Int = MediaRecorder
          */
         fun fromCamera(id : Int = 0) : CameraDeviceInfo{
             return CameraDeviceInfo("/dev/camera$id")
-        }
-
-        fun getCameraId(value : String) : Int{
-            return value.substringAfter("/dev/camera", "0").toInt()
         }
 
         @Throws(NullPointerException::class)

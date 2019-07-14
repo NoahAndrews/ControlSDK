@@ -70,8 +70,10 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
         reader?.setOnImageAvailableListener(this, mBackgroundHandler)
         val manager = context!!.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         try {
-            val cameraId = manager.cameraIdList[0]
-            manager.openCamera(cameraId, mStateCallback, null)
+            val list = manager.cameraIdList
+            val requestedId = streamInfo?.deviceInfo?.getCameraId()?:0
+            val cameraId = if(requestedId < list.size) requestedId else 0
+            manager.openCamera(list[cameraId], mStateCallback, null)
         } catch (e: CameraAccessException) {
             e.printStackTrace()
             //TODO throw error and kill service?
