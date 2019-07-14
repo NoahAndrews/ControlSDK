@@ -3,13 +3,18 @@ package org.btelman.controlsdk.streaming.video.processors
 import android.content.Context
 import android.graphics.Rect
 import android.util.Log
+import android.widget.Toast
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler
+import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.utils.VideoOutputStreamUtil
+import java.io.PrintStream
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -27,13 +32,26 @@ class FFmpegProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler {
     override fun enable(context: Context, streamInfo: StreamInfo) {
         super.enable(context, streamInfo)
         this.streamInfo = streamInfo
-        ffmpeg = FFmpeg.getInstance(context)
+        streaming.set(true)
     }
 
     override fun disable() {
         super.disable()
         streamInfo = null
         ffmpeg = null
+        streaming.set(false)
+        killFFmpeg()
+    }
+
+    /**
+     * Kill FFmpeg by sending garbage data to the outputStream since it does not close on its own
+     * correctly when closing the outputStream
+     */
+    private fun killFFmpeg() {
+        val printStream = PrintStream(process?.outputStream)
+        printStream.print("die") //does not matter what is here. Any garbage data should do the trick
+        printStream.flush()
+        printStream.close()
     }
 
     override fun processData(packet: ImageDataPacket) {
