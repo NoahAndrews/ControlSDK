@@ -9,6 +9,8 @@ import kotlinx.android.synthetic.main.activity_demo.*
 import org.btelman.controlsdk.enums.Operation
 import org.btelman.controlsdk.models.ComponentHolder
 import org.btelman.controlsdk.services.ControlSDKService
+import org.btelman.controlsdk.streaming.components.VideoComponent
+import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.tts.SystemDefaultTTSComponent
 import org.btelman.controlsdk.viewModels.ControlSDKViewModel
 
@@ -64,8 +66,13 @@ class DemoActivity : AppCompatActivity() {
     private fun createComponentHolders() {
         val tts = ComponentHolder(SystemDefaultTTSComponent::class.java, null)
         val demoComponent = ComponentHolder(DemoComponent::class.java, null)
+        val streamInfo = StreamInfo(
+            "http://dev.remo.tv:1567/transmit?name=chan-eb194a7e-6a4f-4ae7-8112-b48a16032d91-video"
+        )
+        val videoComponent = ComponentHolder(VideoComponent::class.java, streamInfo.toBundle())
         arrayList.add(tts)
         arrayList.add(demoComponent)
+        arrayList.add(videoComponent)
     }
 
     fun parseColorForOperation(state : Operation?) : Int{
