@@ -2,7 +2,6 @@ package org.btelman.controlsdk.streaming.factories
 
 import android.os.Bundle
 import org.btelman.controlsdk.streaming.models.CameraDeviceInfo
-import org.btelman.controlsdk.streaming.video.processors.BaseVideoProcessor
 import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
 import org.btelman.controlsdk.streaming.video.retrievers.api16.Camera1SurfaceTextureComponent
 import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2SurfaceTextureComponent
@@ -10,7 +9,7 @@ import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2SurfaceTex
 object VideoRetrieverFactory {
 
     fun findRetriever(bundle: Bundle): BaseVideoRetriever? {
-        bundle.getSerializable("videoProcessorClass")?.let {
+        getClassFromBundle(bundle)?.let {
             (it as? Class<*>)?.let {clazz ->
                 if(clazz.isAssignableFrom(BaseVideoRetriever::class.java)){
                     return clazz.newInstance() as BaseVideoRetriever
@@ -31,10 +30,13 @@ object VideoRetrieverFactory {
         return DEFAULT.newInstance()
     }
 
-    fun <T : BaseVideoProcessor> putClassInBundle(clazz: Class<T>, bundle: Bundle){
+    fun <T : BaseVideoRetriever> putClassInBundle(clazz: Class<T>, bundle: Bundle){
         bundle.putSerializable("videoRetrieverClass", clazz)
     }
 
-    //TODO replace with non-abstract class when we get FFMpeg in here
-    val DEFAULT = BaseVideoRetriever::class.java
+    fun getClassFromBundle(bundle: Bundle) : Class<*>?{
+        return bundle.getSerializable("videoRetrieverClass") as? Class<*>
+    }
+
+    val DEFAULT = Camera1SurfaceTextureComponent::class.java
 }

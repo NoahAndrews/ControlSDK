@@ -62,6 +62,7 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
 
     @SuppressLint("MissingPermission") //Already handled. No way to call this
     override fun setupCamera(streamInfo : StreamInfo?) {
+        //TODO use StreamInfo camera id
         startBackgroundThread()
         width = streamInfo?.width ?: 640
         height = streamInfo?.height ?: 640
