@@ -32,7 +32,7 @@ open class VideoComponent : Component() {
 
     override fun enableInternal() {
         processor.enable(context!!, streamInfo)
-        retriever.enable(streamInfo)
+        retriever.enable(context!!, streamInfo)
         push(DO_FRAME)
     }
 
@@ -50,7 +50,9 @@ open class VideoComponent : Component() {
     }
 
     open fun fetchFrame() {
-        processor.processData(retriever.grabImageData())
+        retriever.grabImageData()?.let {
+            processor.processData(it)
+        }
         push(DO_FRAME)
     }
 
