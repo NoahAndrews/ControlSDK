@@ -51,7 +51,6 @@ class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Camera.Pr
     }
 
     override fun setupCamera(streamInfo : StreamInfo?){ //TODO actually use resolution from here?
-        //TODO use StreamInfo camera id
         camera ?: run {
             val cameraId = streamInfo?.deviceInfo?.getCameraId()?:0
             camera = Camera.open(cameraId)
