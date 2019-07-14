@@ -31,6 +31,23 @@ class FFmpegProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler {
 
     override fun enable(context: Context, streamInfo: StreamInfo) {
         super.enable(context, streamInfo)
+        ffmpeg = FFmpeg.getInstance(context.applicationContext)
+        val latch = CountDownLatch(1)
+        try {
+            ffmpeg?.loadBinary(object : LoadBinaryResponseHandler() {
+                override fun onFinish() {
+                    super.onFinish()
+                    Log.d("FFMPEG", "onFinish")
+                    latch.countDown()
+                }
+            })
+        } catch (e: FFmpegNotSupportedException) {
+            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+            e.printStackTrace()
+            //TODO throw error?
+            return
+        }
+        latch.await()
         this.streamInfo = streamInfo
         streaming.set(true)
     }
@@ -158,7 +175,7 @@ class FFmpegProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler {
 
     companion object{
         const val shouldLog = true
-        const val LOGTAG = "FFmpegProcessor"
+        const val LOGTAG = "FFmpeg"
         val UUID = java.util.UUID.randomUUID().toString()
     }
 }
