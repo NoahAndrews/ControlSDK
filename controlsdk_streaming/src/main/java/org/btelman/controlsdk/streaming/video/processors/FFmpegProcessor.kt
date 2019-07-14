@@ -122,7 +122,7 @@ class FFmpegProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler {
             else builder.append(",transpose=1")
         }
         val bitrate = props.bitrate
-        val command = "-f image2pipe -codec:v mjpeg -i - -f mpegts -framerate ${props.framerate} -codec:v mpeg1video -b ${bitrate}k -minrate ${bitrate}k -maxrate ${bitrate}k -bufsize ${bitrate/1.5}k -bf 0 -tune zerolatency -preset ultrafast -pix_fmt yuv420p $builder http://dev.remo.tv:1567/transmit?name=chan-eb194a7e-6a4f-4ae7-8112-b48a16032d91-video"
+        val command = "-f image2pipe -codec:v mjpeg -i - -f mpegts -framerate ${props.framerate} -codec:v mpeg1video -b ${bitrate}k -minrate ${bitrate}k -maxrate ${bitrate}k -bufsize ${bitrate/1.5}k -bf 0 -tune zerolatency -preset ultrafast -pix_fmt yuv420p $builder ${props.endpoint}"
         ffmpeg?.execute(UUID, null, command.split(" ").toTypedArray(), this)
     }
 
