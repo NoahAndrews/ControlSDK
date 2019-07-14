@@ -37,8 +37,8 @@ open class VideoComponent : Component() {
     }
 
     override fun disableInternal() {
-        processor.disable()
         retriever.disable()
+        processor.disable()
     }
 
     override fun handleMessage(message: Message): Boolean {
