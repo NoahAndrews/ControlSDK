@@ -1,23 +1,26 @@
 package org.btelman.controlsdk.streaming.components
 
-import org.btelman.controlsdk.enums.ComponentType
-import org.btelman.controlsdk.models.Component
+import android.content.Context
+import android.os.Bundle
+import org.btelman.controlsdk.streaming.audio.processors.BaseAudioProcessor
+import org.btelman.controlsdk.streaming.audio.retrievers.BaseAudioRetriever
+import org.btelman.controlsdk.streaming.factories.AudioProcessorFactory
+import org.btelman.controlsdk.streaming.factories.AudioRetrieverFactory
 
 /**
  * Audio component to handle doing stuff with audio
  */
-open class AudioComponent : Component() {
-
-    override fun enableInternal() {
-
+open class AudioComponent : StreamComponent<BaseAudioRetriever, BaseAudioProcessor>() {
+    override fun onInitializeComponent(applicationContext: Context?, bundle: Bundle?) {
+        super.onInitializeComponent(applicationContext, bundle)
+        bundle!!
+        processor = AudioProcessorFactory.findProcessor(bundle) ?: throw IllegalArgumentException("unable to resolve audio processor")
+        retriever = AudioRetrieverFactory.findRetriever(bundle) ?: throw IllegalArgumentException("unable to resolve audio retriever")
     }
 
-    override fun disableInternal() {
-
+    override fun doWorkLoop() {
+        retriever.retrieveAudioByteArray()?.let {
+            processor.processAudioByteArray(it)
+        }
     }
-
-    override fun getType(): ComponentType {
-        return ComponentType.STREAMING
-    }
-
 }

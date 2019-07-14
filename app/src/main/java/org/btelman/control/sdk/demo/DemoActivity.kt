@@ -68,6 +68,7 @@ class DemoActivity : AppCompatActivity() {
         val demoComponent = ComponentHolder(DemoComponent::class.java, null)
         val streamInfo = StreamInfo(
             "http://dev.remo.tv:1567/transmit?name=chan-eb194a7e-6a4f-4ae7-8112-b48a16032d91-video"
+            //,deviceInfo = CameraDeviceInfo.fromCamera(1)
         )
         val bundle = Bundle()
         streamInfo.addToExistingBundle(bundle)
