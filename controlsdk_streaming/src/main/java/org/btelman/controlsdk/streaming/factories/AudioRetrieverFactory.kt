@@ -1,15 +1,15 @@
 package org.btelman.controlsdk.streaming.factories
 
 import android.os.Bundle
+import org.btelman.controlsdk.streaming.audio.retrievers.BaseAudioRetriever
 import org.btelman.controlsdk.streaming.video.processors.BaseVideoProcessor
-import org.btelman.controlsdk.streaming.video.processors.FFmpegProcessor
 
 /**
  * Handles creating the BaseVideoProcessor instance or putting the class in the main bundle
  */
-object VideoProcessorFactory {
-    fun findProcessor(bundle: Bundle): BaseVideoProcessor? {
-        BaseFactory.checkForAndInitClass(getClassFromBundle(bundle), BaseVideoProcessor::class.java)?.let {
+object AudioRetrieverFactory {
+    fun findRetriever(bundle: Bundle): BaseAudioRetriever? {
+        BaseFactory.checkForAndInitClass(getClassFromBundle(bundle), BaseAudioRetriever::class.java)?.let {
             return it
         }
         return DEFAULT.newInstance()
@@ -23,6 +23,6 @@ object VideoProcessorFactory {
         return BaseFactory.getClassFromBundle(bundle, BUNDLE_ID)
     }
 
-    val DEFAULT = FFmpegProcessor::class.java
-    const val BUNDLE_ID = "videoProcessorClass"
+    val DEFAULT = BaseAudioRetriever::class.java
+    const val BUNDLE_ID = "audioRetrieverClass"
 }

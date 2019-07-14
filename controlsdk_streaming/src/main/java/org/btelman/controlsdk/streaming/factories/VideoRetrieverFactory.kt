@@ -8,12 +8,8 @@ import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2SurfaceTex
 
 object VideoRetrieverFactory {
     fun findRetriever(bundle: Bundle): BaseVideoRetriever? {
-        getClassFromBundle(bundle)?.let {
-            (it as? Class<*>)?.let {clazz ->
-                if(BaseVideoRetriever::class.java.isAssignableFrom(clazz)){
-                    return clazz.newInstance() as BaseVideoRetriever
-                }
-            }
+        BaseFactory.checkForAndInitClass(getClassFromBundle(bundle), BaseVideoRetriever::class.java)?.let {
+            return it
         }
         StreamInfo.fromBundle(bundle)?.also {streamInfo ->
             when {
@@ -30,12 +26,13 @@ object VideoRetrieverFactory {
     }
 
     fun <T : BaseVideoRetriever> putClassInBundle(clazz: Class<T>, bundle: Bundle){
-        bundle.putSerializable("videoRetrieverClass", clazz)
+        BaseFactory.putClassInBundle(bundle, BUNDLE_ID, clazz)
     }
 
     fun getClassFromBundle(bundle: Bundle) : Class<*>?{
-        return bundle.getSerializable("videoRetrieverClass") as? Class<*>
+        return BaseFactory.getClassFromBundle(bundle, BUNDLE_ID)
     }
 
     val DEFAULT = Camera1SurfaceTextureComponent::class.java
+    const val BUNDLE_ID = "videoRetrieverClass"
 }
