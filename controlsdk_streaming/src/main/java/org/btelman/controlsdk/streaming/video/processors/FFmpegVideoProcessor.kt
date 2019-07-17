@@ -103,11 +103,7 @@ class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler 
         if(shouldLog)
             Log.d(LOGTAG, "onProgress : $message")
         successCounter++
-        status = when {
-            successCounter > 5 -> ComponentStatus.STABLE
-            successCounter > 2 -> ComponentStatus.INTERMITTENT
-            else -> ComponentStatus.CONNECTING
-        }
+        status = ComponentStatus.STABLE
     }
 
     override fun onFailure(message: String?) {
