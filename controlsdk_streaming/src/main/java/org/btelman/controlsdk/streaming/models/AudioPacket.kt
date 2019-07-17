@@ -3,15 +3,14 @@ package org.btelman.controlsdk.streaming.models
 data class AudioPacket(val b : ByteArray,
                        val timecode : Long = System.currentTimeMillis()) {
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AudioPacket
-
-        if (!b.contentEquals(other.b)) return false
-        if (timecode != other.timecode) return false
-
-        return true
+        return when {
+            this === other -> true
+            javaClass != other?.javaClass -> false
+            else -> {
+                other as AudioPacket
+                b.contentEquals(other.b) && timecode == other.timecode
+            }
+        }
     }
 
     override fun hashCode(): Int {
