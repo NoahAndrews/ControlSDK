@@ -24,6 +24,7 @@ import kotlin.coroutines.resumeWithException
  * Ex. can be used as an interface for LEDs based off of control messages
  */
 abstract class Component : IComponent {
+    protected var context: Context? = null
     protected var eventDispatcher : ComponentEventListener? = null
     private var handlerThread = HandlerThread(
             javaClass.simpleName
@@ -160,7 +161,7 @@ abstract class Component : IComponent {
      * Used to retrieve Context and provide an initialization bundle
      */
     open fun onInitializeComponent(applicationContext: Context?, bundle : Bundle?) {
-
+        context = applicationContext
     }
 
     companion object {

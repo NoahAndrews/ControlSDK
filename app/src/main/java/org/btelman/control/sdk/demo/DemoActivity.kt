@@ -9,6 +9,10 @@ import kotlinx.android.synthetic.main.activity_demo.*
 import org.btelman.controlsdk.enums.Operation
 import org.btelman.controlsdk.models.ComponentHolder
 import org.btelman.controlsdk.services.ControlSDKService
+import org.btelman.controlsdk.streaming.components.AudioComponent
+import org.btelman.controlsdk.streaming.components.VideoComponent
+import org.btelman.controlsdk.streaming.models.CameraDeviceInfo
+import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.tts.SystemDefaultTTSComponent
 import org.btelman.controlsdk.viewModels.ControlSDKViewModel
 
@@ -64,8 +68,21 @@ class DemoActivity : AppCompatActivity() {
     private fun createComponentHolders() {
         val tts = ComponentHolder(SystemDefaultTTSComponent::class.java, null)
         val demoComponent = ComponentHolder(DemoComponent::class.java, null)
+        val streamInfo = StreamInfo(
+            "http://dev.remo.tv:1567/transmit?name=chan-eb194a7e-6a4f-4ae7-8112-b48a16032d91-video",
+            "http://dev.remo.tv:1567/transmit?name=chan-eb194a7e-6a4f-4ae7-8112-b48a16032d91-audio"
+            ,deviceInfo = CameraDeviceInfo.fromCamera(0)
+        )
+        val bundle = Bundle()
+        streamInfo.addToExistingBundle(bundle)
+        //VideoRetrieverFactory.putClassInBundle(DummyCanvasRetriever::class.java, bundle)
+        //VideoProcessorFactory.putClassInBundle(DummyVideoProcessor::class.java, bundle)
+        val videoComponent = ComponentHolder(VideoComponent::class.java, bundle)
+        val audioComponent = ComponentHolder(AudioComponent::class.java, bundle)
         arrayList.add(tts)
         arrayList.add(demoComponent)
+        arrayList.add(videoComponent)
+        arrayList.add(audioComponent)
     }
 
     fun parseColorForOperation(state : Operation?) : Int{
