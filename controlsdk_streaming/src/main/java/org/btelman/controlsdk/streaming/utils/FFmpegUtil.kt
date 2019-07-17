@@ -1,6 +1,7 @@
 package org.btelman.controlsdk.streaming.utils
 
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg
+import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler
 import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException
 import java.io.PrintStream
@@ -39,5 +40,11 @@ object FFmpegUtil {
         }
         latch.await()
         return true
+    }
+
+    fun execute(ffmpeg: FFmpeg?, uuid: String, command: String, responseHandler: FFmpegExecuteResponseHandler) {
+        ffmpeg?.execute(
+            uuid, null, command.split(" ")
+                .toTypedArray(), responseHandler)
     }
 }

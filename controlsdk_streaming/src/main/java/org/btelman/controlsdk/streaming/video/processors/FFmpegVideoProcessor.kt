@@ -7,6 +7,7 @@ import com.github.hiteshsondhi88.libffmpeg.FFmpeg
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException
 import org.btelman.controlsdk.enums.ComponentStatus
+import org.btelman.controlsdk.streaming.audio.processors.FFmpegAudioProcessor
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.utils.FFmpegUtil
@@ -87,7 +88,7 @@ class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler 
         }
         val bitrate = props.bitrate
         val command = "-f image2pipe -codec:v mjpeg -i - -f mpegts -framerate ${props.framerate} -codec:v mpeg1video -b ${bitrate}k -minrate ${bitrate}k -maxrate ${bitrate}k -bufsize ${bitrate/1.5}k -bf 0 -tune zerolatency -preset ultrafast -pix_fmt yuv420p $builder ${props.endpoint}"
-        ffmpeg?.execute(UUID, null, command.split(" ").toTypedArray(), this)
+        FFmpegUtil.execute(ffmpeg, FFmpegAudioProcessor.UUID, command, this)
     }
 
     override fun onStart() {

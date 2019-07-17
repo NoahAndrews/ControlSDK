@@ -70,8 +70,7 @@ class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHandler 
                 val command = "-f s16be -i - -f mpegts -codec:a mp2 -b:a ${bitrate}k -ar 44100" +
                         "$separator-muxdelay 0.001 -filter:a volume=$volumeBoost" +
                         "$separator$endpoint"
-                ffmpeg?.execute(UUID, null, command.split(" ")
-                        .toTypedArray(), this)
+                FFmpegUtil.execute(ffmpeg, UUID, command, this)
             }
         } catch (e: Exception) {
             status = ComponentStatus.ERROR

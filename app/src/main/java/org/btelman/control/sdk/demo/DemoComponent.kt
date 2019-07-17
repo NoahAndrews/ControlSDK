@@ -1,20 +1,16 @@
 package org.btelman.control.sdk.demo
 
-import android.content.Context
-import android.os.Bundle
 import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.models.Component
 import org.btelman.controlsdk.models.ComponentEventObject
 import org.btelman.controlsdk.tts.TTSBaseComponent
 
 /**
- * Created by Brendon on 7/2/2019.
+ * Demo
  */
 class DemoComponent : Component() {
 
-    override fun onInitializeComponent(applicationContext: Context?, bundle: Bundle?) {
-        super.onInitializeComponent(applicationContext, bundle)
-    }
+    //override fun onInitializeComponent available
 
     override fun enableInternal() {
         handler.post {

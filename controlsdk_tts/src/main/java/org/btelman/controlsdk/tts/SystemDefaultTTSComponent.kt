@@ -1,8 +1,6 @@
 package org.btelman.controlsdk.tts
 
-import android.content.Context
 import android.os.Build
-import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.models.ComponentEventObject
@@ -15,10 +13,6 @@ import java.util.concurrent.TimeUnit
  */
 class SystemDefaultTTSComponent : TTSBaseComponent() {
     private var ttobj: TextToSpeech? = null
-
-    override fun onInitializeComponent(applicationContext: Context?, bundle: Bundle?) {
-        super.onInitializeComponent(applicationContext, bundle)
-    }
 
     override fun enableInternal() {
         val latch = CountDownLatch(1)
