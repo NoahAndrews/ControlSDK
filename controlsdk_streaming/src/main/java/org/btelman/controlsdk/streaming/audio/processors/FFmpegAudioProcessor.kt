@@ -8,7 +8,6 @@ import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.utils.FFmpegUtil
 import org.btelman.controlsdk.streaming.utils.OutputStreamUtil
-import java.nio.ByteBuffer
 import java.util.concurrent.atomic.AtomicBoolean
 
 
@@ -53,20 +52,6 @@ class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHandler 
         process?.let { _process ->
             OutputStreamUtil.handleSendByteArray(_process.outputStream, data)
         }
-    }
-
-    fun ShortToByte_ByteBuffer_Method(input: ShortArray): ByteArray {
-        var index= 0
-        val iterations = input.size
-
-        val bb = ByteBuffer.allocate(input.size * 2)
-
-        while (index != iterations) {
-            bb.putShort(input[index])
-            ++index
-        }
-
-        return bb.array()
     }
 
     private fun ensureFFmpegStarted() {

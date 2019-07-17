@@ -10,6 +10,7 @@ import java.util.concurrent.CountDownLatch
  * Utility functions for FFmpeg
  */
 object FFmpegUtil {
+
     /**
      * Kill FFmpeg by sending garbage data to the outputStream since it does not close on its own
      * correctly when closing the outputStream

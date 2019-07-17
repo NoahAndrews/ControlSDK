@@ -2,6 +2,7 @@ package org.btelman.controlsdk.streaming
 import android.os.Bundle
 import androidx.test.runner.AndroidJUnit4
 import org.btelman.controlsdk.streaming.factories.VideoRetrieverFactory
+import org.btelman.controlsdk.streaming.models.CameraDeviceInfo
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
@@ -47,7 +48,8 @@ class VideoRetrieverFactoryAndroidTest {
     @Test
     fun testAPI21Camera(){
         Assume.assumeTrue(Camera2SurfaceTextureComponent.isSupported())
-        val streamInfo = StreamInfo("http://example.com:3000") //testing default parameters. Should use either Camera1SurfaceTextureComponent or Camera2SurfaceTextureComponent
+        val streamInfo = StreamInfo("http://example.com:3000",
+            deviceInfo = CameraDeviceInfo.fromCamera(0))
         val camera = VideoRetrieverFactory.findRetriever(streamInfo.toBundle())
         Assert.assertTrue(camera is Camera2SurfaceTextureComponent)
     }

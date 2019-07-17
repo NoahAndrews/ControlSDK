@@ -2,6 +2,7 @@ package org.btelman.controlsdk.streaming.factories
 
 import android.os.Bundle
 import org.btelman.controlsdk.streaming.audio.processors.BaseAudioProcessor
+import org.btelman.controlsdk.streaming.audio.processors.FFmpegAudioProcessor
 
 /**
  * Handles creating the BaseVideoProcessor instance or putting the class in the main bundle
@@ -22,6 +23,6 @@ object AudioProcessorFactory {
         return BaseFactory.getClassFromBundle(bundle, BUNDLE_ID)
     }
 
-    val DEFAULT = BaseAudioProcessor::class.java
+    val DEFAULT = FFmpegAudioProcessor::class.java
     const val BUNDLE_ID = "audioProcessorClass"
 }
