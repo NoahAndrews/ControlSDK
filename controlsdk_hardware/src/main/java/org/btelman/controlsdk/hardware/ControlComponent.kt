@@ -1,6 +1,5 @@
 package org.btelman.controlsdk.hardware
 
-import android.content.Context
 import android.util.Log
 import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.models.Component
@@ -12,12 +11,7 @@ import org.btelman.controlsdk.models.ComponentEventObject
  *
  *  Subscribes to EventManager.COMMAND and EventManager.STOP_EVENT automatically
  */
-abstract class ControlComponent(context: Context) : Component(context){
-
-    override fun getType(): ComponentType {
-        return ComponentType.HARDWARE
-    }
-
+abstract class ControlComponent : Component(){
     /**
      * Called when any command is received, including but not limited to strings
      */
@@ -43,7 +37,7 @@ abstract class ControlComponent(context: Context) : Component(context){
     }
 
     override fun handleExternalMessage(message: ComponentEventObject): Boolean {
-        if(message.type == ComponentType.CONTROL_SOCKET){
+        if(message.type == ComponentType.CUSTOM){
             when(message.what){
                 EVENT_MAIN -> onCommandInternal(message.data)
             }
@@ -70,6 +64,10 @@ abstract class ControlComponent(context: Context) : Component(context){
             Log.d("ControlComponent","sendToDevice")
             eventDispatcher?.handleMessage(getType(), EVENT_MAIN, byteArray, this)
         }
+    }
+
+    override fun getType(): ComponentType {
+        return ComponentType.HARDWARE
     }
 
     companion object {

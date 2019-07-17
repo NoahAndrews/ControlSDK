@@ -1,6 +1,5 @@
 package org.btelman.controlsdk.hardware.protocols
 
-import android.content.Context
 import com.google.common.primitives.Bytes.concat
 import org.btelman.controlsdk.hardware.ControlComponent
 
@@ -9,7 +8,7 @@ import org.btelman.controlsdk.hardware.ControlComponent
  *
  * This protocol was used in earlier FIRST Tech Challenge seasons
  */
-class NXTJoystickDriverProtocol(context: Context) : ControlComponent(context) {
+class NXTJoystickDriverProtocol : ControlComponent() {
 
     override fun onStringCommand(command: String) {
         super.onStringCommand(command)

@@ -3,7 +3,9 @@ package org.btelman.controlsdk.hardware.interfaces
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import org.btelman.controlsdk.enums.ComponentStatus
+import org.btelman.controlsdk.utils.BundleUtil
 
 /**
  * Connection interface for outbound connections.
@@ -52,4 +54,21 @@ interface CommunicationInterface{
     fun receivedComponentSetupDetails(context: Context, intent: Intent?)
     fun isConnected() : Boolean
     fun send(byteArray: ByteArray) : Boolean
+
+    companion object{
+        fun fromBundle(bundle : Bundle) : Class<*>{
+            val clazz = BundleUtil.getClassFromBundle(bundle, BUNDLE_ID)
+            //yes this will crash, that is what I want for now
+            assert(BundleUtil.checkIfClassMatches(clazz, CommunicationInterface::class.java))
+            return clazz!!
+        }
+
+        fun init(clazz: Class<*>) : CommunicationInterface{
+            return clazz.newInstance() as CommunicationInterface
+        }
+
+        const val BUNDLE_ID = "hardware.CommunicationInterface"
+    }
 }
+
+

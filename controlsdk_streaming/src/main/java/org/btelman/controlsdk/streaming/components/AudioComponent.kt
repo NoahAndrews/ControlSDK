@@ -11,7 +11,7 @@ import org.btelman.controlsdk.streaming.factories.AudioRetrieverFactory
  * Audio component to handle doing stuff with audio
  */
 open class AudioComponent : StreamComponent<BaseAudioRetriever, BaseAudioProcessor>() {
-    override fun onInitializeComponent(applicationContext: Context?, bundle: Bundle?) {
+    override fun onInitializeComponent(applicationContext: Context, bundle: Bundle?) {
         super.onInitializeComponent(applicationContext, bundle)
         bundle!!
         processor = AudioProcessorFactory.findProcessor(bundle) ?: throw IllegalArgumentException("unable to resolve audio processor")

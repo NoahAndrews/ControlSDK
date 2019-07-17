@@ -14,7 +14,7 @@ import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
  */
 open class VideoComponent : StreamComponent<BaseVideoRetriever, BaseVideoProcessor>()  {
 
-    override fun onInitializeComponent(applicationContext: Context?, bundle: Bundle?) {
+    override fun onInitializeComponent(applicationContext: Context, bundle: Bundle?) {
         super.onInitializeComponent(applicationContext, bundle)
         bundle!!
         processor = VideoProcessorFactory.findProcessor(bundle) ?: throw IllegalArgumentException("unable to resolve video processor")

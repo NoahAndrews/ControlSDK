@@ -1,6 +1,5 @@
 package org.btelman.controlsdk.hardware.protocols
 
-import android.content.Context
 import android.util.Log
 import org.btelman.controlsdk.hardware.ControlComponent
 import java.nio.charset.Charset
@@ -10,8 +9,7 @@ import java.nio.charset.Charset
  *
  * Added in case somebody runs into a board that cannot properly handle parsing a multi character command
  */
-class ArduinoSendSingleCharProtocol(context: Context) :
-        ControlComponent(context) {
+class ArduinoSendSingleCharProtocol : ControlComponent() {
 
     override fun onStringCommand(command: String) {
         super.onStringCommand(command)

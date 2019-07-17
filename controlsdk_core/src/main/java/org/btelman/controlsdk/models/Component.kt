@@ -160,7 +160,7 @@ abstract class Component : IComponent {
     /**
      * Used to retrieve Context and provide an initialization bundle
      */
-    open fun onInitializeComponent(applicationContext: Context?, bundle : Bundle?) {
+    open fun onInitializeComponent(applicationContext: Context, bundle : Bundle?) {
         context = applicationContext
     }
 
@@ -173,7 +173,7 @@ abstract class Component : IComponent {
         const val EVENT_MAIN = 1
         const val MESSAGE_TIMEOUT = 2
 
-        fun instantiate(applicationContext: Context?, holder: ComponentHolder<*>) : Component {
+        fun instantiate(applicationContext: Context, holder: ComponentHolder<*>) : Component {
             val component : Component = holder.clazz.newInstance()
             component.onInitializeComponent(applicationContext, holder.data)
             return component

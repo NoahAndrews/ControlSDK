@@ -5,10 +5,12 @@ import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
 import org.btelman.controlsdk.streaming.video.retrievers.api16.Camera1SurfaceTextureComponent
 import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2SurfaceTextureComponent
+import org.btelman.controlsdk.utils.BundleUtil
+import org.btelman.controlsdk.utils.intoBundle
 
 object VideoRetrieverFactory {
     fun findRetriever(bundle: Bundle): BaseVideoRetriever? {
-        BaseFactory.checkForAndInitClass(getClassFromBundle(bundle), BaseVideoRetriever::class.java)?.let {
+        BundleUtil.checkForAndInitClass(getClassFromBundle(bundle), BaseVideoRetriever::class.java)?.let {
             return it
         }
         StreamInfo.fromBundle(bundle)?.also {streamInfo ->
@@ -26,11 +28,11 @@ object VideoRetrieverFactory {
     }
 
     fun <T : BaseVideoRetriever> putClassInBundle(clazz: Class<T>, bundle: Bundle){
-        BaseFactory.putClassInBundle(bundle, BUNDLE_ID, clazz)
+        clazz.intoBundle(AudioProcessorFactory.BUNDLE_ID, bundle)
     }
 
     fun getClassFromBundle(bundle: Bundle) : Class<*>?{
-        return BaseFactory.getClassFromBundle(bundle, BUNDLE_ID)
+        return BundleUtil.getClassFromBundle(bundle, BUNDLE_ID)
     }
 
     val DEFAULT = Camera1SurfaceTextureComponent::class.java

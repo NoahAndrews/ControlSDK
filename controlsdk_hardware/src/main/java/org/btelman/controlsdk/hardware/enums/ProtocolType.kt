@@ -1,6 +1,7 @@
-package org.btelman.controlsdk.hardware
+package org.btelman.controlsdk.hardware.enums
 
 import android.content.Context
+import org.btelman.controlsdk.hardware.ControlComponent
 import org.btelman.controlsdk.hardware.protocols.ArduinoSendBytesProtocol
 import org.btelman.controlsdk.hardware.protocols.ArduinoSendSingleCharProtocol
 import org.btelman.controlsdk.hardware.protocols.NXTJoystickDriverProtocol
@@ -30,10 +31,10 @@ enum class ProtocolType {
 
     fun getInstantiatedClass(context: Context) : ControlComponent {
         return when(this){
-            ArduinoRaw -> ArduinoSendBytesProtocol(context)
-            SingleByte -> SingleByteProtocol(context)
-            ArduinoSingleChar -> ArduinoSendSingleCharProtocol(context)
-            NXTJoystickDriver -> NXTJoystickDriverProtocol(context)
+            ArduinoRaw -> ArduinoSendBytesProtocol()
+            SingleByte -> SingleByteProtocol()
+            ArduinoSingleChar -> ArduinoSendSingleCharProtocol()
+            NXTJoystickDriver -> NXTJoystickDriverProtocol()
         }
     }
 }

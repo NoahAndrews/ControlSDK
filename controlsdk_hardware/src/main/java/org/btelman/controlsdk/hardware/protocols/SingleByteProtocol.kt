@@ -1,6 +1,5 @@
 package org.btelman.controlsdk.hardware.protocols
 
-import android.content.Context
 import org.btelman.controlsdk.hardware.ControlComponent
 import org.btelman.controlsdk.hardware.utils.SingleByteUtil
 
@@ -17,7 +16,7 @@ import org.btelman.controlsdk.hardware.utils.SingleByteUtil
  * Currently hardcoded for a certain speed, but can be changed
  */
 
-class SingleByteProtocol(context: Context) : ControlComponent(context) {
+class SingleByteProtocol : ControlComponent() {
     private val motorForwardSpeed = 127
     private val motorBackwardSpeed = -127
 

@@ -1,15 +1,13 @@
 package org.btelman.controlsdk.hardware.protocols
 
-import android.content.Context
 import android.util.Log
 import org.btelman.controlsdk.hardware.ControlComponent
 import java.nio.charset.Charset
 
 /**
- * Created by Brendon on 9/9/2018.
+ * Arduino String sending converter
  */
-class ArduinoSendBytesProtocol(context: Context) :
-        ControlComponent(context) {
+class ArduinoSendBytesProtocol : ControlComponent() {
 
     override fun onStringCommand(command: String) {
         super.onStringCommand(command)

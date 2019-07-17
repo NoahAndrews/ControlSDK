@@ -13,7 +13,7 @@ class DummyComponent : Component() {
 
     var bundle : Bundle? = null
 
-    override fun onInitializeComponent(applicationContext: Context?, bundle: Bundle?) {
+    override fun onInitializeComponent(applicationContext: Context, bundle: Bundle?) {
         super.onInitializeComponent(applicationContext, bundle)
         this.bundle = bundle
     }
