@@ -1,6 +1,7 @@
 package org.btelman.controlsdk.streaming.audio.retrievers
 
 import android.content.Context
+import org.btelman.controlsdk.streaming.models.AudioPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.utils.AudioRecordingThread
 import org.btelman.controlsdk.streaming.utils.AudioUtil
@@ -12,7 +13,7 @@ class BasicMicrophoneAudioRetriever : BaseAudioRetriever(), AudioRecordingThread
 
     private val recordingThread = AudioRecordingThread(this)
 
-    private var dataArray : ByteArray? = null
+    private var dataArray : AudioPacket? = null
 
     override fun enable(context: Context, streamInfo: StreamInfo) {
         super.enable(context, streamInfo)
@@ -26,11 +27,11 @@ class BasicMicrophoneAudioRetriever : BaseAudioRetriever(), AudioRecordingThread
 
     override fun onAudioDataReceived(data: ShortArray?) {
         dataArray = data?.let { audioArr ->
-            AudioUtil.ShortToByte_ByteBuffer_Method(audioArr)
+            AudioPacket(AudioUtil.ShortToByte_ByteBuffer_Method(audioArr))
         } //?: null
     }
 
-    override fun retrieveAudioByteArray(): ByteArray? {
+    override fun retrieveAudioByteArray(): AudioPacket? {
         return dataArray
     }
 }

@@ -5,6 +5,7 @@ import android.util.Log
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler
 import org.btelman.controlsdk.enums.ComponentStatus
+import org.btelman.controlsdk.streaming.models.AudioPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.utils.FFmpegUtil
 import org.btelman.controlsdk.streaming.utils.OutputStreamUtil
@@ -16,6 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHandler {
 
+    private var lastTimecode: Long = 0L
     private var endpoint: String? = null
     private var status: ComponentStatus = ComponentStatus.DISABLED
     private var ffmpegRunning = AtomicBoolean(false)
@@ -47,10 +49,13 @@ class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHandler 
         Log.d(TAG, "onStart")
     }
 
-    override fun processAudioByteArray(data: ByteArray) {
+    override fun processAudioByteArray(data: AudioPacket) {
         ensureFFmpegStarted()
         process?.let { _process ->
-            OutputStreamUtil.handleSendByteArray(_process.outputStream, data)
+            if(data.timecode != lastTimecode){ //make sure we only send each packet once
+                lastTimecode = data.timecode
+                OutputStreamUtil.handleSendByteArray(_process.outputStream, data.b)
+            }
         }
     }
 
