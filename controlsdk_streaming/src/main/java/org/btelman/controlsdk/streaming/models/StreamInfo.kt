@@ -7,6 +7,7 @@ import org.btelman.controlsdk.streaming.enums.Orientation
  * Data class that will store info for the stream
  */
 data class StreamInfo(val endpoint : String,
+                      val audioEndpoint : String? = null,
                       val width : Int = 640,
                       val height : Int = 480,
                       val bitrate : Int = 512,
@@ -21,6 +22,7 @@ data class StreamInfo(val endpoint : String,
     fun addToExistingBundle(bundle : Bundle) : Bundle{
         bundle.apply {
             putString("endpoint", endpoint)
+            audioEndpoint ?.let { putString("audioEndpoint", it) }
             putInt("width", width)
             putInt("height", height)
             putInt("framerate", framerate)
@@ -34,6 +36,7 @@ data class StreamInfo(val endpoint : String,
         @Throws(NullPointerException::class)
         fun fromBundle(bundle : Bundle) : StreamInfo?{
             val endpoint = bundle.getString("endpoint") ?: return null
+            val audioEndpoint = bundle.getString("audioEndpoint") ?: return null
             val width = bundle.getInt("width")
             val height = bundle.getInt("height")
             val bitrate = bundle.getInt("bitrate")
@@ -43,7 +46,7 @@ data class StreamInfo(val endpoint : String,
                 CameraDeviceInfo.fromBundle(it)
             } ?: return null
 
-            return StreamInfo(endpoint, width, height, bitrate, framerate, orientation, cameraDeviceInfo)
+            return StreamInfo(endpoint, audioEndpoint, width, height, bitrate, framerate, orientation, cameraDeviceInfo)
         }
 
         fun validateFields(vararg vals : Any?){

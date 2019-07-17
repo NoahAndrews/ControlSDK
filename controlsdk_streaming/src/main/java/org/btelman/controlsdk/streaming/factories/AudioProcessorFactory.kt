@@ -2,7 +2,6 @@ package org.btelman.controlsdk.streaming.factories
 
 import android.os.Bundle
 import org.btelman.controlsdk.streaming.audio.processors.BaseAudioProcessor
-import org.btelman.controlsdk.streaming.video.processors.BaseVideoProcessor
 
 /**
  * Handles creating the BaseVideoProcessor instance or putting the class in the main bundle
@@ -15,7 +14,7 @@ object AudioProcessorFactory {
         return DEFAULT.newInstance()
     }
 
-    fun <T : BaseVideoProcessor> putClassInBundle(clazz: Class<T>, bundle: Bundle){
+    fun <T : BaseAudioProcessor> putClassInBundle(clazz: Class<T>, bundle: Bundle){
         BaseFactory.putClassInBundle(bundle, BUNDLE_ID, clazz)
     }
 

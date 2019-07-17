@@ -3,24 +3,20 @@ package org.btelman.controlsdk.streaming.video.processors
 import android.content.Context
 import android.graphics.Rect
 import android.util.Log
-import android.widget.Toast
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler
-import com.github.hiteshsondhi88.libffmpeg.LoadBinaryResponseHandler
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException
-import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
-import org.btelman.controlsdk.streaming.utils.VideoOutputStreamUtil
-import java.io.PrintStream
-import java.util.concurrent.CountDownLatch
+import org.btelman.controlsdk.streaming.utils.FFmpegUtil
+import org.btelman.controlsdk.streaming.utils.OutputStreamUtil
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Process frames via FFmpeg
  */
-class FFmpegProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler {
+class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler {
     private var status: ComponentStatus = ComponentStatus.DISABLED
     private val streaming = AtomicBoolean(false)
     private val ffmpegRunning = AtomicBoolean(false)
@@ -32,22 +28,7 @@ class FFmpegProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler {
     override fun enable(context: Context, streamInfo: StreamInfo) {
         super.enable(context, streamInfo)
         ffmpeg = FFmpeg.getInstance(context.applicationContext)
-        val latch = CountDownLatch(1)
-        try {
-            ffmpeg?.loadBinary(object : LoadBinaryResponseHandler() {
-                override fun onFinish() {
-                    super.onFinish()
-                    Log.d("FFMPEG", "onFinish")
-                    latch.countDown()
-                }
-            })
-        } catch (e: FFmpegNotSupportedException) {
-            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
-            e.printStackTrace()
-            //TODO throw error?
-            return
-        }
-        latch.await()
+        if(!FFmpegUtil.initFFmpegBlocking(ffmpeg)) return //TODO throw error
         this.streamInfo = streamInfo
         streaming.set(true)
     }
@@ -57,18 +38,7 @@ class FFmpegProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler {
         streamInfo = null
         ffmpeg = null
         streaming.set(false)
-        killFFmpeg()
-    }
-
-    /**
-     * Kill FFmpeg by sending garbage data to the outputStream since it does not close on its own
-     * correctly when closing the outputStream
-     */
-    private fun killFFmpeg() {
-        val printStream = PrintStream(process?.outputStream)
-        printStream.print("die") //does not matter what is here. Any garbage data should do the trick
-        printStream.flush()
-        printStream.close()
+        FFmpegUtil.killFFmpeg(process)
     }
 
     override fun processData(packet: ImageDataPacket) {
@@ -77,7 +47,7 @@ class FFmpegProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler {
                 tryBootFFmpeg(packet.r)
             }
             try {
-                VideoOutputStreamUtil.sendImageDataToProcess(process, packet)
+                OutputStreamUtil.sendImageDataToProcess(process, packet)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

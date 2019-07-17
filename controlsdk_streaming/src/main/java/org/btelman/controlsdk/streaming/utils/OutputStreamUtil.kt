@@ -10,7 +10,7 @@ import java.io.OutputStream
 /**
  * Utilities for video processors that transfer image data via a process or an OutputStream
  */
-object VideoOutputStreamUtil {
+object OutputStreamUtil {
     fun sendImageDataToProcess(process : Process?, packet: ImageDataPacket) : Boolean{
         return process?.let { _process ->
             try { //send the data and catch IO exception if it fails
@@ -28,6 +28,10 @@ object VideoOutputStreamUtil {
         } ?: processBitmap(outputStream, packet)
     }
 
+    fun handleSendByteArray(outputStream: OutputStream, b: ByteArray) {
+        outputStream.write(b)
+    }
+
     private fun processBitmap(outputStream: OutputStream, packet: ImageDataPacket): Boolean {
         return (packet.b as? Bitmap)?.compress(
             Bitmap.CompressFormat.JPEG,
@@ -37,7 +41,7 @@ object VideoOutputStreamUtil {
     private fun processByteArray(outputStream: OutputStream, it: ImageDataPacket) : Boolean{
         when (it.format) {
             ImageFormat.JPEG -> {
-                outputStream.write(it.b as ByteArray)
+                handleSendByteArray(outputStream, it.b as ByteArray)
             }
             ImageFormat.NV21 -> {
                 it.r?.let { rect ->
