@@ -1,5 +1,5 @@
-package org.btelman.controlsdk.hardware.drivers.bluetooth
-import org.btelman.controlsdk.hardware.drivers.bluetooth.BluetoothClassicHandler.Companion.SEND_MESSAGE
+package org.btelman.controlsdk.hardware.drivers.libs.bluetooth
+import org.btelman.controlsdk.hardware.drivers.libs.bluetooth.BluetoothClassicHandler.Companion.SEND_MESSAGE
 
 /**
  * Bluetooth class to handle classic bluetooth (serial) connections

@@ -1,4 +1,4 @@
-package org.btelman.controlsdk.hardware
+package org.btelman.controlsdk.hardware.components
 
 import android.content.Context
 import android.os.Bundle
@@ -13,9 +13,9 @@ import org.btelman.controlsdk.models.ComponentEventObject
 /**
  * Main communication Component that holds a reference to CommunicationInterface and controls it
  */
-class CommunicationComponent() : Component() , Runnable{
+class CommunicationDriverComponent() : Component() , Runnable{
     override fun getType(): ComponentType {
-        return ComponentType.HARDWARE //TODO CONTROL_DRIVER
+        return ComponentType.HARDWARE
     }
 
     private var communicationInterface: CommunicationInterface? = null
@@ -61,7 +61,7 @@ class CommunicationComponent() : Component() , Runnable{
     }
 
     override fun handleExternalMessage(message: ComponentEventObject): Boolean {
-        if(message.type == ComponentType.HARDWARE){ //TODO CONTROL_TRANSLATOR
+        if(message.type == ComponentType.HARDWARE && message.what == ControlTranslatorComponent.DRIVER){
             when(message.what){
                 EVENT_MAIN -> {
                     communicationInterface?.send(message.data as ByteArray) ?: return false

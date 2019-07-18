@@ -1,4 +1,4 @@
-package org.btelman.controlsdk.hardware.communications
+package org.btelman.controlsdk.hardware.drivers
 
 import android.app.Activity
 import android.content.*
@@ -9,7 +9,7 @@ import android.os.Message
 import android.util.Log
 import android.widget.Toast
 import org.btelman.controlsdk.enums.ComponentStatus
-import org.btelman.controlsdk.hardware.drivers.usb.UsbService
+import org.btelman.controlsdk.hardware.drivers.libs.usb.UsbService
 import org.btelman.controlsdk.hardware.interfaces.CommunicationInterface
 import java.lang.ref.WeakReference
 

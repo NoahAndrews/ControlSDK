@@ -1,4 +1,4 @@
-package org.btelman.controlsdk.hardware.drivers.bluetooth
+package org.btelman.controlsdk.hardware.drivers.libs.bluetooth
 
 import java.io.IOException
 import java.io.InputStream

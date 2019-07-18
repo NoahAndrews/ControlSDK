@@ -1,14 +1,14 @@
 package org.btelman.controlsdk.hardware.protocols
 
 import com.google.common.primitives.Bytes.concat
-import org.btelman.controlsdk.hardware.ControlComponent
+import org.btelman.controlsdk.hardware.components.ControlTranslatorComponent
 
 /**
  * Handles NXT communication using the the joystick driver for Tetrix/Matrix
  *
  * This protocol was used in earlier FIRST Tech Challenge seasons
  */
-class NXTJoystickDriverProtocol : ControlComponent() {
+class NXTJoystickDriverProtocol : ControlTranslatorComponent() {
 
     override fun onStringCommand(command: String) {
         super.onStringCommand(command)

@@ -166,8 +166,6 @@ abstract class Component : IComponent {
 
     companion object {
         //some handler events (what)
-        const val DO_SOME_WORK = 0
-
         //some constant strings
         const val STATUS_EVENT = 0
         const val EVENT_MAIN = 1

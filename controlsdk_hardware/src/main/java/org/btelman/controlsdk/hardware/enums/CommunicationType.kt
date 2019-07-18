@@ -1,7 +1,7 @@
 package org.btelman.controlsdk.hardware.enums
 
-import org.btelman.controlsdk.hardware.communications.BluetoothClassicCommunication
-import org.btelman.controlsdk.hardware.communications.FelhrUsbSerialCommunication
+import org.btelman.controlsdk.hardware.drivers.BluetoothClassicCommunication
+import org.btelman.controlsdk.hardware.drivers.FelhrUsbSerialCommunication
 import org.btelman.controlsdk.hardware.interfaces.CommunicationInterface
 
 /**

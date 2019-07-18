@@ -1,4 +1,4 @@
-package org.btelman.controlsdk.hardware
+package org.btelman.controlsdk.hardware.components
 
 import android.util.Log
 import org.btelman.controlsdk.enums.ComponentType
@@ -11,7 +11,7 @@ import org.btelman.controlsdk.models.ComponentEventObject
  *
  *  Subscribes to EventManager.COMMAND and EventManager.STOP_EVENT automatically
  */
-abstract class ControlComponent : Component(){
+abstract class ControlTranslatorComponent : Component(){
     /**
      * Called when any command is received, including but not limited to strings
      */
@@ -72,5 +72,7 @@ abstract class ControlComponent : Component(){
 
     companion object {
         const val TAG = "ControlComponent"
+        const val DRIVER = 10
+        const val TRANSLATOR = 11
     }
 }

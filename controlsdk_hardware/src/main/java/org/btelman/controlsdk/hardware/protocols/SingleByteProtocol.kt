@@ -1,6 +1,6 @@
 package org.btelman.controlsdk.hardware.protocols
 
-import org.btelman.controlsdk.hardware.ControlComponent
+import org.btelman.controlsdk.hardware.components.ControlTranslatorComponent
 import org.btelman.controlsdk.hardware.utils.SingleByteUtil
 
 /**
@@ -16,7 +16,7 @@ import org.btelman.controlsdk.hardware.utils.SingleByteUtil
  * Currently hardcoded for a certain speed, but can be changed
  */
 
-class SingleByteProtocol : ControlComponent() {
+class SingleByteProtocol : ControlTranslatorComponent() {
     private val motorForwardSpeed = 127
     private val motorBackwardSpeed = -127
 

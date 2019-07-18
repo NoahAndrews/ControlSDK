@@ -22,7 +22,7 @@
  SOFTWARE.
  */
 
-package org.btelman.controlsdk.hardware.drivers.usb;
+package org.btelman.controlsdk.hardware.drivers.libs.usb;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;

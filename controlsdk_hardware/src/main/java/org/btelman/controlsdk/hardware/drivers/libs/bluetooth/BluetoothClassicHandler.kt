@@ -1,15 +1,15 @@
-package org.btelman.controlsdk.hardware.drivers.bluetooth
+package org.btelman.controlsdk.hardware.drivers.libs.bluetooth
 
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.os.Handler
 import android.os.HandlerThread
-import org.btelman.controlsdk.hardware.drivers.bluetooth.Connection.STATE_CONNECTED
-import org.btelman.controlsdk.hardware.drivers.bluetooth.Connection.STATE_CONNECTING
-import org.btelman.controlsdk.hardware.drivers.bluetooth.Connection.STATE_DISCONNECTED
-import org.btelman.controlsdk.hardware.drivers.bluetooth.Connection.STATE_ERROR
-import org.btelman.controlsdk.hardware.drivers.bluetooth.Connection.STATE_IDLE
+import org.btelman.controlsdk.hardware.drivers.libs.bluetooth.Connection.STATE_CONNECTED
+import org.btelman.controlsdk.hardware.drivers.libs.bluetooth.Connection.STATE_CONNECTING
+import org.btelman.controlsdk.hardware.drivers.libs.bluetooth.Connection.STATE_DISCONNECTED
+import org.btelman.controlsdk.hardware.drivers.libs.bluetooth.Connection.STATE_ERROR
+import org.btelman.controlsdk.hardware.drivers.libs.bluetooth.Connection.STATE_IDLE
 import java.io.IOException
 import java.io.OutputStream
 import java.util.*

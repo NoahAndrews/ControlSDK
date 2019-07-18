@@ -4,5 +4,6 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <application>
         <activity android:name=".activities.ChooseBluetoothActivity"/>
+        <service android:name=".drivers.libs.usb.UsbService"/>
     </application>
 </manifest>

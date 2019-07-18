@@ -1,4 +1,4 @@
-package org.btelman.controlsdk.hardware.communications
+package org.btelman.controlsdk.hardware.drivers
 
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -7,8 +7,8 @@ import android.content.Intent
 import android.util.Log
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.hardware.activities.ChooseBluetoothActivity
-import org.btelman.controlsdk.hardware.drivers.bluetooth.BluetoothClassic
-import org.btelman.controlsdk.hardware.drivers.bluetooth.Connection
+import org.btelman.controlsdk.hardware.drivers.libs.bluetooth.BluetoothClassic
+import org.btelman.controlsdk.hardware.drivers.libs.bluetooth.Connection
 import org.btelman.controlsdk.hardware.interfaces.CommunicationInterface
 
 /**
@@ -29,7 +29,9 @@ class BluetoothClassicCommunication : CommunicationInterface {
     }
 
     override fun needsSetup(activity: Activity): Boolean {
-        val pairingRequired = !activity.applicationContext.getSharedPreferences(CONFIG_PREFS, 0).contains(BLUETOOTH_ADDR)
+        val pairingRequired = !activity.applicationContext.getSharedPreferences(CONFIG_PREFS, 0).contains(
+            BLUETOOTH_ADDR
+        )
         val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         //Return that additional setup is needed if no preferred device OR bluetooth is off
         return pairingRequired || !mBluetoothAdapter.isEnabled
@@ -42,10 +44,13 @@ class BluetoothClassicCommunication : CommunicationInterface {
             mBluetoothAdapter.enable()
         }
         //Start an activity to select our preferred device
-        val pairingRequired = !activity.applicationContext.getSharedPreferences(CONFIG_PREFS, 0).contains(BLUETOOTH_ADDR)
+        val pairingRequired = !activity.applicationContext.getSharedPreferences(CONFIG_PREFS, 0).contains(
+            BLUETOOTH_ADDR
+        )
         if(force || pairingRequired) {
             activity.startActivityForResult(
-                    Intent(activity, ChooseBluetoothActivity::class.java), RESULT_CODE
+                    Intent(activity, ChooseBluetoothActivity::class.java),
+                RESULT_CODE
             )
             return RESULT_CODE
         }
@@ -75,7 +80,8 @@ class BluetoothClassicCommunication : CommunicationInterface {
 
     override fun initConnection(context: Context) {
         Log.d("Bluetooth","initConnection")
-        addr = context.getSharedPreferences(CONFIG_PREFS, 0).getString(BLUETOOTH_ADDR, null)
+        addr = context.getSharedPreferences(CONFIG_PREFS, 0).getString(
+            BLUETOOTH_ADDR, null)
         addr?.let {
             bluetoothClassic = BluetoothClassic(it)
         } ?: throw Exception("No bluetooth address supplied!")
