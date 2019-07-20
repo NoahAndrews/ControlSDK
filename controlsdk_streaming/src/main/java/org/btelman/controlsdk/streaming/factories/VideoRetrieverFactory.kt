@@ -1,5 +1,6 @@
 package org.btelman.controlsdk.streaming.factories
 
+import android.os.Build
 import android.os.Bundle
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
@@ -16,7 +17,7 @@ object VideoRetrieverFactory {
         StreamInfo.fromBundle(bundle)?.also {streamInfo ->
             when {
                 streamInfo.deviceInfo.camera.contains("/dev/video") -> TODO("USB Camera retriever class")
-                streamInfo.deviceInfo.camera.contains("/dev/camera") -> return if(Camera2SurfaceTextureComponent.isSupported()){
+                streamInfo.deviceInfo.camera.contains("/dev/camera") -> return if(Build.VERSION.SDK_INT >= 21){
                     Camera2SurfaceTextureComponent()
                 } else{
                     Camera1SurfaceTextureComponent()
