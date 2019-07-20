@@ -4,11 +4,13 @@ Control API for Android devices to control IoT devices, electronics boards (Ardu
 
 # Work In Progress
 
-Code in here at the moment is not ready for release
+Code in here at the moment is not ready for release. Although functional, future changes may break current functionality or the API may change a lot
 
 This is the end goal of this project.
 
 [ControlSDK Flow (PDF)](docs/ControlSDK.pdf)
+
+The one thing that has changed is that the external apps being able to communicate with it may be more limited than I wanted, and may not be addressed in the first few versions of the sdk
 
 # Use cases
 
