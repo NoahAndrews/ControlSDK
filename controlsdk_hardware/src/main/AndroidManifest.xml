@@ -1,2 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="org.btelman.controlsdk.hardware"/>
+          package="org.btelman.controlsdk.hardware">
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <application>
+        <activity android:name=".activities.ChooseBluetoothActivity"/>
+        <service android:name=".drivers.libs.usb.UsbService"/>
+    </application>
+</manifest>
