@@ -1,6 +1,6 @@
-package org.btelman.controlsdk.hardware.protocols
+package org.btelman.controlsdk.hardware.translators
 
-import org.btelman.controlsdk.hardware.translators.HardwareTranslator
+import org.btelman.controlsdk.hardware.interfaces.Translator
 import java.nio.charset.Charset
 
 /**
@@ -8,7 +8,7 @@ import java.nio.charset.Charset
  *
  * Added in case somebody runs into a board that cannot properly handle parsing a multi character command
  */
-class ArduinoSendSingleCharProtocol : HardwareTranslator() {
+class ArduinoSendSingleCharTranslator : Translator {
     override fun translateString(command: String): ByteArray {
         return getFirstCharAsByteArray(command)
     }

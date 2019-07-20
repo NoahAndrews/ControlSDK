@@ -1,6 +1,6 @@
-package org.btelman.controlsdk.hardware.protocols
+package org.btelman.controlsdk.hardware.translators
 
-import org.btelman.controlsdk.hardware.translators.HardwareTranslator
+import org.btelman.controlsdk.hardware.interfaces.Translator
 import org.btelman.controlsdk.hardware.utils.SingleByteUtil
 
 /**
@@ -16,7 +16,7 @@ import org.btelman.controlsdk.hardware.utils.SingleByteUtil
  * Currently hardcoded for a certain speed, but can be changed
  */
 
-class SingleByteProtocol : HardwareTranslator() {
+class SingleByteTranslator : Translator {
     override fun translateString(command: String): ByteArray {
         return convertToByte(command)
     }

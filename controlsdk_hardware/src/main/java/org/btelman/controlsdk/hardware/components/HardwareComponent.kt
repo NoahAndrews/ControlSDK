@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import kotlinx.coroutines.runBlocking
 import org.btelman.controlsdk.enums.ComponentType
-import org.btelman.controlsdk.hardware.translators.HardwareTranslator
+import org.btelman.controlsdk.hardware.interfaces.Translator
 import org.btelman.controlsdk.models.Component
 import org.btelman.controlsdk.models.ComponentEventObject
 import org.btelman.controlsdk.utils.BundleUtil
@@ -13,14 +13,14 @@ import org.btelman.controlsdk.utils.BundleUtil
  * Component that receives messages and handles sending them to actual hardware
  */
 class HardwareComponent : Component() {
-    var translatorComponent : HardwareTranslator? = null
+    var translatorComponent : Translator? = null
     var communicationDriverComponent : CommunicationDriverComponent? = null
 
     override fun onInitializeComponent(applicationContext: Context, bundle: Bundle?) {
         super.onInitializeComponent(applicationContext, bundle)
         bundle ?: return
         BundleUtil.getClassFromBundle(bundle, HARDWARE_TRANSLATOR_BUNDLE_ID)?.let {
-            translatorComponent = BundleUtil.checkForAndInitClass(it, HardwareTranslator::class.java)
+            translatorComponent = BundleUtil.checkForAndInitClass(it, Translator::class.java)
         }
         BundleUtil.getClassFromBundle(bundle, HARDWARE_DRIVER_BUNDLE_ID)?.let {
             communicationDriverComponent = BundleUtil.checkForAndInitClass(it, CommunicationDriverComponent::class.java)
