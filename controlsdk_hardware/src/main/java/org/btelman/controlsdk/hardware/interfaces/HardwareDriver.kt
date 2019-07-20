@@ -14,7 +14,7 @@ import org.btelman.controlsdk.utils.BundleUtil
  * 1. Instantiated for setup
  * 2. Instantiated for use with the control system
  */
-interface CommunicationInterface{
+interface HardwareDriver{
     /**
      * Get if we should try to reboot component with error
      */
@@ -59,12 +59,12 @@ interface CommunicationInterface{
         fun fromBundle(bundle : Bundle) : Class<*>{
             val clazz = BundleUtil.getClassFromBundle(bundle, BUNDLE_ID)
             //yes this will crash, that is what I want for now
-            assert(BundleUtil.checkIfClassMatches(clazz, CommunicationInterface::class.java))
+            assert(BundleUtil.checkIfClassMatches(clazz, HardwareDriver::class.java))
             return clazz!!
         }
 
-        fun init(clazz: Class<*>) : CommunicationInterface{
-            return clazz.newInstance() as CommunicationInterface
+        fun init(clazz: Class<*>) : HardwareDriver{
+            return clazz.newInstance() as HardwareDriver
         }
 
         const val BUNDLE_ID = "hardware.CommunicationInterface"

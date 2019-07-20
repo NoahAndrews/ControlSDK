@@ -22,10 +22,9 @@ class HardwareComponent : Component() {
         BundleUtil.getClassFromBundle(bundle, HARDWARE_TRANSLATOR_BUNDLE_ID)?.let {
             translatorComponent = BundleUtil.checkForAndInitClass(it, Translator::class.java)
         }
-        BundleUtil.getClassFromBundle(bundle, HARDWARE_DRIVER_BUNDLE_ID)?.let {
-            communicationDriverComponent = BundleUtil.checkForAndInitClass(it, CommunicationDriverComponent::class.java)
-        }
-        communicationDriverComponent ?: return
+        communicationDriverComponent = BundleUtil.getClassFromBundle(bundle, HARDWARE_DRIVER_BUNDLE_ID)?.let {
+            BundleUtil.checkForAndInitClass(it, CommunicationDriverComponent::class.java)
+        } ?: CommunicationDriverComponent()
         translatorComponent ?: return
         communicationDriverComponent?.onInitializeComponent(applicationContext, bundle)
     }

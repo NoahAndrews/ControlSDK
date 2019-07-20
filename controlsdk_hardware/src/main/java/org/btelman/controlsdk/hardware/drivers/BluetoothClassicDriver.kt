@@ -9,13 +9,13 @@ import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.hardware.activities.ChooseBluetoothActivity
 import org.btelman.controlsdk.hardware.drivers.libs.bluetooth.BluetoothClassic
 import org.btelman.controlsdk.hardware.drivers.libs.bluetooth.Connection
-import org.btelman.controlsdk.hardware.interfaces.CommunicationInterface
+import org.btelman.controlsdk.hardware.interfaces.HardwareDriver
 
 /**
  * communication class that works with bluetooth classic
  * and takes control data via EventManager.ROBOT_BYTE_ARRAY event
  */
-class BluetoothClassicCommunication : CommunicationInterface {
+class BluetoothClassicDriver : HardwareDriver {
     var bluetoothClassic : BluetoothClassic? = null
     var addr : String? = null
     var name : String? = null

@@ -10,13 +10,13 @@ import android.util.Log
 import android.widget.Toast
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.hardware.drivers.libs.usb.UsbService
-import org.btelman.controlsdk.hardware.interfaces.CommunicationInterface
+import org.btelman.controlsdk.hardware.interfaces.HardwareDriver
 import java.lang.ref.WeakReference
 
 /**
  * This is the communication component that interfaces with USBService.class (com.felhr.usbserial)
  */
-class FelhrUsbSerialCommunication : CommunicationInterface {
+class FelhrUsbSerialDriver : HardwareDriver {
     private val TAG = "FelhrUsb"
     private var componentStatus = ComponentStatus.DISABLED
 

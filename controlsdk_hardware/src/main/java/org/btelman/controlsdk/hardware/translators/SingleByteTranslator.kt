@@ -36,17 +36,17 @@ class SingleByteTranslator : Translator {
     private val motorBackwardTurnSpeed = -60
 
     private fun convertToByte(command: String) : ByteArray{
-        return when(command){
-            "F" -> {
+        return when(command.toLowerCase()){
+            "f" -> {
                 createPacket(motorForwardSpeed)
             }
-            "B" -> {
+            "b" -> {
                 createPacket(motorBackwardSpeed)
             }
-            "L" -> {
+            "l" -> {
                 createPacket(motorBackwardTurnSpeed, motorForwardTurnSpeed)
             }
-            "R" -> {
+            "r" -> {
                 createPacket(motorForwardTurnSpeed, motorBackwardTurnSpeed)
             }
             else -> {

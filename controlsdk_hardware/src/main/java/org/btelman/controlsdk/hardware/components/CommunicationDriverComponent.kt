@@ -7,47 +7,47 @@ import android.os.Looper
 import android.os.Message
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.enums.ComponentType
-import org.btelman.controlsdk.hardware.interfaces.CommunicationInterface
+import org.btelman.controlsdk.hardware.interfaces.HardwareDriver
 import org.btelman.controlsdk.models.Component
 
 /**
  * Main communication Component that holds a reference to CommunicationInterface and controls it
  */
-class CommunicationDriverComponent() : Component() , Runnable{
+class CommunicationDriverComponent : Component() , Runnable{
     override fun getType(): ComponentType {
         return ComponentType.HARDWARE
     }
 
-    private var communicationInterface: CommunicationInterface? = null
+    private var hardwareDriver: HardwareDriver? = null
     private val uiHandler = Handler(Looper.getMainLooper())
 
     override fun onInitializeComponent(applicationContext: Context, bundle: Bundle?) {
         super.onInitializeComponent(applicationContext, bundle)
         val interfaceClazz = bundle?.let {
-            CommunicationInterface.fromBundle(bundle)
+            HardwareDriver.fromBundle(bundle)
         } ?: return
-        communicationInterface = CommunicationInterface.init(interfaceClazz)
-        communicationInterface?.initConnection(applicationContext)
+        hardwareDriver = HardwareDriver.init(interfaceClazz)
+        hardwareDriver?.initConnection(applicationContext)
         uiHandler.post(this)
     }
 
     @Synchronized
     override fun enableInternal(){
-        communicationInterface?.enable()
+        hardwareDriver?.enable()
     }
 
     @Synchronized
     override fun disableInternal(){
-        communicationInterface?.disable()
+        hardwareDriver?.disable()
     }
 
     private var errorCounter = 0
 
     override fun run() {
         if(enabled.get())
-            status = communicationInterface?.getStatus() ?: ComponentStatus.ERROR
-        if(communicationInterface?.getAutoReboot() == true
-                && communicationInterface?.getStatus() == ComponentStatus.ERROR){
+            status = hardwareDriver?.getStatus() ?: ComponentStatus.ERROR
+        if(hardwareDriver?.getAutoReboot() == true
+                && hardwareDriver?.getStatus() == ComponentStatus.ERROR){
             errorCounter++
             if(errorCounter > 10){
                 reset()
@@ -67,7 +67,7 @@ class CommunicationDriverComponent() : Component() , Runnable{
     override fun handleMessage(message: Message): Boolean {
         when(message.what){
             EVENT_MAIN -> {
-                communicationInterface?.send(message.obj as ByteArray) ?: return false
+                hardwareDriver?.send(message.obj as ByteArray) ?: return false
                 return true
             }
         }
