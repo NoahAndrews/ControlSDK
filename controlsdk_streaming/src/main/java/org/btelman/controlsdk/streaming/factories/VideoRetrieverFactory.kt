@@ -1,20 +1,23 @@
 package org.btelman.controlsdk.streaming.factories
 
+import android.os.Build
 import android.os.Bundle
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
 import org.btelman.controlsdk.streaming.video.retrievers.api16.Camera1SurfaceTextureComponent
 import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2SurfaceTextureComponent
+import org.btelman.controlsdk.utils.BundleUtil
+import org.btelman.controlsdk.utils.intoBundle
 
 object VideoRetrieverFactory {
     fun findRetriever(bundle: Bundle): BaseVideoRetriever? {
-        BaseFactory.checkForAndInitClass(getClassFromBundle(bundle), BaseVideoRetriever::class.java)?.let {
+        BundleUtil.checkForAndInitClass(getClassFromBundle(bundle), BaseVideoRetriever::class.java)?.let {
             return it
         }
         StreamInfo.fromBundle(bundle)?.also {streamInfo ->
             when {
                 streamInfo.deviceInfo.camera.contains("/dev/video") -> TODO("USB Camera retriever class")
-                streamInfo.deviceInfo.camera.contains("/dev/camera") -> return if(Camera2SurfaceTextureComponent.isSupported()){
+                streamInfo.deviceInfo.camera.contains("/dev/camera") -> return if(Build.VERSION.SDK_INT >= 21){
                     Camera2SurfaceTextureComponent()
                 } else{
                     Camera1SurfaceTextureComponent()
@@ -26,11 +29,11 @@ object VideoRetrieverFactory {
     }
 
     fun <T : BaseVideoRetriever> putClassInBundle(clazz: Class<T>, bundle: Bundle){
-        BaseFactory.putClassInBundle(bundle, BUNDLE_ID, clazz)
+        clazz.intoBundle(AudioProcessorFactory.BUNDLE_ID, bundle)
     }
 
     fun getClassFromBundle(bundle: Bundle) : Class<*>?{
-        return BaseFactory.getClassFromBundle(bundle, BUNDLE_ID)
+        return BundleUtil.getClassFromBundle(bundle, BUNDLE_ID)
     }
 
     val DEFAULT = Camera1SurfaceTextureComponent::class.java

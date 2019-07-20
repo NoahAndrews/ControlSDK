@@ -16,7 +16,7 @@ abstract class StreamComponent<R : StreamSubComponent,P : StreamSubComponent> : 
     protected lateinit var processor : P
     protected lateinit var retriever : R
 
-    override fun onInitializeComponent(applicationContext: Context?, bundle: Bundle?) {
+    override fun onInitializeComponent(applicationContext: Context, bundle: Bundle?) {
         super.onInitializeComponent(applicationContext, bundle)
         bundle?.let {
             streamInfo = StreamInfo.fromBundle(it) ?: throw IllegalArgumentException("Must use StreamInfo Bundle")
