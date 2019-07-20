@@ -1,6 +1,6 @@
 package org.btelman.controlsdk.hardware.protocols
 
-import org.btelman.controlsdk.hardware.components.ControlTranslatorComponent
+import org.btelman.controlsdk.hardware.translators.HardwareTranslator
 import org.btelman.controlsdk.hardware.utils.SingleByteUtil
 
 /**
@@ -16,15 +16,27 @@ import org.btelman.controlsdk.hardware.utils.SingleByteUtil
  * Currently hardcoded for a certain speed, but can be changed
  */
 
-class SingleByteProtocol : ControlTranslatorComponent() {
+class SingleByteProtocol : HardwareTranslator() {
+    override fun translateString(command: String): ByteArray {
+        return convertToByte(command)
+    }
+
+    override fun translateAny(command: Any): ByteArray {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun translateStop(): ByteArray {
+        return convertToByte("stop")
+    }
+
     private val motorForwardSpeed = 127
     private val motorBackwardSpeed = -127
 
     private val motorForwardTurnSpeed = 60
     private val motorBackwardTurnSpeed = -60
-    override fun onStringCommand(command: String) {
-        super.onStringCommand(command)
-        val data : ByteArray = when(command){
+
+    private fun convertToByte(command: String) : ByteArray{
+        return when(command){
             "F" -> {
                 createPacket(motorForwardSpeed)
             }
@@ -43,14 +55,6 @@ class SingleByteProtocol : ControlTranslatorComponent() {
                 /*return*/ bytes
             }
         }
-        sendToDevice(data)
-    }
-
-    override fun onStop(any: Any?) {
-        super.onStop(any)
-        val data = ByteArray(1)
-        data[0] = 0x00
-        sendToDevice(data)
     }
 
     /**

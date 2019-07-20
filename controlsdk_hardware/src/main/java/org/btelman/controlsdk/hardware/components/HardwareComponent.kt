@@ -43,7 +43,7 @@ class HardwareComponent : Component() {
     }
 
     override fun handleExternalMessage(message: ComponentEventObject): Boolean {
-        if(message.type == ComponentType.HARDWARE && message.what == ControlTranslatorComponent.DRIVER){
+        if(message.type == ComponentType.HARDWARE){
             when(message.what){
                 EVENT_MAIN -> {
                     when(val data = message.data){

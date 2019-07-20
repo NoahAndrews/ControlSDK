@@ -1,17 +1,15 @@
 package org.btelman.controlsdk.hardware.protocols
 
 import com.google.common.primitives.Bytes.concat
-import org.btelman.controlsdk.hardware.components.ControlTranslatorComponent
+import org.btelman.controlsdk.hardware.translators.HardwareTranslator
 
 /**
  * Handles NXT communication using the the joystick driver for Tetrix/Matrix
  *
  * This protocol was used in earlier FIRST Tech Challenge seasons
  */
-class NXTJoystickDriverProtocol : ControlTranslatorComponent() {
-
-    override fun onStringCommand(command: String) {
-        super.onStringCommand(command)
+class NXTJoystickDriverProtocol : HardwareTranslator() {
+    override fun translateString(command: String): ByteArray {
         val joy1 = Joystick()
         when(command){
             "F" -> {
@@ -31,12 +29,15 @@ class NXTJoystickDriverProtocol : ControlTranslatorComponent() {
                 joy1.topHat = (-1).toByte() //inactive
             }
         }
-        sendToDevice(getPacket(joy1))
+        return getPacket(joy1)
     }
 
-    override fun onStop(any: Any?) {
-        super.onStop(any)
-        sendToDevice(getPacket()) //sends the default packet
+    override fun translateAny(command: Any): ByteArray {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun translateStop(): ByteArray {
+        return getPacket()
     }
 
     class Joystick{

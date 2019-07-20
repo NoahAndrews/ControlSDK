@@ -1,7 +1,6 @@
 package org.btelman.controlsdk.hardware.protocols
 
-import android.util.Log
-import org.btelman.controlsdk.hardware.components.ControlTranslatorComponent
+import org.btelman.controlsdk.hardware.translators.HardwareTranslator
 import java.nio.charset.Charset
 
 /**
@@ -9,21 +8,21 @@ import java.nio.charset.Charset
  *
  * Added in case somebody runs into a board that cannot properly handle parsing a multi character command
  */
-class ArduinoSendSingleCharProtocol : ControlTranslatorComponent() {
-
-    override fun onStringCommand(command: String) {
-        super.onStringCommand(command)
-        sendByte(command)
+class ArduinoSendSingleCharProtocol : HardwareTranslator() {
+    override fun translateString(command: String): ByteArray {
+        return getFirstCharAsByteArray(command)
     }
 
-    override fun onStop(any: Any?) {
-        super.onStop(any)
-        sendByte("s")
+    override fun translateAny(command: Any): ByteArray {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    private fun sendByte(string : String){
-        Log.d(TAG, "message = ${string[0]}")
-        sendToDevice("${string[0]}".toLowerCase().toByteArray(Charset.forName("UTF-8")))
+    override fun translateStop(): ByteArray {
+        return getFirstCharAsByteArray("s")
+    }
+
+    private fun getFirstCharAsByteArray(string : String) : ByteArray{
+        return "${string[0]}".toLowerCase().toByteArray(Charset.forName("UTF-8"))
     }
 
     companion object {
