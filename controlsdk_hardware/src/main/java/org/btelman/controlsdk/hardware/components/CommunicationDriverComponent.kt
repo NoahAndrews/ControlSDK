@@ -4,11 +4,11 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Message
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.hardware.interfaces.CommunicationInterface
 import org.btelman.controlsdk.models.Component
-import org.btelman.controlsdk.models.ComponentEventObject
 
 /**
  * Main communication Component that holds a reference to CommunicationInterface and controls it
@@ -60,15 +60,17 @@ class CommunicationDriverComponent() : Component() , Runnable{
         uiHandler.postDelayed(this, 200)
     }
 
-    override fun handleExternalMessage(message: ComponentEventObject): Boolean {
-        if(message.type == ComponentType.HARDWARE && message.what == ControlTranslatorComponent.DRIVER){
-            when(message.what){
-                EVENT_MAIN -> {
-                    communicationInterface?.send(message.data as ByteArray) ?: return false
-                    return true
-                }
+    open fun sendToDriver(data : ByteArray){
+        dispatchMessage(Message.obtain(handler, EVENT_MAIN, data))
+    }
+
+    override fun handleMessage(message: Message): Boolean {
+        when(message.what){
+            EVENT_MAIN -> {
+                communicationInterface?.send(message.obj as ByteArray) ?: return false
+                return true
             }
         }
-        return super.handleExternalMessage(message)
+        return super.handleMessage(message)
     }
 }
