@@ -40,3 +40,13 @@ dependencies {
 repositories {
     mavenCentral()
 }
+
+ext{
+    publishedGroupId = 'org.btelman.controlsdk'
+    libraryName = 'networking'
+    artifact = 'networking'
+
+    libraryDescription = 'Network interface for the controlsdk'
+}
+
+apply from: '../bintray.gradle'

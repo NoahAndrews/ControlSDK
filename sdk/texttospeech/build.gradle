@@ -40,3 +40,13 @@ dependencies {
 repositories {
     mavenCentral()
 }
+
+ext{
+    publishedGroupId = 'org.btelman.controlsdk'
+    libraryName = 'texttospeech'
+    artifact = 'texttospeech'
+
+    libraryDescription = 'streaming interface for the controlsdk'
+}
+
+apply from: '../bintray.gradle'

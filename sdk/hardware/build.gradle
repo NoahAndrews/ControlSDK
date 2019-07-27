@@ -45,3 +45,13 @@ repositories {
     jcenter()
     maven { url "https://jitpack.io" }
 }
+
+ext{
+    publishedGroupId = 'org.btelman.controlsdk'
+    libraryName = 'hardware'
+    artifact = 'hardware'
+
+    libraryDescription = 'Hardware interface for the controlsdk'
+}
+
+apply from: '../bintray.gradle'

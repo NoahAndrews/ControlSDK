@@ -49,3 +49,13 @@ dependencies {
 repositories {
     mavenCentral()
 }
+
+ext{
+    publishedGroupId = 'org.btelman.controlsdk'
+    libraryName = 'core'
+    artifact = 'core'
+
+    libraryDescription = 'Control api for robots or other local devices with the option for telepresence'
+}
+
+apply from: '../bintray.gradle'
