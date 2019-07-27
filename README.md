@@ -27,4 +27,4 @@ The one thing that has changed is that the external apps being able to communica
 - ControlSDK app can handle controlling motors
 
 - Custom app can communicate with another device with the ControlSDK. In this scenario, 
-the ControlSDK on the main device will relay data to the second device.
+the ControlSDK on the main device will relay data to the second device
