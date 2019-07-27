@@ -11,7 +11,7 @@ import org.btelman.controlsdk.enums.Operation
 import org.btelman.controlsdk.hardware.components.HardwareComponent
 import org.btelman.controlsdk.hardware.drivers.BluetoothClassicDriver
 import org.btelman.controlsdk.hardware.interfaces.HardwareDriver
-import org.btelman.controlsdk.hardware.translators.SingleByteTranslator
+import org.btelman.controlsdk.hardware.translators.ArduinoSendSingleCharTranslator
 import org.btelman.controlsdk.models.ComponentHolder
 import org.btelman.controlsdk.services.ControlSDKService
 import org.btelman.controlsdk.streaming.components.AudioComponent
@@ -103,7 +103,7 @@ class DemoActivity : AppCompatActivity() {
 
         val hardwareBundle = Bundle()
         hardwareBundle.putSerializable(HardwareDriver.BUNDLE_ID, BluetoothClassicDriver::class.java)
-        hardwareBundle.putSerializable(HardwareComponent.HARDWARE_TRANSLATOR_BUNDLE_ID, SingleByteTranslator::class.java)
+        hardwareBundle.putSerializable(HardwareComponent.HARDWARE_TRANSLATOR_BUNDLE_ID, ArduinoSendSingleCharTranslator::class.java)
         val hardwareComponent = ComponentHolder(HardwareComponent::class.java, hardwareBundle)
         val dummyComponent = ComponentHolder(DummyController::class.java, Bundle())
         arrayList.add(tts)

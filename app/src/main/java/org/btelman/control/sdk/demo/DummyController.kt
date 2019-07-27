@@ -17,6 +17,7 @@ class DummyController : Component(){
 
     }
 
+    private var time: Long = System.currentTimeMillis()
     var i = 0
 
     override fun handleMessage(message: Message): Boolean {
@@ -39,7 +40,11 @@ class DummyController : Component(){
                     "stop"
                 }
             }
-            i++
+            if(System.currentTimeMillis()-time > 1000 ){
+                time = System.currentTimeMillis()
+                i++
+            }
+            Thread.sleep(100)
             eventDispatcher?.handleMessage(ComponentType.HARDWARE, EVENT_MAIN, string, this)
         }
         dispatchMessage(Message.obtain(handler, EVENT_MAIN))
