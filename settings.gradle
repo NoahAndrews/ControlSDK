@@ -1,1 +1,1 @@
-include ':app', ':controlsdk_core', ':controlsdk_hardware', ':controlsdk_streaming', ':controlsdk_networking', ':controlsdk_tts', ':FFmpegAndroid-release'
+include ':demo', ':sdk:core', ':sdk:hardware', ':sdk:streaming', ':sdk:networking', ':sdk:texttospeech', ':FFmpegAndroid-release'

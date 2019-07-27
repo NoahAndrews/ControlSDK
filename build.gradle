@@ -10,6 +10,9 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.3.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
@@ -29,7 +32,23 @@ ext{
     globalBuildToolsVersion = "28.0.3"
     buildNumber = BITRISE_BUILD_NUMBER
     gitHash = getGitHash()
-    versionSemantic = "0.1.0"
+    versionSemantic = "0.2.0"
+
+    bintrayRepo = 'maven'
+    bintrayName = 'ControlSDK'
+
+    siteUrl = 'https://github.com/btelman96/ControlSDK'
+    gitUrl = 'https://github.com/btelman96/ControlSDK.git'
+
+    libraryVersion = "$versionSemantic"
+
+    developerId = 'btelman96'
+    developerName = 'Brendon Telman'
+    developerEmail = 'controlsdk@btelman.org'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
 }
 
 allprojects {
