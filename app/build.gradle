@@ -43,9 +43,9 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation test
     androidTestImplementation androidTest
-    implementation project(':controlsdk_core')
+    implementation project(':core')
     implementation project(':controlsdk_hardware')
     implementation project(':controlsdk_networking')
-    implementation project(':controlsdk_streaming')
-    implementation project(':controlsdk_tts')
+    implementation project(':streaming')
+    implementation project(':tts')
 }
