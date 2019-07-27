@@ -35,8 +35,13 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    implementation project(':sdk:controlsdk_core')
+    implementation project(':sdk:core')
+
+    api 'com.github.felHR85:UsbSerial:4.5.1'
 }
 repositories {
+    google()
     mavenCentral()
+    jcenter()
+    maven { url "https://jitpack.io" }
 }

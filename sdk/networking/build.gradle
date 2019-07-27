@@ -35,8 +35,7 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    implementation project(':sdk:controlsdk_core')
-    implementation project(':FFmpegAndroid-release')
+    implementation project(':sdk:core')
 }
 repositories {
     mavenCentral()

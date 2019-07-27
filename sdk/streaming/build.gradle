@@ -35,13 +35,9 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    implementation project(':sdk:controlsdk_core')
-
-    api 'com.github.felHR85:UsbSerial:4.5.1'
+    implementation project(':sdk:core')
+    implementation project(':FFmpegAndroid-release')
 }
 repositories {
-    google()
     mavenCentral()
-    jcenter()
-    maven { url "https://jitpack.io" }
 }
