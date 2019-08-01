@@ -12,6 +12,7 @@ import org.btelman.controlsdk.hardware.components.HardwareComponent
 import org.btelman.controlsdk.hardware.drivers.BluetoothClassicDriver
 import org.btelman.controlsdk.hardware.interfaces.HardwareDriver
 import org.btelman.controlsdk.hardware.translators.ArduinoSendSingleCharTranslator
+import org.btelman.controlsdk.hardware.utils.TranslationClassFinder
 import org.btelman.controlsdk.models.ComponentHolder
 import org.btelman.controlsdk.services.ControlSDKService
 import org.btelman.controlsdk.streaming.components.AudioComponent
@@ -30,6 +31,7 @@ class DemoActivity : AppCompatActivity() {
     val bt = BluetoothClassicDriver()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        TranslationClassFinder.getClasses(this)
         setContentView(R.layout.activity_demo)
         createComponentHolders()
 
