@@ -1,0 +1,10 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation group: 'com.google.auto.service', name: 'auto-service', version: '1.0-rc6'
+    implementation project(path: ':annotations')
+}
+
+sourceCompatibility = "7"
+targetCompatibility = "7"
