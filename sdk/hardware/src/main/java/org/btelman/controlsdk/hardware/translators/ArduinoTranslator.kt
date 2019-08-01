@@ -2,12 +2,14 @@ package org.btelman.controlsdk.hardware.translators
 
 import android.util.Log
 import org.btelman.controlsdk.hardware.interfaces.Translator
+import org.btelman.controlsdk.hardware.interfaces.TranslatorComponent
 import java.nio.charset.Charset
 
 /**
  * Arduino String sending converter
  * Sends output string in format of "$string\r\n"
  */
+@TranslatorComponent
 class ArduinoTranslator : Translator {
     override fun translateString(command: String): ByteArray {
         return getBytesArrayWithTerminator(command)
