@@ -1,1 +1,44 @@
-Will be updated when first release or pre-release version is made
+## Release 0.2.1 ##
+
+Now using org.btelman:FFmpegAndroid:0.4.0 for FFmpeg via https://dl.bintray.com/btelman96/maven
+
+Same code, but now hosted on bintray to make it be automatically grabbed when using the streaming module
+
+## Release 0.2.0 ##
+
+Restructured entire project to have all of the sdk related modules under
+the sdk folder.
+
+Bintray integration.
+
+To use this sdk without importing, add this to repos:
+
+```
+        maven {
+            url  "https://dl.bintray.com/btelman96/maven"
+        }
+```
+
+Then add each desired module to the dependencies.
+
+```
+    def controlsdk_version = "0.2.0"
+    api "org.btelman.controlsdk:core:$controlsdk_version"
+    api "org.btelman.controlsdk:streaming:$controlsdk_version"
+    api "org.btelman.controlsdk:hardware:$controlsdk_version"
+    api "org.btelman.controlsdk:texttospeech:$controlsdk_version"
+    api "org.btelman.controlsdk:networking:$controlsdk_version" //currently empty, may be removed in the future
+```
+
+Mixing versions is not supported, even though not all versions may have touched code in a different module.
+
+The only requirement is core, all other are optional, as custom classes can interface with it
+
+## Release 0.1.0 ##
+
+Initial release. Structure or API may change a lot in the future. This is a first working prototype,
+but may not be optimal for use yet
+
+See the app demo classes to see how to use certain features
+
+

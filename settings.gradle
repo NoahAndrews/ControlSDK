@@ -1,1 +1,1 @@
-include ':demo', ':sdk:core', ':sdk:hardware', ':sdk:streaming', ':sdk:networking', ':sdk:texttospeech', ':FFmpegAndroid-release'
+include ':demo', ':sdk:core', ':sdk:hardware', ':sdk:streaming', ':sdk:networking', ':sdk:texttospeech'
