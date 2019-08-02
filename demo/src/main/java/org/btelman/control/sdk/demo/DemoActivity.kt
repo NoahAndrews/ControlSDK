@@ -89,8 +89,8 @@ class DemoActivity : AppCompatActivity() {
             true
         }
 
-        //if(bt.needsSetup(this))
-           // request = bt.setupComponent(this, true)
+        if(bt.needsSetup(this))
+            request = bt.setupComponent(this, true)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
