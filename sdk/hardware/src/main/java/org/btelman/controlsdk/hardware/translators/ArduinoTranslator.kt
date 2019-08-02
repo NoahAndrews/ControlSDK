@@ -9,7 +9,7 @@ import java.nio.charset.Charset
  * Arduino String sending converter
  * Sends output string in format of "$string\r\n"
  */
-@TranslatorComponent
+@TranslatorComponent(description = "Sends output String in lowercase format of \"{string}\\r\\n\" as a ByteArray")
 class ArduinoTranslator : Translator {
     override fun translateString(command: String): ByteArray {
         return getBytesArrayWithTerminator(command)

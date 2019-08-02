@@ -11,4 +11,4 @@ package org.btelman.controlsdk.hardware.interfaces
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-annotation class TranslatorComponent
+annotation class TranslatorComponent(val description : String = "", val requiresSetup : Boolean = false)

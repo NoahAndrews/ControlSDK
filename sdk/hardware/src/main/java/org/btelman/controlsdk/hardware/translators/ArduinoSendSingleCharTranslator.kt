@@ -9,7 +9,8 @@ import java.nio.charset.Charset
  *
  * Added in case somebody runs into a board that cannot properly handle parsing a multi character command
  */
-@TranslatorComponent
+@TranslatorComponent(
+    description = "Like ArduinoTranslator, but only sends first lowercase character as byte without line endings")
 class ArduinoSendSingleCharTranslator : Translator {
     override fun translateString(command: String): ByteArray {
         return getFirstCharAsByteArray(command)

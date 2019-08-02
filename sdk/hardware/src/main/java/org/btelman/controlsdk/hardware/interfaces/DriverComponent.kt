@@ -10,4 +10,4 @@ package org.btelman.controlsdk.hardware.interfaces
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
-annotation class DriverComponent
+annotation class DriverComponent(val description : String = "", val requiresSetup : Boolean = false)

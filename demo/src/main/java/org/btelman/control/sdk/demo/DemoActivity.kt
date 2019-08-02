@@ -11,7 +11,9 @@ import kotlinx.android.synthetic.main.activity_demo.*
 import org.btelman.controlsdk.enums.Operation
 import org.btelman.controlsdk.hardware.components.HardwareComponent
 import org.btelman.controlsdk.hardware.drivers.BluetoothClassicDriver
+import org.btelman.controlsdk.hardware.interfaces.DriverComponent
 import org.btelman.controlsdk.hardware.interfaces.HardwareDriver
+import org.btelman.controlsdk.hardware.interfaces.TranslatorComponent
 import org.btelman.controlsdk.hardware.translators.ArduinoSendSingleCharTranslator
 import org.btelman.controlsdk.hardware.utils.HardwareFinder
 import org.btelman.controlsdk.models.ComponentHolder
@@ -35,10 +37,12 @@ class DemoActivity : AppCompatActivity() {
 
         //examples of fetching all available services
         HardwareFinder.getTranslationClasses(this).forEach{
-            Log.d("TRANSLATE", it.name+"")
+            Log.d("TRANSLATE", it.name+"\n" +
+                    it.getAnnotation(TranslatorComponent::class.java)?.description)
         }
         HardwareFinder.getDriverClasses(this).forEach{
-            Log.d("DRIVER", it.name+"")
+            Log.d("DRIVER", it.name+"\n" +
+                    it.getAnnotation(DriverComponent::class.java)?.description)
         }
 
         setContentView(R.layout.activity_demo)

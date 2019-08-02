@@ -16,7 +16,7 @@ import org.btelman.controlsdk.hardware.utils.SingleByteUtil
  *
  * Currently hardcoded for a certain speed, but can be changed
  */
-@TranslatorComponent
+@TranslatorComponent("Uses the SaberTooth motor controller simplified serial protocol")
 class SingleByteTranslator : Translator {
     override fun translateString(command: String): ByteArray {
         return convertToByte(command)

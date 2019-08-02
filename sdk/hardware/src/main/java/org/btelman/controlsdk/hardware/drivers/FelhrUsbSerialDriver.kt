@@ -17,7 +17,7 @@ import java.lang.ref.WeakReference
 /**
  * This is the communication component that interfaces with USBService.class (com.felhr.usbserial)
  */
-@DriverComponent
+@DriverComponent(description = "Send data over USB Serial at 9600 BAUD")
 class FelhrUsbSerialDriver : HardwareDriver {
     private val TAG = "FelhrUsb"
     private var componentStatus = ComponentStatus.DISABLED
