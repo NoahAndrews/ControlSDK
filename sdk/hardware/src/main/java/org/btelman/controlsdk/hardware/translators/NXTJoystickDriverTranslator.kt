@@ -2,12 +2,16 @@ package org.btelman.controlsdk.hardware.translators
 
 import com.google.common.primitives.Bytes.concat
 import org.btelman.controlsdk.hardware.interfaces.Translator
+import org.btelman.controlsdk.hardware.interfaces.TranslatorComponent
 
 /**
  * Handles NXT communication using the the joystick driver for Tetrix/Matrix
  *
  * This protocol was used in earlier FIRST Tech Challenge seasons
  */
+@TranslatorComponent(
+    "Converts to Lego Mindstorms NXT protocol using the the joystick driver for Tetrix/Matrix. " +
+            "FBLR commands are sent as d-pad directions")
 class NXTJoystickDriverTranslator : Translator {
     override fun translateString(command: String): ByteArray {
         val joy1 = Joystick()
