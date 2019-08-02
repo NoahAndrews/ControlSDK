@@ -1,39 +1,47 @@
-package org.btelman.controlsdk.hardware.utils
+package org.btelman.controlsdk.utils
 
 import android.content.Context
-import android.util.Log
 import dalvik.system.BaseDexClassLoader
 import dalvik.system.DexFile
-import org.btelman.controlsdk.hardware.interfaces.TranslatorComponent
 import java.lang.reflect.Field
 
 /**
- * Find all classes that use the TranslatorAnnotation
+ * Scan for classes with annotations. This will scan all files, so may take a while on older devices
  */
-object TranslationClassFinder {
-    private val classes = ArrayList<Class<*>>()
+object ClassScanner {
+    private var cachedDexClasses: ArrayList<Class<*>>? = null
 
-    fun getClasses(context: Context){
+    fun <A : Annotation> getClassesWithAnnotation(context: Context, annotation: Class<A>): ArrayList<Class<*>> {
+        val clazzes = getClasses(context) //init first
+        val list = ArrayList<Class<*>>()
+        clazzes.forEach { clazz ->
+            clazz.getAnnotation(annotation)?.let {
+                list.add(clazz)
+            }
+        }
+        return list
+    }
+
+    fun getClasses(context: Context) : ArrayList<Class<*>> {
+        cachedDexClasses?.let{ return ArrayList(it) }
+        val list = ArrayList<Class<*>>()
         val dexes = getDexFiles(context)
+        val loader = context.classLoader
         dexes.forEach {
             val iter = it.entries()
             while (iter.hasMoreElements()) {
                 val className = iter.nextElement()
-
                 try {
                     if (!className.contains("$")) {
-                        classes.add(Class.forName(className, false, null))
+                        list.add(Class.forName(className, false, loader))
                     }
                 } catch (e: ClassNotFoundException) {
                     e.printStackTrace()
                 }
             }
         }
-        classes.forEach {clazz ->
-            clazz.getAnnotation(TranslatorComponent::class.java)?.let {
-                Log.d("SCAN", clazz.name)
-            }
-        }
+        cachedDexClasses = list
+        return ArrayList(list)
     }
 
     internal fun getDexFiles(context: Context): List<DexFile> {

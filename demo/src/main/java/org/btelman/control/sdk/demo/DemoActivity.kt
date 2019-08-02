@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_demo.*
@@ -12,7 +13,7 @@ import org.btelman.controlsdk.hardware.components.HardwareComponent
 import org.btelman.controlsdk.hardware.drivers.BluetoothClassicDriver
 import org.btelman.controlsdk.hardware.interfaces.HardwareDriver
 import org.btelman.controlsdk.hardware.translators.ArduinoSendSingleCharTranslator
-import org.btelman.controlsdk.hardware.utils.TranslationClassFinder
+import org.btelman.controlsdk.hardware.utils.HardwareFinder
 import org.btelman.controlsdk.models.ComponentHolder
 import org.btelman.controlsdk.services.ControlSDKService
 import org.btelman.controlsdk.streaming.components.AudioComponent
@@ -31,7 +32,15 @@ class DemoActivity : AppCompatActivity() {
     val bt = BluetoothClassicDriver()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        TranslationClassFinder.getClasses(this)
+
+        //examples of fetching all available services
+        HardwareFinder.getTranslationClasses(this).forEach{
+            Log.d("TRANSLATE", it.name+"")
+        }
+        HardwareFinder.getDriverClasses(this).forEach{
+            Log.d("DRIVER", it.name+"")
+        }
+
         setContentView(R.layout.activity_demo)
         createComponentHolders()
 
@@ -76,8 +85,8 @@ class DemoActivity : AppCompatActivity() {
             true
         }
 
-        if(bt.needsSetup(this))
-            request = bt.setupComponent(this, true)
+        //if(bt.needsSetup(this))
+           // request = bt.setupComponent(this, true)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
