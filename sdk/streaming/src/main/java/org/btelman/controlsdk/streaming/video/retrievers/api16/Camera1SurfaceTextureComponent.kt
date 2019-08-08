@@ -54,7 +54,7 @@ class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Camera.Pr
         camera ?: run {
             val cameraId = streamInfo?.deviceInfo?.getCameraId() ?: 0
             if(cameraId > Camera.getNumberOfCameras())
-                throw Exception("Attempted to open camera $cameraId. Only ${Camera.getNumberOfCameras()} devices exist!")
+                throw Exception("Attempted to open camera $cameraId. Only ${Camera.getNumberOfCameras()} cameras exist!")
             camera = Camera.open(cameraId)
             camera?.setDisplayOrientation(90)
         }
