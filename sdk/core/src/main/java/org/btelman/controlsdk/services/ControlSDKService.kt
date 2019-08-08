@@ -258,6 +258,7 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
      */
     private fun setupForeground() {
         val intentHide = Intent(SERVICE_STOP_BROADCAST)
+        intentHide.setPackage(packageName)
         val hide = PendingIntent.getBroadcast(this,
                 System.currentTimeMillis().toInt(), intentHide, PendingIntent.FLAG_CANCEL_CURRENT)
         val notification = NotificationCompat.Builder(this, CONTROL_SERVICE)
