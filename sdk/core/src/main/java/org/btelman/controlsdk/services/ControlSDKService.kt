@@ -269,6 +269,7 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
     }
 
     companion object {
+        var allowNotificationForExceptions = true
         const val START = 1
         const val STOP = 2
         const val RESET = 4

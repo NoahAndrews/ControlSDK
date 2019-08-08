@@ -10,4 +10,7 @@
     <string name="send_data_permissions_details">Allow app to send data to ControlSDK</string>
     <string name="appBackgrounded">App is running in the background.</string>
     <string name="terminateApp">Terminate app</string>
+    <string name="componentCrashed">Error detected</string>
+    <string name="componentCrashedText">component stopped working</string>
+    <string name="error">Error</string>
 </resources>
