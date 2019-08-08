@@ -127,6 +127,7 @@ class DemoActivity : AppCompatActivity() {
         arrayList.add(audioComponent)
         arrayList.add(hardwareComponent)
         arrayList.add(dummyComponent)
+        arrayList.add(ComponentHolder(UnstableComponent::class.java, Bundle()))
     }
 
     fun parseColorForOperation(state : Operation?) : Int{

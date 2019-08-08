@@ -28,3 +28,9 @@ The one thing that has changed is that the external apps being able to communica
 
 - Custom app can communicate with another device with the ControlSDK. In this scenario, 
 the ControlSDK on the main device will relay data to the second device.
+
+## Turning off notifications for when internal exceptions occur
+
+Add this to your application class
+
+`ControlSDKService.allowNotificationForExceptions = false`
