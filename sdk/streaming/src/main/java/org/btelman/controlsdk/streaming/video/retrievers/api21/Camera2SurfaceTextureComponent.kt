@@ -71,8 +71,10 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
         try {
             val list = manager.cameraIdList
             val requestedId = streamInfo?.deviceInfo?.getCameraId()?:0
-            val cameraId = if(requestedId < list.size) requestedId else 0
-            manager.openCamera(list[cameraId], mStateCallback, null)
+            if(requestedId > list.size){
+                throw java.lang.Exception("Attempted to open camera $requestedId. Only ${list.size} cameras exist!")
+            }
+            manager.openCamera(list[requestedId], mStateCallback, null)
         } catch (e: CameraAccessException) {
             e.printStackTrace()
             //TODO throw error and kill service?

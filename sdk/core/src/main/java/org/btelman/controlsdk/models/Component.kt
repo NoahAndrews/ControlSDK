@@ -1,14 +1,17 @@
 package org.btelman.controlsdk.models
 
+import android.app.NotificationManager
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
+import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.btelman.controlsdk.R
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.interfaces.ComponentEventListener
 import org.btelman.controlsdk.interfaces.IComponent
@@ -16,6 +19,7 @@ import org.btelman.controlsdk.services.ControlSDKService
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.random.Random
 
 /**
  * Base component object to use to extend functionality of your robot.
@@ -86,14 +90,27 @@ abstract class Component : IComponent {
 
     fun enableWithCallback(callback: Callback<Boolean>){
         handler.post {
-            enableInternal()
+            try {
+                enableInternal()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                throwError(e)
+                status = ComponentStatus.ERROR
+            }
             callback.onComplete(true)
         }
     }
 
     fun disableWithCallback(callback: Callback<Boolean>){
         handler.post {
-            disableInternal()
+            try {
+                disableInternal()
+            }
+            catch (e : Exception){
+                e.printStackTrace()
+                throwError(e)
+                status = ComponentStatus.ERROR
+            }
             handler.removeCallbacksAndMessages(null)
             callback.onComplete(true)
         }
@@ -162,6 +179,23 @@ abstract class Component : IComponent {
      */
     open fun onInitializeComponent(applicationContext: Context, bundle : Bundle?) {
         context = applicationContext
+    }
+
+    open fun throwError(e : Exception){
+        if(!ControlSDKService.allowNotificationForExceptions) return
+        context?.let {
+            val errorMessage = getType().toString().toLowerCase() +" "+ it.getString(R.string.componentCrashedText)
+            val notification = NotificationCompat.Builder(it, ControlSDKService.CONTROL_SERVICE)
+                .setContentTitle(it.getString(R.string.componentCrashed))
+                .setContentText(errorMessage)
+                .setSmallIcon(android.R.drawable.stat_notify_error)
+                .setStyle(NotificationCompat.BigTextStyle()
+                .bigText("$errorMessage\n" +
+                        "Please report this to the developer if you believe this should not be happening:\n" +
+                        e.message))
+            val service = it.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            service.notify(Random.nextInt(), notification.build())
+        }
     }
 
     companion object {
