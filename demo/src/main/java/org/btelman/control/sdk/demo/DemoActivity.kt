@@ -84,6 +84,14 @@ class DemoActivity : AppCompatActivity() {
                 null -> powerButton.setTextColor(parseColorForOperation(null))
             }
         }
+
+        settingsButton?.setOnClickListener {
+            Intent(this, DemoSettingsActivity::class.java).also {
+                startActivity(it)
+                finish()
+            }
+        }
+
         powerButton.setOnLongClickListener{
             request = bt.setupComponent(this, true)
             true
@@ -99,6 +107,11 @@ class DemoActivity : AppCompatActivity() {
         if(request == requestCode && resultCode == Activity.RESULT_OK){
             bt.receivedComponentSetupDetails(this, data)
         }
+    }
+
+    override fun onDestroy() {
+        controlSDKViewModel?.unbind(this)
+        super.onDestroy()
     }
 
     private fun createComponentHolders() {
