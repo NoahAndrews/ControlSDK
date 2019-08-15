@@ -52,6 +52,7 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
             getString(R.string.channel_description))
         setupForeground()
         handler.obtainMessage(RESET).sendToTarget()
+        mMessenger = Messenger(handler)
     }
 
     /**
@@ -60,7 +61,6 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
      */
     override fun onBind(intent: Intent): IBinder? {
         Toast.makeText(applicationContext, "binding", Toast.LENGTH_SHORT).show()
-        mMessenger = Messenger(handler)
         emitState()
         return mMessenger.binder
     }
