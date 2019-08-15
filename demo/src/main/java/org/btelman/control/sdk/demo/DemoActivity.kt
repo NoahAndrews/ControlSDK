@@ -109,11 +109,6 @@ class DemoActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        controlSDKViewModel?.unbind(this)
-        super.onDestroy()
-    }
-
     private fun createComponentHolders() {
         val tts = ComponentHolder(SystemDefaultTTSComponent::class.java, null)
         val demoComponent = ComponentHolder(DemoComponent::class.java, null)
