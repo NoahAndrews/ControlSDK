@@ -16,20 +16,22 @@ import org.btelman.controlsdk.hardware.interfaces.HardwareDriver
 import org.btelman.controlsdk.hardware.interfaces.TranslatorComponent
 import org.btelman.controlsdk.hardware.translators.ArduinoSendSingleCharTranslator
 import org.btelman.controlsdk.hardware.utils.HardwareFinder
+import org.btelman.controlsdk.interfaces.ControlSdkApi
 import org.btelman.controlsdk.models.ComponentHolder
 import org.btelman.controlsdk.services.ControlSDKService
+import org.btelman.controlsdk.services.ControlSDKServiceConnection
+import org.btelman.controlsdk.services.observeAutoCreate
 import org.btelman.controlsdk.streaming.components.AudioComponent
 import org.btelman.controlsdk.streaming.components.VideoComponent
 import org.btelman.controlsdk.streaming.models.CameraDeviceInfo
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.tts.SystemDefaultTTSComponent
-import org.btelman.controlsdk.viewModels.ControlSDKViewModel
 
 class DemoActivity : AppCompatActivity() {
 
     private var request: Int = -1
     private var recording = false
-    private var controlSDKViewModel: ControlSDKViewModel? = null
+    private var controlAPI : ControlSdkApi = ControlSDKServiceConnection.getNewInstance(this)
     private val arrayList = ArrayList<ComponentHolder<*>>()
     val bt = BluetoothClassicDriver()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,36 +52,28 @@ class DemoActivity : AppCompatActivity() {
 
         ContextCompat.startForegroundService(applicationContext, Intent(applicationContext, ControlSDKService::class.java))
 
-        controlSDKViewModel = ControlSDKViewModel.getObject(this)
-        controlSDKViewModel?.setServiceBoundListener(this){ connected ->
-            powerButton.isEnabled = connected == Operation.OK
+        controlAPI.getServiceBoundObserver().observeAutoCreate(this){ connected ->
+            handleServiceBoundState(connected)
         }
-        controlSDKViewModel?.setStatusObserver(this){ serviceStatus ->
-            powerButton?.let {
-                powerButton.setTextColor(parseColorForOperation(serviceStatus))
-                val isLoading = serviceStatus == Operation.LOADING
-                powerButton.isEnabled = !isLoading
-                if(isLoading) return@setStatusObserver //processing command. Disable button
-                recording = serviceStatus == Operation.OK
-                /*if(recording && settings.autoHideMainControls.value)
-                    startSleepDelayed()*/
-            }
+        controlAPI.getServiceStateObserver().observeAutoCreate(this){ serviceStatus ->
+            handleServiceState(serviceStatus)
         }
+        controlAPI.connectToService()
 
         powerButton?.setOnClickListener {
-            when(controlSDKViewModel?.api?.getServiceStateObserver()?.value){
+            when(controlAPI.getServiceStateObserver().value){
                 Operation.NOT_OK -> {
                     arrayList.forEach {
-                        controlSDKViewModel?.api?.attachToLifecycle(it)
+                        controlAPI.attachToLifecycle(it)
                     }
-                    controlSDKViewModel?.api?.enable()
+                    controlAPI.enable()
                 }
                 Operation.LOADING -> {} //do nothing
                 Operation.OK -> {
                     arrayList.forEach {
-                        controlSDKViewModel?.api?.detachFromLifecycle(it)
+                        controlAPI.detachFromLifecycle(it)
                     }
-                    controlSDKViewModel?.api?.disable()
+                    controlAPI.disable()
                 }
                 null -> powerButton.setTextColor(parseColorForOperation(null))
             }
@@ -99,6 +93,27 @@ class DemoActivity : AppCompatActivity() {
 
         if(bt.needsSetup(this))
             request = bt.setupComponent(this, true)
+    }
+
+    override fun onDestroy() {
+        controlAPI.disconnectFromService()
+        super.onDestroy()
+    }
+
+    private fun handleServiceBoundState(connected: Operation) {
+        powerButton.isEnabled = connected == Operation.OK
+    }
+
+    private fun handleServiceState(serviceStatus: Operation) {
+        powerButton?.let {
+            powerButton.setTextColor(parseColorForOperation(serviceStatus))
+            val isLoading = serviceStatus == Operation.LOADING
+            powerButton.isEnabled = !isLoading
+            if(isLoading) return //processing command. Disable button
+            recording = serviceStatus == Operation.OK
+            /*if(recording && settings.autoHideMainControls.value)
+                startSleepDelayed()*/
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

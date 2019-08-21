@@ -4,20 +4,21 @@ import android.content.*
 import android.os.IBinder
 import android.os.Message
 import android.os.Messenger
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import org.btelman.controlsdk.enums.Operation
-import org.btelman.controlsdk.interfaces.IControlSdkApi
+import org.btelman.controlsdk.interfaces.ControlSdkApi
 import org.btelman.controlsdk.models.ComponentHolder
 
 /**
  * Binder for ControlSDK Service that allows us to put all of the communication code in one class
  */
 class ControlSDKServiceConnection private constructor(
-        anyContext: Context,
-        private val context : Context = anyContext.applicationContext
-) : ServiceConnection, IControlSdkApi {
+        val context: Context
+) : ServiceConnection, ControlSdkApi {
 
     /**
      * LiveData object for whether or not the service has the components enabled
@@ -42,14 +43,14 @@ class ControlSDKServiceConnection private constructor(
         // service using a Messenger, so here we get a client-side
         // representation of that from the raw IBinder object.
         mService = Messenger(service)
-        serviceBoundObserver.value = Operation.OK
+        serviceBoundObserver.postValue(Operation.OK)
     }
 
     override fun onServiceDisconnected(className: ComponentName) {
         // This is called when the connection with the service has been
         // unexpectedly disconnected -- that is, its process crashed.
         mService = null
-        serviceBoundObserver.value = Operation.NOT_OK
+        serviceBoundObserver.postValue(Operation.NOT_OK)
     }
 
     @Throws(IllegalStateException::class)
@@ -101,7 +102,7 @@ class ControlSDKServiceConnection private constructor(
         LocalBroadcastManager.getInstance(context).registerReceiver(receiver,
                 IntentFilter(ControlSDKService.SERVICE_STATUS_BROADCAST))
         Intent(context, ControlSDKService::class.java).also { intent ->
-            context.bindService(intent, this, Context.BIND_AUTO_CREATE)
+            context.bindService(intent, this, Context.BIND_ABOVE_CLIENT)
         }
     }
 
@@ -135,8 +136,16 @@ class ControlSDKServiceConnection private constructor(
     }
 
     companion object {
-        fun getNewInstance(context: Context) : IControlSdkApi{
+        fun getNewInstance(context: Context) : ControlSdkApi{
             return ControlSDKServiceConnection(context)
         }
+    }
+}
+
+fun <T> LiveData<T>.observeAutoCreate(owner: LifecycleOwner, observer : (T) -> Unit) : Observer<T>{
+    return Observer<T>{
+        observer(it)
+    }.also {
+        observe(owner, it)
     }
 }
