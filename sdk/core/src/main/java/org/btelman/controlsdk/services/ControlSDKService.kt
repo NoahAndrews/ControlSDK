@@ -52,6 +52,7 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
             getString(R.string.channel_description))
         setupForeground()
         handler.obtainMessage(RESET).sendToTarget()
+        mMessenger = Messenger(handler)
     }
 
     /**
@@ -60,9 +61,19 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
      */
     override fun onBind(intent: Intent): IBinder? {
         Toast.makeText(applicationContext, "binding", Toast.LENGTH_SHORT).show()
-        mMessenger = Messenger(handler)
         emitState()
         return mMessenger.binder
+    }
+
+    override fun onRebind(intent: Intent?) {
+        Toast.makeText(applicationContext, "rebinding", Toast.LENGTH_SHORT).show()
+        emitState()
+        super.onRebind(intent)
+    }
+
+    override fun onUnbind(intent: Intent?): Boolean {
+        Toast.makeText(applicationContext, "unbinding", Toast.LENGTH_SHORT).show()
+        return true
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
