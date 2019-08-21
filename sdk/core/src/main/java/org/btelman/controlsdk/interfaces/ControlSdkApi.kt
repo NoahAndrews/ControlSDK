@@ -7,7 +7,7 @@ import org.btelman.controlsdk.models.ComponentHolder
 /**
  * Interface for communicating with the robot service
  */
-interface IControlSdkApi {
+interface ControlSdkApi {
 
     /**
      * Enable the connection
