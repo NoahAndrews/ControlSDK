@@ -53,8 +53,8 @@ class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Camera.Pr
     override fun setupCamera(streamInfo : StreamInfo?){ //TODO actually use resolution from here?
         camera ?: run {
             val cameraId = streamInfo?.deviceInfo?.getCameraId() ?: 0
-            if(cameraId > Camera.getNumberOfCameras())
-                throw Exception("Attempted to open camera $cameraId. Only ${Camera.getNumberOfCameras()} cameras exist!")
+            if(cameraId+1 > Camera.getNumberOfCameras())
+                throw Exception("Attempted to open camera $cameraId. Only ${Camera.getNumberOfCameras()} cameras exist! 0 is first camera")
             camera = Camera.open(cameraId)
             camera?.setDisplayOrientation(90)
         }
