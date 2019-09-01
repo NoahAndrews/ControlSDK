@@ -43,8 +43,10 @@ abstract class StreamComponent<R : StreamSubComponent,P : StreamSubComponent> : 
     }
 
     fun fetchFrame() {
+        handler.postDelayed({
+            push(DO_FRAME)
+        },1000/30)
         doWorkLoop()
-        push(DO_FRAME)
     }
 
     abstract fun doWorkLoop()
