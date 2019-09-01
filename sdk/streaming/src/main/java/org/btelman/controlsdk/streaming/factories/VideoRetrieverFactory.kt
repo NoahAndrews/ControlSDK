@@ -29,7 +29,7 @@ object VideoRetrieverFactory {
     }
 
     fun <T : BaseVideoRetriever> putClassInBundle(clazz: Class<T>, bundle: Bundle){
-        clazz.intoBundle(AudioProcessorFactory.BUNDLE_ID, bundle)
+        clazz.intoBundle(BUNDLE_ID, bundle)
     }
 
     fun getClassFromBundle(bundle: Bundle) : Class<*>?{
