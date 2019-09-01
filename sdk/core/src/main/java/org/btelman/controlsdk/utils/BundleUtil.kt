@@ -5,16 +5,16 @@ import android.os.Bundle
 /**
  * Util for bundles
  */
-fun <T> Class<T>.toBundle(key : String) : Bundle {
-    return intoBundle(key, Bundle())
-}
-
-fun <T> Class<T>.intoBundle(key : String, bundle: Bundle) : Bundle {
-    bundle.putSerializable(key, this::class.java)
-    return bundle
-}
-
 object BundleUtil{
+    fun toBundle(key : String, clazz : Class<*>) : Bundle {
+        return intoBundle(key, clazz, Bundle())
+    }
+
+    fun intoBundle(key : String, clazz : Class<*>, bundle: Bundle) : Bundle {
+        bundle.putSerializable(key, clazz)
+        return bundle
+    }
+
     fun <T> checkForAndInitClass(clazz : Class<*>?, base : Class<T>) : T?{
         return if(checkIfClassMatches(clazz, base))
             clazz!!.newInstance() as T

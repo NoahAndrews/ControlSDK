@@ -7,7 +7,6 @@ import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
 import org.btelman.controlsdk.streaming.video.retrievers.api16.Camera1SurfaceTextureComponent
 import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2SurfaceTextureComponent
 import org.btelman.controlsdk.utils.BundleUtil
-import org.btelman.controlsdk.utils.intoBundle
 
 object VideoRetrieverFactory {
     fun findRetriever(bundle: Bundle): BaseVideoRetriever? {
@@ -29,7 +28,7 @@ object VideoRetrieverFactory {
     }
 
     fun <T : BaseVideoRetriever> putClassInBundle(clazz: Class<T>, bundle: Bundle){
-        clazz.intoBundle(BUNDLE_ID, bundle)
+        BundleUtil.intoBundle(BUNDLE_ID, clazz, bundle)
     }
 
     fun getClassFromBundle(bundle: Bundle) : Class<*>?{

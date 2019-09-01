@@ -4,6 +4,7 @@ import androidx.test.runner.AndroidJUnit4
 import org.btelman.controlsdk.streaming.audio.processors.BaseAudioProcessor
 import org.btelman.controlsdk.streaming.audio.processors.FFmpegAudioProcessor
 import org.btelman.controlsdk.streaming.factories.AudioProcessorFactory
+import org.btelman.controlsdk.streaming.models.AudioPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.junit.Assert
 import org.junit.Test
@@ -37,8 +38,8 @@ class AudioProcessorFactoryAndroidTest {
     }
 
     class MockAudioProcessor : BaseAudioProcessor() {
-        override fun processAudioByteArray(data: ByteArray) {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        override fun processAudioByteArray(data: AudioPacket) {
+
         }
     }
 }
