@@ -21,8 +21,12 @@ open class VideoComponent : StreamComponent<BaseVideoRetriever, BaseVideoProcess
         retriever = VideoRetrieverFactory.findRetriever(bundle) ?: throw IllegalArgumentException("unable to resolve video retriever")
     }
 
+    var lastTimecode = 0L
+
     override fun doWorkLoop() {
         retriever.grabImageData()?.let {
+            if(lastTimecode == it.timecode) return
+            lastTimecode = it.timecode
             processor.processData(it)
         }
     }
