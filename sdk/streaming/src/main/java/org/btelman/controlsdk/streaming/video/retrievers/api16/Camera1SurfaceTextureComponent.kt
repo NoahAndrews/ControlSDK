@@ -7,7 +7,6 @@ import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.SurfaceTextureVideoRetriever
 
-
 /**
  * Class that contains only the camera components for streaming to letsrobot.tv
  *
@@ -51,8 +50,8 @@ class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Camera.Pr
     }
 
     override fun setupCamera(streamInfo : StreamInfo?){ //TODO actually use resolution from here?
+        val cameraId = streamInfo?.deviceInfo?.getCameraId() ?: 0
         camera ?: run {
-            val cameraId = streamInfo?.deviceInfo?.getCameraId() ?: 0
             if(cameraId+1 > Camera.getNumberOfCameras())
                 throw Exception("Attempted to open camera $cameraId. Only ${Camera.getNumberOfCameras()} cameras exist! 0 is first camera")
             camera = Camera.open(cameraId)
@@ -61,6 +60,8 @@ class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Camera.Pr
         camera?.let {
             val p = it.parameters
             p.setPreviewSize(640, 480)
+            p.setPictureSize(640, 480)
+            p.setRecordingHint(true)
             it.parameters = p
             it.setPreviewTexture(mStManager?.surfaceTexture)
             it.setPreviewCallback(this)
