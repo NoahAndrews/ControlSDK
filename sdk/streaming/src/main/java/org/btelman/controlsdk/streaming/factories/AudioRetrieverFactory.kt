@@ -4,7 +4,6 @@ import android.os.Bundle
 import org.btelman.controlsdk.streaming.audio.retrievers.BaseAudioRetriever
 import org.btelman.controlsdk.streaming.audio.retrievers.BasicMicrophoneAudioRetriever
 import org.btelman.controlsdk.utils.BundleUtil
-import org.btelman.controlsdk.utils.intoBundle
 
 /**
  * Handles creating the BaseVideoProcessor instance or putting the class in the main bundle
@@ -18,7 +17,7 @@ object AudioRetrieverFactory {
     }
 
     fun <T : BaseAudioRetriever> putClassInBundle(clazz: Class<T>, bundle: Bundle){
-        clazz.intoBundle(AudioProcessorFactory.BUNDLE_ID, bundle)
+        BundleUtil.intoBundle(BUNDLE_ID, clazz, bundle)
     }
 
     fun getClassFromBundle(bundle: Bundle) : Class<*>?{

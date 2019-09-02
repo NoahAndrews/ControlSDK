@@ -4,6 +4,7 @@ import androidx.test.runner.AndroidJUnit4
 import org.btelman.controlsdk.streaming.audio.retrievers.BaseAudioRetriever
 import org.btelman.controlsdk.streaming.audio.retrievers.BasicMicrophoneAudioRetriever
 import org.btelman.controlsdk.streaming.factories.AudioRetrieverFactory
+import org.btelman.controlsdk.streaming.models.AudioPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.junit.Assert
 import org.junit.Test
@@ -40,7 +41,7 @@ class AudioRetrieverFactoryAndroidTest {
     }
 
     class MockAudioRetriever : BaseAudioRetriever() {
-        override fun retrieveAudioByteArray(): ByteArray? {
+        override fun retrieveAudioByteArray(): AudioPacket? {
             TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         }
     }

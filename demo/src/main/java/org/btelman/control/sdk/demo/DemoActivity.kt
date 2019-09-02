@@ -111,8 +111,6 @@ class DemoActivity : AppCompatActivity() {
             powerButton.isEnabled = !isLoading
             if(isLoading) return //processing command. Disable button
             recording = serviceStatus == Operation.OK
-            /*if(recording && settings.autoHideMainControls.value)
-                startSleepDelayed()*/
         }
     }
 
@@ -128,14 +126,15 @@ class DemoActivity : AppCompatActivity() {
         val tts = ComponentHolder(SystemDefaultTTSComponent::class.java, null)
         val demoComponent = ComponentHolder(DemoComponent::class.java, null)
         val streamInfo = StreamInfo(
-            "http://dev.remo.tv:1567/transmit?name=chan-eb194a7e-6a4f-4ae7-8112-b48a16032d91-video",
-            "http://dev.remo.tv:1567/transmit?name=chan-eb194a7e-6a4f-4ae7-8112-b48a16032d91-audio"
+            "streamvideourl", //TODO video url
+            "streamaudiourl" //TODO audio url
             ,deviceInfo = CameraDeviceInfo.fromCamera(0)
         )
         val bundle = Bundle()
         streamInfo.addToExistingBundle(bundle)
         //VideoRetrieverFactory.putClassInBundle(DummyCanvasRetriever::class.java, bundle)
         //VideoProcessorFactory.putClassInBundle(DummyVideoProcessor::class.java, bundle)
+        //VideoRetrieverFactory.putClassInBundle(Camera1SurfaceTextureComponent::class.java, bundle)
         val videoComponent = ComponentHolder(VideoComponent::class.java, bundle)
         val audioComponent = ComponentHolder(AudioComponent::class.java, bundle)
 
@@ -144,7 +143,7 @@ class DemoActivity : AppCompatActivity() {
         hardwareBundle.putSerializable(HardwareComponent.HARDWARE_TRANSLATOR_BUNDLE_ID, ArduinoSendSingleCharTranslator::class.java)
         val hardwareComponent = ComponentHolder(HardwareComponent::class.java, hardwareBundle)
         val dummyComponent = ComponentHolder(DummyController::class.java, Bundle())
-        arrayList.add(tts)
+        arrayList.add(tts) //noisy and potentially annoying due to dummyComponent giving it garbage, but good for testing
         arrayList.add(demoComponent)
         arrayList.add(videoComponent)
         arrayList.add(audioComponent)
