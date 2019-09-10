@@ -86,7 +86,7 @@ class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler 
             else builder.append(",transpose=1")
         }
         val bitrate = props.bitrate
-        val command = "-f image2pipe -codec:v mjpeg -i - -f mpegts -framerate ${props.framerate} -codec:v mpeg1video -b ${bitrate}k -minrate ${bitrate}k -maxrate ${bitrate}k -bufsize ${bitrate/1.5}k -bf 0 -tune zerolatency -preset ultrafast -pix_fmt yuv420p $builder ${props.endpoint}"
+        val command = "-f image2 -codec:v rawvideo -pix_fmt yuv420p -s ${props.width}x${props.height} -i - -f mpegts -framerate ${props.framerate} -codec:v mpeg1video -b ${bitrate}k -minrate ${bitrate}k -maxrate ${bitrate}k -bufsize ${bitrate/1.5}k -bf 0 -tune zerolatency -preset ultrafast -pix_fmt yuv420p $builder ${props.endpoint}"
         FFmpegUtil.execute(ffmpeg, UUID, command, this)
     }
 

@@ -65,7 +65,7 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
         startBackgroundThread()
         width = streamInfo?.width ?: 640
         height = streamInfo?.height ?: 640
-        reader = ImageReader.newInstance(width, height, ImageFormat.JPEG, 10)
+        reader = ImageReader.newInstance(width, height, ImageFormat.YUV_420_888, 2)
         reader?.setOnImageAvailableListener(this, mBackgroundHandler)
         val manager = context!!.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         try {
@@ -118,8 +118,7 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
                 val buffer = it.planes[0].buffer
                 val imageBytes = ByteArray(buffer.remaining())
                 buffer.get(imageBytes)
-                val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                latestPackage = ImageDataPacket(bitmap)
+                latestPackage = ImageDataPacket(imageBytes, ImageFormat.YUV_420_888)
             }
         } finally {
             image?.close()
