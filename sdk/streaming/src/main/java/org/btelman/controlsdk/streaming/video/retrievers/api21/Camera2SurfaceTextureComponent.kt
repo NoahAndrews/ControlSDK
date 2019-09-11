@@ -1,8 +1,8 @@
 package org.btelman.controlsdk.streaming.video.retrievers.api21
 
 import android.annotation.SuppressLint
+import android.annotation.TargetApi
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.hardware.camera2.*
 import android.media.Image
@@ -16,12 +16,14 @@ import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.SurfaceTextureVideoRetriever
 
+
 /**
  * Camera retrieval via Camera2 API and an offscreen SurfaceTexture for rendering the preview
  */
 @RequiresApi(21)
 class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageReader.OnImageAvailableListener {
 
+    private var data: ByteArray? = null
     private var width = 0
     private var height = 0
 
@@ -115,14 +117,49 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
         try {
             image = reader?.acquireLatestImage()
             image?.let {
-                val buffer = it.planes[0].buffer
-                val imageBytes = ByteArray(buffer.remaining())
-                buffer.get(imageBytes)
-                latestPackage = ImageDataPacket(imageBytes, ImageFormat.YUV_420_888)
+                latestPackage = ImageDataPacket(convertYuv420888ToYuv(image), ImageFormat.YUV_420_888)
             }
         } finally {
             image?.close()
         }
+    }
+
+    @TargetApi(21)
+    fun convertYuv420888ToYuv(image: Image): ByteArray {
+        val yPlane = image.planes[0]
+        val ySize = yPlane.buffer.remaining()
+
+        val uPlane = image.planes[1]
+        val vPlane = image.planes[2]
+
+        // be aware that this size does not include the padding at the end, if there is any
+        // (e.g. if pixel stride is 2 the size is ySize / 2 - 1)
+        val uSize = uPlane.buffer.remaining()
+        val vSize = vPlane.buffer.remaining()
+
+        val data = ByteArray(ySize + ySize / 2)
+
+        yPlane.buffer.get(data, 0, ySize)
+
+        val ub = uPlane.buffer
+        val vb = vPlane.buffer
+
+        val uvPixelStride = uPlane.pixelStride //stride guaranteed to be the same for u and v planes
+        if (uvPixelStride == 1) {
+            uPlane.buffer.get(data, ySize, uSize)
+            vPlane.buffer.get(data, ySize + uSize, vSize)
+        }
+        else{
+            // if pixel stride is 2 there is padding between each pixel
+            // converting it to NV21 by filling the gaps of the v plane with the u values
+            vb.get(data, ySize, vSize)
+            var i = 0
+            while (i < uSize) {
+                data[ySize + i + 1] = ub.get(i)
+                i += 2
+            }
+        }
+        return data
     }
 
     /**
