@@ -1,7 +1,6 @@
 package org.btelman.controlsdk.streaming.video.retrievers.api21
 
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.ImageFormat
 import android.hardware.camera2.*
@@ -124,7 +123,6 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
         }
     }
 
-    @TargetApi(21)
     fun convertYuv420888ToYuv(image: Image): ByteArray {
         val yPlane = image.planes[0]
         val ySize = yPlane.buffer.remaining()
@@ -137,7 +135,8 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
         val uSize = uPlane.buffer.remaining()
         val vSize = vPlane.buffer.remaining()
 
-        val data = ByteArray(ySize + ySize / 2)
+        if(data?.size != ySize + ySize / 2)
+            data = ByteArray(ySize + ySize / 2)
 
         yPlane.buffer.get(data, 0, ySize)
 
@@ -155,11 +154,11 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
             vb.get(data, ySize, vSize)
             var i = 0
             while (i < uSize) {
-                data[ySize + i + 1] = ub.get(i)
+                data!![ySize + i + 1] = ub.get(i)
                 i += 2
             }
         }
-        return data
+        return data!!
     }
 
     /**
