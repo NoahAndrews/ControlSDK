@@ -28,6 +28,7 @@ data class StreamInfo(val endpoint : String,
             putInt("framerate", framerate)
             putInt("orientation", orientation.value)
             putBundle("deviceInfo", deviceInfo.toBundle())
+            bundle.putInt("bitrate", bitrate)
         }
         return bundle
     }
