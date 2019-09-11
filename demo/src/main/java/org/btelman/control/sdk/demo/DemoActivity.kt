@@ -125,7 +125,8 @@ class DemoActivity : AppCompatActivity() {
         val tts = ComponentHolder(SystemDefaultTTSComponent::class.java, null)
         val demoComponent = ComponentHolder(DemoComponent::class.java, null)
         val streamInfo = StreamInfo(
-            "http://dev.remo.tv:1567/transmit?name=chan-3650a36e-a336-4531-9084-26cee4a33c02-video", //TODO video url
+            "TODO-video", //TODO video url
+            "TODO-audio",
             deviceInfo = CameraDeviceInfo.fromCamera(0)
         )
         val bundle = Bundle()
@@ -134,7 +135,7 @@ class DemoActivity : AppCompatActivity() {
         //VideoProcessorFactory.putClassInBundle(DummyVideoProcessor::class.java, bundle)
         VideoRetrieverFactory.putClassInBundle(Camera1SurfaceTextureComponent::class.java, bundle)
         val videoComponent = ComponentHolder(VideoComponent::class.java, bundle)
-        //val audioComponent = ComponentHolder(AudioComponent::class.java, bundle)
+        val audioComponent = ComponentHolder(AudioComponent::class.java, bundle)
 
         val hardwareBundle = Bundle()
         hardwareBundle.putSerializable(HardwareDriver.BUNDLE_ID, BluetoothClassicDriver::class.java)
@@ -142,12 +143,12 @@ class DemoActivity : AppCompatActivity() {
         val hardwareComponent = ComponentHolder(HardwareComponent::class.java, hardwareBundle)
         val dummyComponent = ComponentHolder(DummyController::class.java, Bundle())
         arrayList.add(tts) //noisy and potentially annoying due to dummyComponent giving it garbage, but good for testing
-        //arrayList.add(demoComponent)
+        arrayList.add(demoComponent)
         arrayList.add(videoComponent)
-        //arrayList.add(audioComponent)
-        //arrayList.add(hardwareComponent)
-        //arrayList.add(dummyComponent)
-        //arrayList.add(ComponentHolder(UnstableComponent::class.java, Bundle()))
+        arrayList.add(audioComponent)
+        arrayList.add(hardwareComponent)
+        arrayList.add(dummyComponent)
+        arrayList.add(ComponentHolder(UnstableComponent::class.java, Bundle()))
     }
 
     fun parseColorForOperation(state : Operation?) : Int{
