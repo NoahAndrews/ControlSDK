@@ -56,21 +56,16 @@ class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Camera.Pr
         val cameraHeight = streamInfo?.height ?: 480
         camera ?: run {
             if(cameraId+1 > Camera.getNumberOfCameras())
-                throw Exception("Attempted to open camera $cameraId. Only ${Camera.getNumberOfCameras()} cameras exist! 0 is first camera")
+                throw Exception("Attempted to open camera $cameraId. " +
+                        "Only ${Camera.getNumberOfCameras()} cameras exist! 0 is first camera")
             camera = Camera.open(cameraId)
             camera?.setDisplayOrientation(90)
         }
         camera?.let {
             val p = it.parameters
-            supportedPreviewSizes = p.supportedPreviewSizes
-            var supportsSize = false
-            supportedPreviewSizes?.forEach { size ->
-                if(size.height == cameraHeight && size.width == cameraWidth){
-                    supportsSize = true
-                }
-            }
-            if(!supportsSize) throw java.lang.Exception("Camera size " +
-                    "${cameraWidth}x$cameraHeight not supported by this camera!")
+            if(!validateSizeSupported(p, cameraWidth, cameraHeight))
+                throw java.lang.Exception("Camera size " +
+                        "${cameraWidth}x$cameraHeight not supported by this camera!")
             p.setPreviewSize(cameraWidth, cameraHeight)
             p.setRecordingHint(true)
             it.parameters = p
@@ -78,5 +73,16 @@ class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Camera.Pr
             it.setPreviewCallback(this)
             it.startPreview()
         }
+    }
+
+    private fun validateSizeSupported(p: Camera.Parameters?, cameraWidth: Int, cameraHeight: Int) : Boolean{
+        supportedPreviewSizes = p?.supportedPreviewSizes
+        var supportsSize = false
+        supportedPreviewSizes?.forEach { size ->
+            if(size.height == cameraHeight && size.width == cameraWidth){
+                supportsSize = true
+            }
+        }
+        return supportsSize
     }
 }
