@@ -18,6 +18,7 @@ import org.btelman.controlsdk.streaming.video.retrievers.SurfaceTextureVideoRetr
  */
 @Suppress("DEPRECATION")
 class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Camera.PreviewCallback{
+    private var supportedPreviewSizes: MutableList<Camera.Size>? = null
     private var r: Rect? = null
     private var camera : Camera? = null
     private var _widthV1 = 0
@@ -51,21 +52,37 @@ class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Camera.Pr
 
     override fun setupCamera(streamInfo : StreamInfo?){ //TODO actually use resolution from here?
         val cameraId = streamInfo?.deviceInfo?.getCameraId() ?: 0
+        val cameraWidth = streamInfo?.width ?: 640
+        val cameraHeight = streamInfo?.height ?: 480
         camera ?: run {
             if(cameraId+1 > Camera.getNumberOfCameras())
-                throw Exception("Attempted to open camera $cameraId. Only ${Camera.getNumberOfCameras()} cameras exist! 0 is first camera")
+                throw Exception("Attempted to open camera $cameraId. " +
+                        "Only ${Camera.getNumberOfCameras()} cameras exist! 0 is first camera")
             camera = Camera.open(cameraId)
             camera?.setDisplayOrientation(90)
         }
         camera?.let {
             val p = it.parameters
-            p.setPreviewSize(640, 480)
-            p.setPictureSize(640, 480)
+            if(!validateSizeSupported(p, cameraWidth, cameraHeight))
+                throw java.lang.Exception("Camera size " +
+                        "${cameraWidth}x$cameraHeight not supported by this camera!")
+            p.setPreviewSize(cameraWidth, cameraHeight)
             p.setRecordingHint(true)
             it.parameters = p
             it.setPreviewTexture(mStManager?.surfaceTexture)
             it.setPreviewCallback(this)
             it.startPreview()
         }
+    }
+
+    private fun validateSizeSupported(p: Camera.Parameters?, cameraWidth: Int, cameraHeight: Int) : Boolean{
+        supportedPreviewSizes = p?.supportedPreviewSizes
+        var supportsSize = false
+        supportedPreviewSizes?.forEach { size ->
+            if(size.height == cameraHeight && size.width == cameraWidth){
+                supportsSize = true
+            }
+        }
+        return supportsSize
     }
 }

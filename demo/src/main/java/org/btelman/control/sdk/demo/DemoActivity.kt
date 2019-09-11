@@ -23,8 +23,10 @@ import org.btelman.controlsdk.services.ControlSDKServiceConnection
 import org.btelman.controlsdk.services.observeAutoCreate
 import org.btelman.controlsdk.streaming.components.AudioComponent
 import org.btelman.controlsdk.streaming.components.VideoComponent
+import org.btelman.controlsdk.streaming.factories.VideoRetrieverFactory
 import org.btelman.controlsdk.streaming.models.CameraDeviceInfo
 import org.btelman.controlsdk.streaming.models.StreamInfo
+import org.btelman.controlsdk.streaming.video.retrievers.api16.Camera1SurfaceTextureComponent
 import org.btelman.controlsdk.tts.SystemDefaultTTSComponent
 
 class DemoActivity : AppCompatActivity() {
@@ -90,9 +92,6 @@ class DemoActivity : AppCompatActivity() {
             request = bt.setupComponent(this, true)
             true
         }
-
-        if(bt.needsSetup(this))
-            request = bt.setupComponent(this, true)
     }
 
     override fun onDestroy() {
@@ -126,15 +125,15 @@ class DemoActivity : AppCompatActivity() {
         val tts = ComponentHolder(SystemDefaultTTSComponent::class.java, null)
         val demoComponent = ComponentHolder(DemoComponent::class.java, null)
         val streamInfo = StreamInfo(
-            "streamvideourl", //TODO video url
-            "streamaudiourl" //TODO audio url
-            ,deviceInfo = CameraDeviceInfo.fromCamera(0)
+            "TODO-video", //TODO video url
+            "TODO-audio",
+            deviceInfo = CameraDeviceInfo.fromCamera(0)
         )
         val bundle = Bundle()
         streamInfo.addToExistingBundle(bundle)
         //VideoRetrieverFactory.putClassInBundle(DummyCanvasRetriever::class.java, bundle)
         //VideoProcessorFactory.putClassInBundle(DummyVideoProcessor::class.java, bundle)
-        //VideoRetrieverFactory.putClassInBundle(Camera1SurfaceTextureComponent::class.java, bundle)
+        VideoRetrieverFactory.putClassInBundle(Camera1SurfaceTextureComponent::class.java, bundle)
         val videoComponent = ComponentHolder(VideoComponent::class.java, bundle)
         val audioComponent = ComponentHolder(AudioComponent::class.java, bundle)
 

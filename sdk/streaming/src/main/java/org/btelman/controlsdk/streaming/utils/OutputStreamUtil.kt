@@ -44,10 +44,10 @@ object OutputStreamUtil {
                 handleSendByteArray(outputStream, it.b as ByteArray)
             }
             ImageFormat.NV21 -> {
-                it.r?.let { rect ->
-                    val im = YuvImage(it.b as ByteArray, it.format, rect.width(), rect.height(), null)
-                    return im.compressToJpeg(rect, 100, outputStream) //TODO change quality?
-                }
+                outputStream.write(it.b as ByteArray)
+            }
+            ImageFormat.YUV_420_888 -> {
+                outputStream.write(it.b as ByteArray)
             }
             else -> {
             }

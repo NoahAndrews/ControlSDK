@@ -6,6 +6,7 @@ import android.util.Log
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
@@ -28,7 +29,7 @@ class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler 
     override fun enable(context: Context, streamInfo: StreamInfo) {
         super.enable(context, streamInfo)
         ffmpeg = FFmpeg.getInstance(context.applicationContext)
-        if(!FFmpegUtil.initFFmpegBlocking(ffmpeg)) return //TODO throw error
+        if(!FFmpegUtil.initFFmpegBlocking(ffmpeg)) throw FFmpegNotSupportedException("Device does not support FFmpeg. Please contact the developer")
         this.streamInfo = streamInfo
         streaming.set(true)
     }
@@ -86,7 +87,7 @@ class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler 
             else builder.append(",transpose=1")
         }
         val bitrate = props.bitrate
-        val command = "-f image2pipe -codec:v mjpeg -i - -f mpegts -framerate ${props.framerate} -codec:v mpeg1video -b ${bitrate}k -minrate ${bitrate}k -maxrate ${bitrate}k -bufsize ${bitrate/1.5}k -bf 0 -tune zerolatency -preset ultrafast -pix_fmt yuv420p $builder ${props.endpoint}"
+        val command = "-f rawvideo -vcodec rawvideo -s ${props.width}x${props.height} -r 25 -pix_fmt nv21 -i - -f mpegts -framerate ${props.framerate} -codec:v mpeg1video -b ${bitrate}k -minrate ${bitrate}k -maxrate ${bitrate}k -bufsize ${bitrate/1.5}k -bf 0 $builder ${props.endpoint}"
         FFmpegUtil.execute(ffmpeg, UUID, command, this)
     }
 
