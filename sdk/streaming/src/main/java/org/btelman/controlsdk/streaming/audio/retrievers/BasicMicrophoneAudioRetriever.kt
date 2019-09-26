@@ -9,7 +9,7 @@ import org.btelman.controlsdk.streaming.utils.AudioUtil
 /**
  * Grab audio from the microphone and send it to the processor when asked to
  */
-class BasicMicrophoneAudioRetriever : BaseAudioRetriever(), AudioRecordingThread.AudioDataReceivedListener {
+open class BasicMicrophoneAudioRetriever : BaseAudioRetriever(), AudioRecordingThread.AudioDataReceivedListener {
 
     private val recordingThread = AudioRecordingThread(this)
 
