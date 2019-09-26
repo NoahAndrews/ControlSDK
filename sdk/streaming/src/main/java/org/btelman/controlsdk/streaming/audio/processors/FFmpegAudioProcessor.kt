@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 /**
  * Process audio from a source and send it to a specified endpoint with FFmpeg
  */
-class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHandler {
+open class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHandler {
 
     private var lastTimecode: Long = 0L
     private var endpoint: String? = null
@@ -33,7 +33,6 @@ class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHandler 
         endpoint = streamInfo.audioEndpoint ?: return//?: else we can't do anything
         ffmpeg = FFmpeg.getInstance(context)
         if(!FFmpegUtil.initFFmpegBlocking(ffmpeg)) return //TODO throw error
-
     }
 
     override fun disable() {
@@ -59,7 +58,7 @@ class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHandler 
         }
     }
 
-    private fun ensureFFmpegStarted() {
+    protected open fun ensureFFmpegStarted() {
         try {
             if(!ffmpegRunning.get()){
                 successCounter = 0
