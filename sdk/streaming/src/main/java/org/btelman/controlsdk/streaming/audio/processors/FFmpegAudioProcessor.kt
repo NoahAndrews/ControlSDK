@@ -15,11 +15,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 /**
  * Process audio from a source and send it to a specified endpoint with FFmpeg
  */
-class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHandler {
+open class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHandler {
 
+    private var streamInfo: StreamInfo? = null
     private var lastTimecode: Long = 0L
     private var endpoint: String? = null
     private var status: ComponentStatus = ComponentStatus.DISABLED
+    private val streaming = AtomicBoolean(false)
     private var ffmpegRunning = AtomicBoolean(false)
 
     private var ffmpeg : FFmpeg? = null
@@ -30,17 +32,17 @@ class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHandler 
 
     override fun enable(context: Context, streamInfo: StreamInfo) {
         super.enable(context, streamInfo)
+        this.streamInfo = streamInfo
         endpoint = streamInfo.audioEndpoint ?: return//?: else we can't do anything
         ffmpeg = FFmpeg.getInstance(context)
         if(!FFmpegUtil.initFFmpegBlocking(ffmpeg)) return //TODO throw error
-
     }
 
     override fun disable() {
         super.disable()
         process?.destroy()
         process = null
-        ffmpegRunning.set(false)
+        streaming.set(false)
         FFmpegUtil.killFFmpeg(process)
     }
 
@@ -50,31 +52,15 @@ class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHandler 
     }
 
     override fun processAudioByteArray(data: AudioPacket) {
-        ensureFFmpegStarted()
+        if(!streaming.get()) return
+        if (!ffmpegRunning.getAndSet(true)) {
+            tryBootFFmpeg()
+        }
         process?.let { _process ->
             if(data.timecode != lastTimecode){ //make sure we only send each packet once
                 lastTimecode = data.timecode
                 OutputStreamUtil.handleSendByteArray(_process.outputStream, data.b)
             }
-        }
-    }
-
-    private fun ensureFFmpegStarted() {
-        try {
-            if(!ffmpegRunning.get()){
-                successCounter = 0
-                status = ComponentStatus.CONNECTING
-                val bitrate = 32 //TODO make adjustable
-                val volumeBoost = 1 //TODO make adjustable
-                val separator = " "
-                val command = "-f s16be -i - -f mpegts -codec:a mp2 -b:a ${bitrate}k -ar 44100" +
-                        "$separator-muxdelay 0.001 -filter:a volume=$volumeBoost" +
-                        "$separator$endpoint"
-                FFmpegUtil.execute(ffmpeg, UUID, command, this)
-            }
-        } catch (e: Exception) {
-            status = ComponentStatus.ERROR
-            e.printStackTrace()
         }
     }
 
@@ -101,6 +87,57 @@ class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHandler 
     override fun onProcess(p0: Process?) {
         process = p0
         Log.d(TAG, "onProcess")
+    }
+
+    protected open fun tryBootFFmpeg() {
+        if(!streaming.get()){
+            ffmpegRunning.set(false)
+            status = ComponentStatus.DISABLED
+            process?.outputStream?.close()
+        }
+        try {
+            bootFFmpeg()
+        } catch (e: Exception) {
+            status = ComponentStatus.ERROR
+            e.printStackTrace()
+        }
+    }
+
+    protected open fun bootFFmpeg() {
+        successCounter = 0
+        status = ComponentStatus.CONNECTING
+        FFmpegUtil.execute(ffmpeg, UUID, getCommand(), this)
+    }
+
+    protected open fun getCommand() : String{
+        val props = streamInfo ?: throw IllegalStateException("no StreamInfo supplied!")
+        val list = ArrayList<String>()
+        list.apply {
+            addAll(getVideoInputOptions(props))
+            addAll(getVideoOutputOptions(props))
+            add(props.audioEndpoint!!)
+        }
+        return list.joinToString (" ")
+    }
+
+    protected open fun getVideoInputOptions(props: StreamInfo): ArrayList<String> {
+        return arrayListOf(
+            "-f s16be",
+            "-i -"
+        )
+    }
+
+    protected open fun getVideoOutputOptions(props: StreamInfo): Collection<String> {
+        val bitrate = 32 //TODO make adjustable
+        val volumeBoost = 1 //TODO make adjustable
+        return arrayListOf(
+            "-f mpegts",
+            "-codec:a mp2",
+            "-b:a ${bitrate}k",
+            "-ar 44100",
+            "-muxdelay 0.001",
+            "-filter:a volume=$volumeBoost"
+        )
     }
 
     companion object {
