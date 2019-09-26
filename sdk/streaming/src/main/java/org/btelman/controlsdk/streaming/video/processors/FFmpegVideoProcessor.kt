@@ -101,7 +101,7 @@ open class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHan
     /**
      * Boot ffmpeg using config. If given a Rect, use that for resolution instead.
      */
-    open fun tryBootFFmpeg(r : Rect? = null){
+    protected open fun tryBootFFmpeg(r : Rect? = null){
         if(!streaming.get()){
             ffmpegRunning.set(false)
             status = ComponentStatus.DISABLED
