@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 /**
  * Process frames via FFmpeg
  */
-class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler {
+open class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler {
     private var status: ComponentStatus = ComponentStatus.DISABLED
     private val streaming = AtomicBoolean(false)
     private val ffmpegRunning = AtomicBoolean(false)
@@ -53,42 +53,6 @@ class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler 
                 e.printStackTrace()
             }
         }
-    }
-
-    /**
-     * Boot ffmpeg using config. If given a Rect, use that for resolution instead.
-     */
-    fun tryBootFFmpeg(r : Rect? = null){
-        if(!streaming.get()){
-            ffmpegRunning.set(false)
-            status = ComponentStatus.DISABLED
-            process?.outputStream?.close()
-            return
-        }
-        try{
-            bootFFmpeg(r)
-        } catch (e: FFmpegCommandAlreadyRunningException) {
-            status = ComponentStatus.ERROR
-            e.printStackTrace()
-            // Handle if FFmpeg is already running
-        }
-    }
-
-    @Throws(FFmpegCommandAlreadyRunningException::class)
-    private fun bootFFmpeg(r : Rect? = null) {
-        val props = streamInfo ?: return
-        successCounter = 0
-        status = ComponentStatus.CONNECTING
-
-        val rotationOption = props.orientation.ordinal //leave blank
-        val builder = StringBuilder()
-        for (i in 0..rotationOption){
-            if(i == 0) builder.append("-vf transpose=1")
-            else builder.append(",transpose=1")
-        }
-        val bitrate = props.bitrate
-        val command = "-f rawvideo -vcodec rawvideo -s ${props.width}x${props.height} -r 25 -pix_fmt nv21 -i - -f mpegts -framerate ${props.framerate} -codec:v mpeg1video -b ${bitrate}k -minrate ${bitrate}k -maxrate ${bitrate}k -bufsize ${bitrate/1.5}k -bf 0 $builder ${props.endpoint}"
-        FFmpegUtil.execute(ffmpeg, UUID, command, this)
     }
 
     override fun onStart() {
@@ -132,6 +96,98 @@ class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler 
         if(shouldLog)
             Log.d(LOGTAG, "onProcess")
         this.process = p0
+    }
+
+    /**
+     * Boot ffmpeg using config. If given a Rect, use that for resolution instead.
+     */
+    open fun tryBootFFmpeg(r : Rect? = null){
+        if(!streaming.get()){
+            ffmpegRunning.set(false)
+            status = ComponentStatus.DISABLED
+            process?.outputStream?.close()
+            return
+        }
+        try{
+            bootFFmpeg(r)
+        } catch (e: FFmpegCommandAlreadyRunningException) {
+            status = ComponentStatus.ERROR
+            e.printStackTrace()
+            // Handle if FFmpeg is already running
+        }
+    }
+
+    @Throws(FFmpegCommandAlreadyRunningException::class)
+    protected open fun bootFFmpeg(r : Rect? = null) {
+        successCounter = 0
+        status = ComponentStatus.CONNECTING
+        FFmpegUtil.execute(ffmpeg, UUID, getCommand(), this)
+    }
+
+    protected open fun getCommand() : String{
+        val props = streamInfo ?: throw IllegalStateException("no StreamInfo supplied!")
+        val list = ArrayList<String>()
+        list.apply {
+            addAll(getVideoInputOptions(props))
+            addAll(getVideoOutputOptions(props))
+
+            buildFilterOptions(props).let{
+                if(it.isNotBlank())
+                    add(it)
+            }
+            add(props.endpoint)
+        }
+
+        return list.joinToString (" ")
+    }
+
+    private fun buildFilterOptions(props: StreamInfo): String {
+        val options = getFilterOptions(props)
+        return if(options.isNotBlank()){
+            "-vf $options"
+        } else ""
+    }
+
+    protected open fun getVideoInputOptions(props : StreamInfo): ArrayList<String> {
+        return arrayListOf(
+            "-f rawvideo",
+            "-vcodec rawvideo",
+            "-s ${props.width}x${props.height}",
+            "-r 25",
+            "-pix_fmt nv21",
+            "-i -"
+        )
+    }
+
+    protected open fun getVideoOutputOptions(props : StreamInfo): ArrayList<String> {
+        val bitrate = props.bitrate
+        return arrayListOf(
+            "-f mpegts",
+            "-framerate ${props.framerate}",
+            "-codec:v mpeg1video",
+            "-b ${bitrate}k -minrate ${bitrate}k -maxrate ${bitrate}k -bufsize ${bitrate/1.5}k",
+            "-bf 0"
+        )
+    }
+
+    protected open fun getFilterOptions(props : StreamInfo): String {
+        val rotationOption = props.orientation.ordinal //leave blank
+        val filterList = ArrayList<String>()
+        for (i in 0..rotationOption){
+            filterList.add("transpose=1")
+        }
+        if(filterList.isNotEmpty()){
+            return filterList.joinToString(",")
+        }
+        return ""
+    }
+
+    /**
+     * Appends all elements that are not `null` to the given [destination].
+     */
+    private fun <C : MutableCollection<in String>, String : Any> Iterable<String?>.filterNotEmpty(destination: C): C {
+        for (element in this) if (element != "" && element != null) destination.add(element)
+        return destination
     }
 
     companion object{
