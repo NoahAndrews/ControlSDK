@@ -35,7 +35,12 @@ open class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHan
         this.streamInfo = streamInfo
         endpoint = streamInfo.audioEndpoint ?: return//?: else we can't do anything
         ffmpeg = FFmpeg.getInstance(context)
-        if(!FFmpegUtil.initFFmpegBlocking(ffmpeg)) return //TODO throw error
+        FFmpegUtil.initFFmpegAsync(FFmpeg.getInstance(context)){ success ->
+            streaming.set(success)
+            if(!success){
+                throw ExceptionInInitializerError("Unable to stream : FFMpeg Not Supported on this device")
+            }
+        }
     }
 
     override fun disable() {
