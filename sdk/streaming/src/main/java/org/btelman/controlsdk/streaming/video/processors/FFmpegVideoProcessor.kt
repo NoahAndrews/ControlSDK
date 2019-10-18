@@ -6,7 +6,6 @@ import android.util.Log
 import com.github.hiteshsondhi88.libffmpeg.FFmpeg
 import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler
 import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException
-import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegNotSupportedException
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
@@ -29,9 +28,13 @@ open class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHan
     override fun enable(context: Context, streamInfo: StreamInfo) {
         super.enable(context, streamInfo)
         ffmpeg = FFmpeg.getInstance(context.applicationContext)
-        if(!FFmpegUtil.initFFmpegBlocking(ffmpeg)) throw FFmpegNotSupportedException("Device does not support FFmpeg. Please contact the developer")
         this.streamInfo = streamInfo
-        streaming.set(true)
+        FFmpegUtil.initFFmpegAsync(FFmpeg.getInstance(context)){ success ->
+            streaming.set(success)
+            if(!success){
+                throw ExceptionInInitializerError("Unable to stream : FFMpeg Not Supported on this device")
+            }
+        }
     }
 
     override fun disable() {
