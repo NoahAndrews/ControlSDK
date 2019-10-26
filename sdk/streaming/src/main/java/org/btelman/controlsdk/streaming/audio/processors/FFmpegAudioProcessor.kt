@@ -58,14 +58,19 @@ open class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHan
 
     override fun processAudioByteArray(data: AudioPacket) {
         if(!streaming.get()) return
-        if (!ffmpegRunning.getAndSet(true)) {
-            tryBootFFmpeg()
-        }
-        process?.let { _process ->
-            if(data.timecode != lastTimecode){ //make sure we only send each packet once
-                lastTimecode = data.timecode
-                OutputStreamUtil.handleSendByteArray(_process.outputStream, data.b)
+        try {
+            if (!ffmpegRunning.getAndSet(true)) {
+                tryBootFFmpeg()
             }
+            process?.let { _process ->
+                if(data.timecode != lastTimecode){ //make sure we only send each packet once
+                    lastTimecode = data.timecode
+                    OutputStreamUtil.handleSendByteArray(_process.outputStream, data.b)
+                }
+            }
+        } catch (e: Exception) {
+            status = ComponentStatus.ERROR
+            e.printStackTrace()
         }
     }
 
