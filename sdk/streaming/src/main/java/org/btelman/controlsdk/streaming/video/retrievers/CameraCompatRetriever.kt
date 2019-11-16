@@ -41,6 +41,14 @@ class CameraCompatRetriever : BaseVideoRetriever(){
         retriever?.enable(context, streamInfo)
     }
 
+    override fun listenForFrame(func: () -> Unit) {
+        retriever?.listenForFrame(func)
+    }
+
+    override fun removeListenerForFrame() {
+        retriever?.removeListenerForFrame()
+    }
+
     override fun disable() {
         super.disable()
         retriever?.disable()
