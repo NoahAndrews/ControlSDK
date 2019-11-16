@@ -15,6 +15,7 @@ abstract class StreamComponent<R : StreamSubComponent,P : StreamSubComponent> : 
     protected lateinit var streamInfo : StreamInfo
     protected lateinit var processor : P
     protected lateinit var retriever : R
+    protected var shouldAutoUpdateLoop = true
 
     override fun onInitializeComponent(applicationContext: Context, bundle: Bundle?) {
         super.onInitializeComponent(applicationContext, bundle)
@@ -43,7 +44,7 @@ abstract class StreamComponent<R : StreamSubComponent,P : StreamSubComponent> : 
     }
 
     fun fetchFrame() {
-        push(DO_FRAME)
+        if(shouldAutoUpdateLoop) push(DO_FRAME)
         doWorkLoop()
     }
 
@@ -67,8 +68,8 @@ abstract class StreamComponent<R : StreamSubComponent,P : StreamSubComponent> : 
     }
 
     companion object{
-        private const val FRAME_FETCH = 0
-        private const val FRAME_PUSH = 1
-        private const val DO_FRAME = 2
+        const val FRAME_FETCH = 0
+        const val FRAME_PUSH = 1
+        const val DO_FRAME = 2
     }
 }

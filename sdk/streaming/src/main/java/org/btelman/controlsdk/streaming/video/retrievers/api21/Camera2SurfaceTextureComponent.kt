@@ -121,6 +121,7 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
             image = reader?.acquireLatestImage()
             image?.let {
                 latestPackage = ImageDataPacket(convertYuv420888ToYuv(image), ImageFormat.YUV_420_888)
+                notifyFrameUpdated()
             }
         } finally {
             image?.close()
