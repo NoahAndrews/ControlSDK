@@ -50,11 +50,13 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
         }
 
         override fun onDisconnected(@NonNull cameraDevice: CameraDevice) {
+            closePreviewSession()
             cameraDevice.close()
             mCameraDevice = null
         }
 
         override fun onError(@NonNull cameraDevice: CameraDevice, error: Int) {
+            closePreviewSession()
             cameraDevice.close()
             mCameraDevice = null
         }
@@ -92,6 +94,8 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
     override fun releaseCamera() {
         stopBackgroundThread()
         reader?.close()
+        closePreviewSession()
+        mCameraDevice?.close()
     }
 
     private var latestPackage : ImageDataPacket? = null
@@ -117,6 +121,7 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
             image = reader?.acquireLatestImage()
             image?.let {
                 latestPackage = ImageDataPacket(convertYuv420888ToYuv(image), ImageFormat.YUV_420_888)
+                notifyFrameUpdated()
             }
         } finally {
             image?.close()

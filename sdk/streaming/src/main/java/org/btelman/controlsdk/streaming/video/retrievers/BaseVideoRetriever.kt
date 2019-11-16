@@ -8,4 +8,18 @@ import org.btelman.controlsdk.streaming.models.ImageDataPacket
  */
 abstract class BaseVideoRetriever : StreamSubComponent(){
     abstract fun grabImageData() : ImageDataPacket?
+
+    protected var frameListener : (()->Unit)? = null
+
+    open fun notifyFrameUpdated(){
+        frameListener?.invoke()
+    }
+
+    open fun listenForFrame(func : ()->Unit){
+        frameListener = func
+    }
+
+    open fun removeListenerForFrame(){
+        frameListener = null
+    }
 }
