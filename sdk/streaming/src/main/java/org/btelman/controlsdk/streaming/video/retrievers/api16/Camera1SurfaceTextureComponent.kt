@@ -39,6 +39,7 @@ class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Camera.Pr
                 r = Rect(0, 0, _widthV1, _heightV1)
             }
         }
+        notifyFrameUpdated()
         latestPackage = ImageDataPacket(b, ImageFormat.NV21, r)
     }
 

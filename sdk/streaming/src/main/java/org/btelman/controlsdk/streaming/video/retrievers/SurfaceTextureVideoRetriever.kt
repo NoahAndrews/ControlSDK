@@ -24,6 +24,7 @@ abstract class SurfaceTextureVideoRetriever : BaseVideoRetriever() {
 
     override fun enable(context: Context, streamInfo: StreamInfo) {
         super.enable(context, streamInfo)
+
         eglSurface = eglCore?.createOffscreenSurface(streamInfo.width, streamInfo.height)
         eglCore?.makeCurrent(eglSurface)
         mStManager = SurfaceTextureUtils.SurfaceTextureManager()

@@ -19,15 +19,39 @@ open class VideoComponent : StreamComponent<BaseVideoRetriever, BaseVideoProcess
     private var targetFPS = 30
     private var lastTimeCode = 0L
 
+    /**
+     * Sets the loopMode. Defaults to false. To change this, please override it
+     */
+    open fun setLoopMode(){
+        shouldAutoUpdateLoop = false
+    }
+
     override fun onInitializeComponent(applicationContext: Context, bundle: Bundle?) {
         super.onInitializeComponent(applicationContext, bundle)
         bundle!!
         processor = VideoProcessorFactory.findProcessor(bundle) ?: throw IllegalArgumentException("unable to resolve video processor")
         retriever = VideoRetrieverFactory.findRetriever(bundle) ?: throw IllegalArgumentException("unable to resolve video retriever")
+        setLoopMode()
         targetFPS = bundle.getInt(VIDEO_FRAMERATE_LOOP, 30)
         sendStaleFramesWhenStarved = bundle.getBoolean(VIDEO_SEND_STALE_FRAMES_WHEN_STARVED, false)
         if(sendStaleFramesWhenStarved)
             sendStaleFramesDelay = bundle.getInt(VIDEO_STALE_FRAME_DELAY, 1000)
+    }
+
+    override fun enableInternal() {
+        super.enableInternal()
+        retriever.listenForFrame{
+            onFrameUpdate()
+        }
+    }
+
+    fun onFrameUpdate(){
+        push(DO_FRAME)
+    }
+
+    override fun disableInternal() {
+        super.disableInternal()
+        retriever.removeListenerForFrame()
     }
 
     override fun doWorkLoop() {
