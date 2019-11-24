@@ -45,6 +45,7 @@ dependencies {
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     api 'com.google.guava:guava:27.1-android'
+    api 'org.btelman.logutil:logutil:1.0'
 }
 repositories {
     mavenCentral()

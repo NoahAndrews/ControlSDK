@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_demo.*
@@ -26,8 +25,10 @@ import org.btelman.controlsdk.streaming.components.VideoComponent
 import org.btelman.controlsdk.streaming.factories.VideoRetrieverFactory
 import org.btelman.controlsdk.streaming.models.CameraDeviceInfo
 import org.btelman.controlsdk.streaming.models.StreamInfo
-import org.btelman.controlsdk.streaming.video.retrievers.api16.Camera1SurfaceTextureComponent
+import org.btelman.controlsdk.streaming.video.retrievers.CameraCompatRetriever
 import org.btelman.controlsdk.tts.SystemDefaultTTSComponent
+import org.btelman.logutil.kotlin.LogUtil
+import org.btelman.logutil.kotlin.MeasurementUtil
 
 class DemoActivity : AppCompatActivity() {
 
@@ -36,17 +37,23 @@ class DemoActivity : AppCompatActivity() {
     private var controlAPI : ControlSdkApi = ControlSDKServiceConnection.getNewInstance(this)
     private val arrayList = ArrayList<ComponentHolder<*>>()
     val bt = BluetoothClassicDriver()
+    val log = LogUtil("DemoActivity")
+    val measurementUtil = MeasurementUtil(log)
     override fun onCreate(savedInstanceState: Bundle?) {
+        measurementUtil.start("onCreate")
         super.onCreate(savedInstanceState)
-
         //examples of fetching all available services
-        HardwareFinder.getTranslationClasses(this).forEach{
-            Log.d("TRANSLATE", it.name+"\n" +
-                    it.getAnnotation(TranslatorComponent::class.java)?.description)
-        }
-        HardwareFinder.getDriverClasses(this).forEach{
-            Log.d("DRIVER", it.name+"\n" +
-                    it.getAnnotation(DriverComponent::class.java)?.description)
+        measurementUtil.measure("Hardware Scan"){
+            HardwareFinder.getTranslationClasses(this).forEach{
+                log.v {
+                    "TRANSLATOR SCANNED:\n\t${it.name}\n\t${it.getAnnotation(TranslatorComponent::class.java)?.description}"
+                }
+            }
+            HardwareFinder.getDriverClasses(this).forEach{
+                log.v {
+                    "DRIVER FOUND:\n\t${it.name}\n\t${it.getAnnotation(DriverComponent::class.java)?.description}"
+                }
+            }
         }
 
         setContentView(R.layout.activity_demo)
@@ -92,6 +99,7 @@ class DemoActivity : AppCompatActivity() {
             request = bt.setupComponent(this, true)
             true
         }
+        measurementUtil.stop("onCreate")
     }
 
     override fun onDestroy() {
@@ -123,17 +131,17 @@ class DemoActivity : AppCompatActivity() {
 
     private fun createComponentHolders() {
         val tts = ComponentHolder(SystemDefaultTTSComponent::class.java, null)
-        val demoComponent = ComponentHolder(DemoComponent::class.java, null)
+        //val demoComponent = ComponentHolder(DemoComponent::class.java, null)
         val streamInfo = StreamInfo(
-            "TODO-video", //TODO video url
-            "TODO-audio",
+            "http://remo.tv:1567/transmit?name=chan-9c1d2981-4990-43ff-bd12-7a95ed221743-video", //TODO video url
+            "http://remo.tv:1567/transmit?name=chan-9c1d2981-4990-43ff-bd12-7a95ed221743-audio",
             deviceInfo = CameraDeviceInfo.fromCamera(0)
         )
         val bundle = Bundle()
         streamInfo.addToExistingBundle(bundle)
         //VideoRetrieverFactory.putClassInBundle(DummyCanvasRetriever::class.java, bundle)
         //VideoProcessorFactory.putClassInBundle(DummyVideoProcessor::class.java, bundle)
-        VideoRetrieverFactory.putClassInBundle(Camera1SurfaceTextureComponent::class.java, bundle)
+        VideoRetrieverFactory.putClassInBundle(CameraCompatRetriever::class.java, bundle)
         val videoComponent = ComponentHolder(VideoComponent::class.java, bundle)
         val audioComponent = ComponentHolder(AudioComponent::class.java, bundle)
 
@@ -143,11 +151,11 @@ class DemoActivity : AppCompatActivity() {
         val hardwareComponent = ComponentHolder(HardwareComponent::class.java, hardwareBundle)
         val dummyComponent = ComponentHolder(DummyController::class.java, Bundle())
         arrayList.add(tts) //noisy and potentially annoying due to dummyComponent giving it garbage, but good for testing
-        arrayList.add(demoComponent)
+        //arrayList.add(demoComponent)
         arrayList.add(videoComponent)
         arrayList.add(audioComponent)
         arrayList.add(hardwareComponent)
-        arrayList.add(dummyComponent)
+        //arrayList.add(dummyComponent)
         arrayList.add(ComponentHolder(UnstableComponent::class.java, Bundle()))
     }
 
