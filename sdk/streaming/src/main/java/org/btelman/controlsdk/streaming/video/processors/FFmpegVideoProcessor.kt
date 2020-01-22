@@ -3,9 +3,6 @@ package org.btelman.controlsdk.streaming.video.processors
 import android.content.Context
 import android.graphics.Rect
 import android.util.Log
-import com.github.hiteshsondhi88.libffmpeg.FFmpeg
-import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler
-import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
@@ -16,20 +13,18 @@ import java.util.concurrent.atomic.AtomicBoolean
 /**
  * Process frames via FFmpeg
  */
-open class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHandler {
+open class FFmpegVideoProcessor : BaseVideoProcessor(){
     private var status: ComponentStatus = ComponentStatus.DISABLED
     private val streaming = AtomicBoolean(false)
     private val ffmpegRunning = AtomicBoolean(false)
     private var successCounter = 0
     private var streamInfo: StreamInfo? = null
-    protected var ffmpeg : FFmpeg? = null
     var process : Process? = null
 
     override fun enable(context: Context, streamInfo: StreamInfo) {
         super.enable(context, streamInfo)
-        ffmpeg = FFmpeg.getInstance(context.applicationContext)
         this.streamInfo = streamInfo
-        FFmpegUtil.initFFmpegAsync(FFmpeg.getInstance(context)){ success ->
+        FFmpegUtil.initFFmpeg(context){ success ->
             streaming.set(success)
             if(!success){
                 throw ExceptionInInitializerError("Unable to stream : FFMpeg Not Supported on this device")
@@ -40,7 +35,6 @@ open class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHan
     override fun disable() {
         super.disable()
         streamInfo = null
-        ffmpeg = null
         streaming.set(false)
         FFmpegUtil.killFFmpeg(process)
     }
@@ -58,48 +52,46 @@ open class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHan
         }
     }
 
-    override fun onStart() {
-        ffmpegRunning.set(true)
-        @Suppress("ConstantConditionIf")
-        if(shouldLog)
-            Log.d(LOGTAG, "onStart")
+    val ffmpegListener = object : FFmpegUtil.FFmpegExecuteResponseHandler(){
+        override fun onStart() {
+            ffmpegRunning.set(true)
+            @Suppress("ConstantConditionIf")
+            if(shouldLog)
+                Log.d(LOGTAG, "onStart")
+        }
+
+        override fun onProgress(message: String) {
+            @Suppress("ConstantConditionIf")
+            if(shouldLog)
+                Log.d(LOGTAG, "onProgress : $message")
+            successCounter++
+            status = ComponentStatus.STABLE
+        }
+
+        override fun onError(message: String) {
+            Log.e(LOGTAG, "progress : $message")
+            status = ComponentStatus.ERROR
+        }
+
+        override fun onComplete(statusCode: Int?) {
+            @Suppress("ConstantConditionIf")
+            if(shouldLog)
+                Log.d(LOGTAG, "onComplete : $statusCode")
+            ffmpegRunning.set(false)
+            process?.destroy()
+            process = null
+            status = ComponentStatus.DISABLED
+        }
+
+        override fun onProcess(process: Process) {
+            @Suppress("ConstantConditionIf")
+            if(shouldLog)
+                Log.d(LOGTAG, "onProcess")
+            this@FFmpegVideoProcessor.process = process
+        }
     }
 
-    override fun onProgress(message: String?) {
-        @Suppress("ConstantConditionIf")
-        if(shouldLog)
-            Log.d(LOGTAG, "onProgress : $message")
-        successCounter++
-        status = ComponentStatus.STABLE
-    }
 
-    override fun onFailure(message: String?) {
-        Log.e(LOGTAG, "progress : $message")
-        status = ComponentStatus.ERROR
-    }
-
-    override fun onSuccess(message: String?) {
-        @Suppress("ConstantConditionIf")
-        if(shouldLog)
-            Log.d(LOGTAG, "onSuccess : $message")
-    }
-
-    override fun onFinish() {
-        @Suppress("ConstantConditionIf")
-        if(shouldLog)
-            Log.d(LOGTAG, "onFinish")
-        ffmpegRunning.set(false)
-        process?.destroy()
-        process = null
-        status = ComponentStatus.DISABLED
-    }
-
-    override fun onProcess(p0: Process?) {
-        @Suppress("ConstantConditionIf")
-        if(shouldLog)
-            Log.d(LOGTAG, "onProcess")
-        this.process = p0
-    }
 
     /**
      * Boot ffmpeg using config. If given a Rect, use that for resolution instead.
@@ -113,18 +105,17 @@ open class FFmpegVideoProcessor : BaseVideoProcessor(), FFmpegExecuteResponseHan
         }
         try{
             bootFFmpeg(r)
-        } catch (e: FFmpegCommandAlreadyRunningException) {
+        } catch (e: java.lang.Exception) {
             status = ComponentStatus.ERROR
             e.printStackTrace()
             // Handle if FFmpeg is already running
         }
     }
 
-    @Throws(FFmpegCommandAlreadyRunningException::class)
     protected open fun bootFFmpeg(r : Rect? = null) {
         successCounter = 0
         status = ComponentStatus.CONNECTING
-        FFmpegUtil.execute(ffmpeg, UUID, getCommand(), this)
+        FFmpegUtil.execute(context!!, UUID, getCommand(), ffmpegListener)
     }
 
     protected open fun getCommand() : String{

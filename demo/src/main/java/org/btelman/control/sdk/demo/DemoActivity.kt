@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.activity_demo.*
+import org.btelman.android.ffmpeg.FFmpegRunner
 import org.btelman.controlsdk.enums.Operation
 import org.btelman.controlsdk.hardware.components.HardwareComponent
 import org.btelman.controlsdk.hardware.drivers.BluetoothClassicDriver
@@ -39,6 +40,8 @@ class DemoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if(!FFmpegRunner.checkIfUpToDate(this))
+            FFmpegRunner.update(this)
         //examples of fetching all available services
         HardwareFinder.getTranslationClasses(this).forEach{
             Log.d("TRANSLATE", it.name+"\n" +
@@ -125,8 +128,8 @@ class DemoActivity : AppCompatActivity() {
         val tts = ComponentHolder(SystemDefaultTTSComponent::class.java, null)
         val demoComponent = ComponentHolder(DemoComponent::class.java, null)
         val streamInfo = StreamInfo(
-            "TODO-video", //TODO video url
-            "TODO-audio",
+            "http://remo.tv:1567/transmit?name=chan-9c1d2981-4990-43ff-bd12-7a95ed221743-video", //TODO video url
+            "http://remo.tv:1567/transmit?name=chan-9c1d2981-4990-43ff-bd12-7a95ed221743-audio",
             deviceInfo = CameraDeviceInfo.fromCamera(0)
         )
         val bundle = Bundle()
