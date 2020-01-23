@@ -6,9 +6,21 @@ apply plugin: 'kotlin-android-extensions'
 
 apply from: '../../unitTesting.gradle'
 
+ext{
+    publishedGroupId = 'org.btelman.controlsdk'
+    libraryName = 'core'
+    artifact = 'core'
+
+    libraryDescription = 'Control api for robots or other local devices with the option for telepresence'
+}
+
 android {
     compileSdkVersion 28
     buildToolsVersion = globalBuildToolsVersion
+
+    compileOptions {
+        kotlinOptions.freeCompilerArgs += ['-module-name', "$publishedGroupId.$artifact"]
+    }
 
     defaultConfig {
         minSdkVersion 16
@@ -50,14 +62,6 @@ dependencies {
 }
 repositories {
     mavenCentral()
-}
-
-ext{
-    publishedGroupId = 'org.btelman.controlsdk'
-    libraryName = 'core'
-    artifact = 'core'
-
-    libraryDescription = 'Control api for robots or other local devices with the option for telepresence'
 }
 
 apply from: '../bintray.gradle'

@@ -2,9 +2,19 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-android'
 
+ext{
+    publishedGroupId = 'org.btelman.controlsdk'
+    libraryName = 'networking'
+    artifact = 'networking'
+
+    libraryDescription = 'Network interface for the controlsdk'
+}
+
 android {
     compileSdkVersion 28
-
+    compileOptions {
+        kotlinOptions.freeCompilerArgs += ['-module-name', "$publishedGroupId.$artifact"]
+    }
 
     defaultConfig {
         minSdkVersion 16
@@ -39,14 +49,6 @@ dependencies {
 }
 repositories {
     mavenCentral()
-}
-
-ext{
-    publishedGroupId = 'org.btelman.controlsdk'
-    libraryName = 'networking'
-    artifact = 'networking'
-
-    libraryDescription = 'Network interface for the controlsdk'
 }
 
 apply from: '../bintray.gradle'
