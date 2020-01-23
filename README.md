@@ -28,3 +28,7 @@ the ControlSDK on the main device will relay data to the second device.
 Add this to your application class
 
 `ControlSDKService.allowNotificationForExceptions = false`
+
+
+Note: This only applies when using the streaming module
+This software uses code of <a href=http://ffmpeg.org>FFmpeg</a> licensed under the <a href=http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html>LGPLv2.1</a> and its source can be downloaded <a href=https://github.com/btelman96/ffmpeg-android>here</a>
