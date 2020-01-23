@@ -5,6 +5,7 @@ import org.btelman.android.ffmpeg.FFmpegRunner
 import org.btelman.android.shellutil.BinaryUpdateChecker
 import java.io.File
 import java.io.PrintStream
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -65,10 +66,11 @@ object FFmpegUtil {
     }
 
     fun execute(context: Context, uuid: String, command: String, responseHandler: FFmpegExecuteResponseHandler) {
-        FFmpegRunner.Builder(context).also {
+        val builder = FFmpegRunner.Builder(context).also {
             responseHandler.bind(it)
             it.command = command
         }
+        FFmpegRunner.startProcess(builder, UUID.fromString(uuid))
     }
 
     abstract class FFmpegExecuteResponseHandler{
