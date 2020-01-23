@@ -6,12 +6,6 @@ Control API for Android devices to control IoT devices, electronics boards (Ardu
 
 Code in here at the moment is not ready for release. Although functional, future changes may break current functionality or the API may change a lot
 
-This is the end goal of this project.
-
-[ControlSDK Flow (PDF)](docs/ControlSDK.pdf)
-
-The one thing that has changed is that the external apps being able to communicate with it may be more limited than I wanted, and may not be addressed in the first few versions of the sdk
-
 # Use cases
 
 ## Telepresence through any service easily.
@@ -34,3 +28,7 @@ the ControlSDK on the main device will relay data to the second device.
 Add this to your application class
 
 `ControlSDKService.allowNotificationForExceptions = false`
+
+
+Note: This only applies when using the streaming module
+This software uses code of <a href=http://ffmpeg.org>FFmpeg</a> licensed under the <a href=http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html>LGPLv2.1</a> and its source can be downloaded <a href=https://github.com/btelman96/ffmpeg-android>here</a>

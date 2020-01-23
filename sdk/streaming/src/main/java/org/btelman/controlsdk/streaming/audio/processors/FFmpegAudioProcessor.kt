@@ -2,8 +2,6 @@ package org.btelman.controlsdk.streaming.audio.processors
 
 import android.content.Context
 import android.util.Log
-import com.github.hiteshsondhi88.libffmpeg.FFmpeg
-import com.github.hiteshsondhi88.libffmpeg.FFmpegExecuteResponseHandler
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.AudioPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
@@ -15,7 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 /**
  * Process audio from a source and send it to a specified endpoint with FFmpeg
  */
-open class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHandler {
+open class FFmpegAudioProcessor : BaseAudioProcessor() {
 
     private var streamInfo: StreamInfo? = null
     private var lastTimecode: Long = 0L
@@ -23,8 +21,6 @@ open class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHan
     private var status: ComponentStatus = ComponentStatus.DISABLED
     private val streaming = AtomicBoolean(false)
     private var ffmpegRunning = AtomicBoolean(false)
-
-    private var ffmpeg : FFmpeg? = null
 
     private var process: Process? = null
 
@@ -34,8 +30,7 @@ open class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHan
         super.enable(context, streamInfo)
         this.streamInfo = streamInfo
         endpoint = streamInfo.audioEndpoint ?: return//?: else we can't do anything
-        ffmpeg = FFmpeg.getInstance(context)
-        FFmpegUtil.initFFmpegAsync(FFmpeg.getInstance(context)){ success ->
+        FFmpegUtil.initFFmpeg(context){ success ->
             streaming.set(success)
             if(!success){
                 throw ExceptionInInitializerError("Unable to stream : FFMpeg Not Supported on this device")
@@ -49,11 +44,6 @@ open class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHan
         process = null
         streaming.set(false)
         FFmpegUtil.killFFmpeg(process)
-    }
-
-    override fun onStart() {
-        ffmpegRunning.set(true)
-        Log.d(TAG, "onStart")
     }
 
     override fun processAudioByteArray(data: AudioPacket) {
@@ -74,29 +64,36 @@ open class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHan
         }
     }
 
-    override fun onProgress(message: String?) {
-        successCounter++
-        status = ComponentStatus.STABLE
-    }
+    val ffmpegListener = object : FFmpegUtil.FFmpegExecuteResponseHandler(){
+        override fun onStart() {
+            ffmpegRunning.set(true)
+            Log.d(TAG, "onStart")
+        }
 
-    override fun onFailure(message: String?) {
-        status = ComponentStatus.ERROR //TODO
-        Log.e(TAG, "progress : $message")
-    }
+        override fun onProgress(message: String) {
+            @Suppress("ConstantConditionIf")
+            Log.d(TAG, "onProgress : $message")
+            successCounter++
+            status = ComponentStatus.STABLE
+        }
 
-    override fun onSuccess(message: String?) {
-        Log.d(TAG, "onSuccess : $message")
-    }
+        override fun onError(message: String) {
+            status = ComponentStatus.ERROR //TODO
+            Log.e(TAG, "progress : $message")
+        }
 
-    override fun onFinish() {
-        Log.d(TAG, "onFinish")
-        status = ComponentStatus.DISABLED
-        ffmpegRunning.set(false)
-    }
+        override fun onComplete(statusCode: Int?) {
+            @Suppress("ConstantConditionIf")
+            Log.d(TAG, "onComplete : $statusCode")
+            status = ComponentStatus.DISABLED
+            ffmpegRunning.set(false)
+        }
 
-    override fun onProcess(p0: Process?) {
-        process = p0
-        Log.d(TAG, "onProcess")
+        override fun onProcess(process: Process) {
+            @Suppress("ConstantConditionIf")
+            Log.d(TAG, "onProcess")
+            this@FFmpegAudioProcessor.process = process
+        }
     }
 
     protected open fun tryBootFFmpeg() {
@@ -116,7 +113,7 @@ open class FFmpegAudioProcessor : BaseAudioProcessor(), FFmpegExecuteResponseHan
     protected open fun bootFFmpeg() {
         successCounter = 0
         status = ComponentStatus.CONNECTING
-        FFmpegUtil.execute(ffmpeg, UUID, getCommand(), this)
+        FFmpegUtil.execute(context!!, UUID, getCommand(), ffmpegListener)
     }
 
     protected open fun getCommand() : String{

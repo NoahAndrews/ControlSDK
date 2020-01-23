@@ -1,15 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
           package="org.btelman.controlsdk">
-    <permission android:name="org.btelman.controlsdk.INSECURE_COMM"
-                android:protectionLevel="normal"
-                android:description="@string/insecure_comms_permission"/>
-    <permission android:name="org.btelman.controlsdk.SECURE_COMM"
-                android:protectionLevel="dangerous"
-                android:description="@string/secure_comms_permission_details"/>
-    <permission android:name="org.btelman.controlsdk.SEND_DATA"
-                android:protectionLevel="dangerous"
-                android:description="@string/secure_comms_permission_details"/>
-
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
