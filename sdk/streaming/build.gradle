@@ -28,7 +28,9 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api "org.btelman.ffmpeg:core:1.0.1"
+    implementation 'org.btelman.android:shellutil:1.3'
     testImplementation 'junit:junit:4.12'
+    implementation 'androidx.appcompat:appcompat:1.1.0' //annotations...
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
