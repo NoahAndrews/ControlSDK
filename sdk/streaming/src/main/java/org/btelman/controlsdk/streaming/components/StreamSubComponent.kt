@@ -11,6 +11,7 @@ import org.btelman.controlsdk.streaming.models.StreamInfo
 abstract class StreamSubComponent : Component() {
     protected var streamInfo: StreamInfo? = null
     open fun updateStreamInfo(streamInfo: StreamInfo){
+        log.d{"updateStreamInfo"}
         this.streamInfo = streamInfo
     }
 

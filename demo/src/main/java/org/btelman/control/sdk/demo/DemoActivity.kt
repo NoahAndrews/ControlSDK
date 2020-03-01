@@ -134,6 +134,8 @@ class DemoActivity : AppCompatActivity() {
         val streamInfo = StreamInfo(
             "http://remo.tv:1567/transmit?name=chan-9c1d2981-4990-43ff-bd12-7a95ed221743-video", //TODO video url
             "http://remo.tv:1567/transmit?name=chan-9c1d2981-4990-43ff-bd12-7a95ed221743-audio",
+            width = 1280,
+            height = 720,
             deviceInfo = CameraDeviceInfo.fromCamera(0)
         )
         val bundle = Bundle()

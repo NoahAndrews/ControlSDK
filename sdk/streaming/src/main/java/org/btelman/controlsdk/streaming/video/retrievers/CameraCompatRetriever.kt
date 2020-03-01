@@ -37,6 +37,9 @@ open class CameraCompatRetriever : BaseVideoRetriever(){
         instantiateReceiver()
         runBlocking {
             retriever?.setEventListener(eventDispatcher)
+            streamInfo?.let {
+                retriever?.updateStreamInfo(it)
+            }?:log.e("streamInfo is null!")
             retriever?.enable()?.await()
         }
         status = ComponentStatus.STABLE
