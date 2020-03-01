@@ -10,7 +10,7 @@ import androidx.annotation.RequiresApi
 import kotlinx.coroutines.runBlocking
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.video.retrievers.api16.Camera1SurfaceTextureComponent
-import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2SurfaceTextureComponent
+import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2Component
 
 /**
  * Handle compatibility between camera1 and camera2 usage, since some api21 devices are
@@ -50,7 +50,7 @@ open class CameraCompatRetriever : BaseVideoRetriever(){
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     protected open fun createCamera2(): BaseVideoRetriever? {
-        return Camera2SurfaceTextureComponent()
+        return Camera2Component()
     }
 
     override fun listenForFrame(func: () -> Unit) {

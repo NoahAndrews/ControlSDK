@@ -7,7 +7,7 @@ import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
 import org.btelman.controlsdk.streaming.video.retrievers.api16.Camera1SurfaceTextureComponent
-import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2SurfaceTextureComponent
+import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2Component
 import org.junit.Assert
 import org.junit.Assume
 import org.junit.Test
@@ -27,7 +27,7 @@ class VideoRetrieverFactoryAndroidTest {
         val streamInfo = StreamInfo("http://example.com:3000") //testing default parameters. Should use either Camera1SurfaceTextureComponent or Camera2SurfaceTextureComponent
         val camera = VideoRetrieverFactory.findRetriever(streamInfo.toBundle())
         if(camera !is Camera1SurfaceTextureComponent &&
-            camera !is Camera2SurfaceTextureComponent)
+            camera !is Camera2Component)
             Assert.fail()
 
         //test custom class
@@ -47,11 +47,11 @@ class VideoRetrieverFactoryAndroidTest {
 
     @Test
     fun testAPI21Camera(){
-        Assume.assumeTrue(Camera2SurfaceTextureComponent.isSupported())
+        Assume.assumeTrue(Camera2Component.isSupported())
         val streamInfo = StreamInfo("http://example.com:3000",
             deviceInfo = CameraDeviceInfo.fromCamera(0))
         val camera = VideoRetrieverFactory.findRetriever(streamInfo.toBundle())
-        Assert.assertTrue(camera is Camera2SurfaceTextureComponent)
+        Assert.assertTrue(camera is Camera2Component)
     }
 
     class MockVideoRetriever : BaseVideoRetriever() {

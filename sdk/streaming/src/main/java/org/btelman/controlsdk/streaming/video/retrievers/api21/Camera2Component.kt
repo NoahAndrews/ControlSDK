@@ -21,7 +21,7 @@ import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
  */
 @Suppress("MemberVisibilityCanBePrivate")
 @RequiresApi(21)
-open class Camera2SurfaceTextureComponent : BaseVideoRetriever(), ImageReader.OnImageAvailableListener {
+open class Camera2Component : BaseVideoRetriever(), ImageReader.OnImageAvailableListener {
 
     private var data: ByteArray? = null
     protected var width = 0
