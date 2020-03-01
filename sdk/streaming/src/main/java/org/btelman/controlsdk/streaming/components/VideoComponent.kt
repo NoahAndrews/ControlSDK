@@ -30,7 +30,10 @@ open class VideoComponent : StreamComponent<BaseVideoRetriever, BaseVideoProcess
         super.onInitializeComponent(applicationContext, bundle)
         bundle!!
         processor = VideoProcessorFactory.findProcessor(bundle) ?: throw IllegalArgumentException("unable to resolve video processor")
+        processor.onInitializeComponent(applicationContext, bundle)
+
         retriever = VideoRetrieverFactory.findRetriever(bundle) ?: throw IllegalArgumentException("unable to resolve video retriever")
+        retriever.onInitializeComponent(applicationContext, bundle)
         setLoopMode()
         targetFPS = bundle.getInt(VIDEO_FRAMERATE_LOOP, 30)
         sendStaleFramesWhenStarved = bundle.getBoolean(VIDEO_SEND_STALE_FRAMES_WHEN_STARVED, false)

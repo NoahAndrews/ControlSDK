@@ -31,6 +31,10 @@ class CommunicationDriverComponent : Component() , Runnable{
         uiHandler.post(this)
     }
 
+    override fun getInitialStatus(): ComponentStatus {
+        return ComponentStatus.CONNECTING
+    }
+
     @Synchronized
     override fun enableInternal(){
         hardwareDriver?.enable()

@@ -3,12 +3,12 @@ package org.btelman.controlsdk.streaming.video.retrievers.api16
 import android.graphics.ImageFormat
 import android.graphics.Rect
 import android.hardware.Camera
+import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
-import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.SurfaceTextureVideoRetriever
 
 /**
- * Class that contains only the camera components for streaming to letsrobot.tv
+ * Class that contains only the camera components for streaming
  *
  * To make this functional, pass in cameraId and a valid SurfaceHolder to a Core.Builder instance
  *
@@ -17,7 +17,7 @@ import org.btelman.controlsdk.streaming.video.retrievers.SurfaceTextureVideoRetr
  * Does not support USB webcams
  */
 @Suppress("DEPRECATION")
-class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Camera.PreviewCallback{
+open class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Camera.PreviewCallback{
     private var supportedPreviewSizes: MutableList<Camera.Size>? = null
     private var r: Rect? = null
     private var camera : Camera? = null
@@ -51,29 +51,40 @@ class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Camera.Pr
         camera = null
     }
 
-    override fun setupCamera(streamInfo : StreamInfo?){ //TODO actually use resolution from here?
+    override fun setupCamera(){
         val cameraId = streamInfo?.deviceInfo?.getCameraId() ?: 0
-        val cameraWidth = streamInfo?.width ?: 640
-        val cameraHeight = streamInfo?.height ?: 480
         camera ?: run {
-            if(cameraId+1 > Camera.getNumberOfCameras())
-                throw Exception("Attempted to open camera $cameraId. " +
-                        "Only ${Camera.getNumberOfCameras()} cameras exist! 0 is first camera")
+            if(cameraId+1 > Camera.getNumberOfCameras()){
+                val e = Exception("Attempted to open camera $cameraId. Only ${Camera.getNumberOfCameras()} cameras exist! 0 is first camera")
+                log.e("Error opening camera", e)
+                status = ComponentStatus.ERROR
+                throw e
+            }
             camera = Camera.open(cameraId)
             camera?.setDisplayOrientation(90)
         }
         camera?.let {
-            val p = it.parameters
-            if(!validateSizeSupported(p, cameraWidth, cameraHeight))
-                throw java.lang.Exception("Camera size " +
-                        "${cameraWidth}x$cameraHeight not supported by this camera!")
-            p.setPreviewSize(cameraWidth, cameraHeight)
-            p.setRecordingHint(true)
-            it.parameters = p
+            it.parameters = updateCameraParams(it.parameters)
             it.setPreviewTexture(mStManager?.surfaceTexture)
             it.setPreviewCallback(this)
             it.startPreview()
         }
+        status = ComponentStatus.STABLE
+    }
+
+    open fun updateCameraParams(parameters : Camera.Parameters) : Camera.Parameters{
+        val cameraWidth = streamInfo?.width ?: 640
+        val cameraHeight = streamInfo?.height ?: 480
+        if(!validateSizeSupported(parameters, cameraWidth, cameraHeight)){
+            val e = java.lang.Exception("Camera size " +
+                    "${cameraWidth}x$cameraHeight not supported by this camera!")
+            log.e("Failed to use width=$cameraWidth and height=$cameraHeight for camera!", e)
+            status = ComponentStatus.ERROR
+            throw e
+        }
+        parameters.setPreviewSize(cameraWidth, cameraHeight)
+        parameters.setRecordingHint(true)
+        return parameters
     }
 
     private fun validateSizeSupported(p: Camera.Parameters?, cameraWidth: Int, cameraHeight: Int) : Boolean{

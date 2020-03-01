@@ -16,6 +16,7 @@ import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.interfaces.ComponentEventListener
 import org.btelman.controlsdk.interfaces.IComponent
 import org.btelman.controlsdk.services.ControlSDKService
+import org.btelman.logutil.kotlin.LogUtil
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -34,6 +35,8 @@ abstract class Component : IComponent {
             javaClass.simpleName
     ).also { it.start() }
 
+    protected val log = LogUtil("ControlSDKComponent : ${javaClass.name}", ControlSDKService.loggerID)
+
     /**
      * Constructor that the service will use to start the component. For custom actions, please use onInitializeComponent
      */
@@ -50,6 +53,9 @@ abstract class Component : IComponent {
         set(value) {
             if(_status == value) return //Only set state if changed
             _status = value
+            log.v{
+                "Update Status $value : ${eventDispatcher?.let { "Sending upwards" } ?: "dispatcher null"}"
+            }
             eventDispatcher?.handleMessage(getType(),
                 STATUS_EVENT, status, this)
         }
@@ -62,7 +68,14 @@ abstract class Component : IComponent {
     protected abstract fun enableInternal()
     protected abstract fun disableInternal()
 
+    open fun getInitialStatus() : ComponentStatus{
+        return ComponentStatus.STABLE
+    }
+
     override fun setEventListener(listener: ComponentEventListener?) {
+        log.d{
+            "setEventListener"
+        }
         eventDispatcher = listener
     }
 
@@ -72,6 +85,9 @@ abstract class Component : IComponent {
 
 
     protected fun reset() { //TODO this could potentially create thread locks?
+        log.d{
+            "reset"
+        }
         runBlocking {
             disable().await()
             enable().await()
@@ -82,9 +98,27 @@ abstract class Component : IComponent {
      * Called when component should startup. Will return without action if already enabled
      */
     override fun enable() = GlobalScope.async{
+        log.d{
+            "enable"
+        }
         if(enabled.getAndSet(true)) return@async false
-        status = ComponentStatus.CONNECTING
+        status = getInitialStatus()
         awaitCallback<Boolean> { enableWithCallback(it) }
+        return@async true
+    }
+
+    /**
+     * Called when component should shut down
+     *
+     * Will return without action if already enabled
+     */
+    override fun disable() = GlobalScope.async{
+        if(!enabled.getAndSet(false)) return@async false
+        log.d{
+            "disable"
+        }
+        awaitCallback<Boolean> { disableWithCallback(it) }
+        status = ComponentStatus.DISABLED
         return@async true
     }
 
@@ -93,7 +127,6 @@ abstract class Component : IComponent {
             try {
                 enableInternal()
             } catch (e: Exception) {
-                e.printStackTrace()
                 throwError(e)
                 status = ComponentStatus.ERROR
             }
@@ -132,18 +165,6 @@ abstract class Component : IComponent {
             }
 
     /**
-     * Called when component should shut down
-     *
-     * Will return without action if already enabled
-     */
-    override fun disable() = GlobalScope.async{
-        if(!enabled.getAndSet(false)) return@async false
-        awaitCallback<Boolean> { disableWithCallback(it) }
-        status = ComponentStatus.DISABLED
-        return@async true
-    }
-
-    /**
      * Called when we have not received a response from the server in a while
      */
     open fun timeout(){}
@@ -178,10 +199,14 @@ abstract class Component : IComponent {
      * Used to retrieve Context and provide an initialization bundle
      */
     open fun onInitializeComponent(applicationContext: Context, bundle : Bundle?) {
+        log.d{
+            "onInitializeComponent"
+        }
         context = applicationContext
     }
 
     open fun throwError(e : Exception){
+        log.e("Error", e)
         if(!ControlSDKService.allowNotificationForExceptions) return
         context?.let {
             val errorMessage = getType().toString().toLowerCase() +" "+ it.getString(R.string.componentCrashedText)

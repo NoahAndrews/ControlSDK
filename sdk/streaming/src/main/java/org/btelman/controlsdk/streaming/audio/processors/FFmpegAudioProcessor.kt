@@ -1,7 +1,7 @@
 package org.btelman.controlsdk.streaming.audio.processors
 
 import android.content.Context
-import android.util.Log
+import android.os.Bundle
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.AudioPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
@@ -14,11 +14,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Process audio from a source and send it to a specified endpoint with FFmpeg
  */
 open class FFmpegAudioProcessor : BaseAudioProcessor() {
-
-    private var streamInfo: StreamInfo? = null
     private var lastTimecode: Long = 0L
     private var endpoint: String? = null
-    private var status: ComponentStatus = ComponentStatus.DISABLED
     private val streaming = AtomicBoolean(false)
     private var ffmpegRunning = AtomicBoolean(false)
 
@@ -26,11 +23,14 @@ open class FFmpegAudioProcessor : BaseAudioProcessor() {
 
     private var successCounter: Int = 0
 
-    override fun enable(context: Context, streamInfo: StreamInfo) {
-        super.enable(context, streamInfo)
-        this.streamInfo = streamInfo
-        endpoint = streamInfo.audioEndpoint ?: return//?: else we can't do anything
-        FFmpegUtil.initFFmpeg(context){ success ->
+    override fun onInitializeComponent(applicationContext: Context, bundle: Bundle?) {
+        super.onInitializeComponent(applicationContext, bundle)
+        endpoint = streamInfo?.audioEndpoint ?: return//?: else we can't do anything
+    }
+
+    override fun enableInternal() {
+        super.enableInternal()
+        FFmpegUtil.initFFmpeg(context!!){ success ->
             streaming.set(success)
             if(!success){
                 throw ExceptionInInitializerError("Unable to stream : FFMpeg Not Supported on this device")
@@ -38,8 +38,8 @@ open class FFmpegAudioProcessor : BaseAudioProcessor() {
         }
     }
 
-    override fun disable() {
-        super.disable()
+    override fun disableInternal() {
+        super.disableInternal()
         process?.destroy()
         process = null
         streaming.set(false)
@@ -67,31 +67,39 @@ open class FFmpegAudioProcessor : BaseAudioProcessor() {
     val ffmpegListener = object : FFmpegUtil.FFmpegExecuteResponseHandler(){
         override fun onStart() {
             ffmpegRunning.set(true)
-            Log.d(TAG, "onStart")
+            log.d("FFMPEG : onStart")
         }
 
         override fun onProgress(message: String) {
             @Suppress("ConstantConditionIf")
-            Log.d(TAG, "onProgress : $message")
+            log.d{
+                "FFMPEG : onProgress : $message"
+            }
             successCounter++
             status = ComponentStatus.STABLE
         }
 
         override fun onError(message: String) {
             status = ComponentStatus.ERROR //TODO
-            Log.e(TAG, "progress : $message")
+            log.e{
+                "FFMPEG : onError : $message"
+            }
         }
 
         override fun onComplete(statusCode: Int?) {
             @Suppress("ConstantConditionIf")
-            Log.d(TAG, "onComplete : $statusCode")
+            log.d {
+                "FFMPEG : onComplete : $statusCode"
+            }
             status = ComponentStatus.DISABLED
             ffmpegRunning.set(false)
         }
 
         override fun onProcess(process: Process) {
             @Suppress("ConstantConditionIf")
-            Log.d(TAG, "onProcess")
+            log.v{
+                "FFMPEG : onProcess"
+            }
             this@FFmpegAudioProcessor.process = process
         }
     }
@@ -148,7 +156,6 @@ open class FFmpegAudioProcessor : BaseAudioProcessor() {
     }
 
     companion object {
-        const val TAG = "Audio"
         val UUID = java.util.UUID.randomUUID().toString()
     }
 }

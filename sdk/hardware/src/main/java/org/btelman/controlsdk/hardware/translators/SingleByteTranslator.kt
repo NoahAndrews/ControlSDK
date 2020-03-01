@@ -74,8 +74,4 @@ class SingleByteTranslator : Translator {
         data[1] = SingleByteUtil.getDriveSpeed(motor1.toByte(), 1)
         return data
     }
-
-    companion object {
-        const val TAG = "SingleByteProtocol"
-    }
 }

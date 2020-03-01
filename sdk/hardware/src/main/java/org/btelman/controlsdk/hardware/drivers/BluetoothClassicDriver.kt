@@ -4,25 +4,32 @@ import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.hardware.activities.ChooseBluetoothActivity
 import org.btelman.controlsdk.hardware.drivers.libs.bluetooth.BluetoothClassic
 import org.btelman.controlsdk.hardware.drivers.libs.bluetooth.Connection
 import org.btelman.controlsdk.hardware.interfaces.DriverComponent
 import org.btelman.controlsdk.hardware.interfaces.HardwareDriver
+import org.btelman.controlsdk.services.ControlSDKService
+import org.btelman.logutil.kotlin.LogUtil
 
 /**
  * communication class that works with bluetooth classic
  * and takes control data via EventManager.ROBOT_BYTE_ARRAY event
+ *
+ * TODO better error handling
  */
 @DriverComponent(description = "Send data over bluetooth classic (Serial) at 9600 BAUD", requiresSetup = true)
 class BluetoothClassicDriver : HardwareDriver {
     var bluetoothClassic : BluetoothClassic? = null
     var addr : String? = null
     var name : String? = null
+    private val log = LogUtil("BluetoothClassicDriver", ControlSDKService.loggerID)
 
     override fun clearSetup(context: Context) {
+        log.d{
+            "Clear prefs"
+        }
         context.getSharedPreferences(CONFIG_PREFS, 0).edit().clear().apply()
     }
 
@@ -40,9 +47,15 @@ class BluetoothClassicDriver : HardwareDriver {
     }
 
     override fun setupComponent(activity: Activity, force : Boolean): Int {
+        log.d{
+            "setupComponent force=$force"
+        }
         //Make sure we turn bluetooth on for setup
         val mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if(!mBluetoothAdapter.isEnabled) {
+            log.d{
+                "enable bluetooth..."
+            }
             mBluetoothAdapter.enable()
         }
         //Start an activity to select our preferred device
@@ -50,6 +63,9 @@ class BluetoothClassicDriver : HardwareDriver {
             BLUETOOTH_ADDR
         )
         if(force || pairingRequired) {
+            log.d{
+                "Launching ChooseBluetoothActivity..."
+            }
             activity.startActivityForResult(
                     Intent(activity, ChooseBluetoothActivity::class.java),
                 RESULT_CODE
@@ -75,13 +91,17 @@ class BluetoothClassicDriver : HardwareDriver {
     }
 
     override fun send(byteArray: ByteArray): Boolean {
-        Log.d("Bluetooth", "message out = $byteArray")
+        log.v{
+            "send $byteArray"
+        }
         bluetoothClassic?.writeBytes(byteArray)
         return true
     }
 
     override fun initConnection(context: Context) {
-        Log.d("Bluetooth","initConnection")
+        log.d{
+            "initConnection"
+        }
         addr = context.getSharedPreferences(CONFIG_PREFS, 0).getString(
             BLUETOOTH_ADDR, null)
         addr?.let {
@@ -106,7 +126,9 @@ class BluetoothClassicDriver : HardwareDriver {
             bluetoothClassic?.disconnect()
             "disable"
         }
-        Log.d("Bluetooth", message)
+        log.d{
+            message
+        }
     }
 
     override fun getStatus(): ComponentStatus {
@@ -128,9 +150,9 @@ class BluetoothClassicDriver : HardwareDriver {
     }
 
     companion object {
-        val BLUETOOTH_ADDR = "addr"
-        val BLUETOOTH_NAME = "name"
-        val CONFIG_PREFS = "BluetoothClassicConfig"
-        val RESULT_CODE = 312
+        const val BLUETOOTH_ADDR = "addr"
+        const val BLUETOOTH_NAME = "name"
+        const val CONFIG_PREFS = "BluetoothClassicConfig"
+        const val RESULT_CODE = 312
     }
 }

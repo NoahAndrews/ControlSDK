@@ -29,6 +29,9 @@ import org.btelman.controlsdk.streaming.models.CameraDeviceInfo
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.api16.Camera1SurfaceTextureComponent
 import org.btelman.controlsdk.tts.SystemDefaultTTSComponent
+import org.btelman.logutil.kotlin.LogLevel
+import org.btelman.logutil.kotlin.LogUtil
+import org.btelman.logutil.kotlin.LogUtilInstance
 
 class DemoActivity : AppCompatActivity() {
 
@@ -39,7 +42,10 @@ class DemoActivity : AppCompatActivity() {
     val bt = BluetoothClassicDriver()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        LogUtilInstance(ControlSDKService.CONTROL_SERVICE, LogLevel.VERBOSE).also {
+            Log.d("DemoActivity", "Setup logger")
+            LogUtil.addCustomLogUtilInstance(ControlSDKService::class.java.name, it)
+        }
         if(!FFmpegRunner.checkIfUpToDate(this))
             FFmpegRunner.update(this)
         //examples of fetching all available services
