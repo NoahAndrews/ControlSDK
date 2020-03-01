@@ -21,9 +21,28 @@ import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2Component
  */
 open class CameraCompatRetriever : BaseVideoRetriever(){
     private var retriever : BaseVideoRetriever? = null
+    private var bundle : Bundle? = null
 
     override fun onInitializeComponent(applicationContext: Context, bundle: Bundle?) {
         super.onInitializeComponent(applicationContext, bundle)
+        this.bundle = bundle
+    }
+
+    override fun grabImageData(): ImageDataPacket? {
+        return retriever?.grabImageData()
+    }
+
+    override fun enableInternal() {
+        super.enableInternal()
+        instantiateReceiver()
+        runBlocking {
+            retriever?.setEventListener(eventDispatcher)
+            retriever?.enable()?.await()
+        }
+        status = ComponentStatus.STABLE
+    }
+
+    private fun instantiateReceiver() {
         val cameraInfo = streamInfo!!.deviceInfo
         val cameraId = cameraInfo.getCameraId()
         retriever = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
@@ -34,20 +53,7 @@ open class CameraCompatRetriever : BaseVideoRetriever(){
             log.d("Using Camera1 API. Device API too low or LIMITED capabilities")
             createCamera1()
         }
-        retriever?.onInitializeComponent(applicationContext, bundle)
-    }
-
-    override fun grabImageData(): ImageDataPacket? {
-        return retriever?.grabImageData()
-    }
-
-    override fun enableInternal() {
-        super.enableInternal()
-        runBlocking {
-            retriever?.setEventListener(eventDispatcher)
-            retriever?.enable()?.await()
-        }
-        status = ComponentStatus.STABLE
+        retriever?.onInitializeComponent(context!!, bundle)
     }
 
     protected open fun createCamera1(): BaseVideoRetriever? {
