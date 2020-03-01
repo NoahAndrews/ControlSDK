@@ -1,5 +1,6 @@
 package org.btelman.controlsdk.streaming.components
 
+import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.models.Component
 import org.btelman.controlsdk.streaming.models.StreamInfo
@@ -15,6 +16,10 @@ abstract class StreamSubComponent : Component() {
 
     override fun getType(): ComponentType {
         return ComponentType.STREAMING
+    }
+
+    override fun getInitialStatus(): ComponentStatus {
+        return ComponentStatus.CONNECTING
     }
 
     override fun enableInternal() {

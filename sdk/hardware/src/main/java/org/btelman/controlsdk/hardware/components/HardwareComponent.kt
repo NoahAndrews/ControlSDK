@@ -3,7 +3,6 @@ package org.btelman.controlsdk.hardware.components
 import android.content.Context
 import android.os.Bundle
 import kotlinx.coroutines.runBlocking
-import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.hardware.interfaces.Translator
 import org.btelman.controlsdk.models.Component
@@ -35,7 +34,6 @@ class HardwareComponent : Component() {
         runBlocking{
             communicationDriverComponent?.enable()?.await()
         }
-        status = ComponentStatus.STABLE
     }
 
     override fun disableInternal() {

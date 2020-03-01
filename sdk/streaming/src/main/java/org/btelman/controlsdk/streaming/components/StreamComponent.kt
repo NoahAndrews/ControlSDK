@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Message
 import kotlinx.coroutines.runBlocking
+import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.models.Component
 import org.btelman.controlsdk.streaming.models.StreamInfo
@@ -64,6 +65,10 @@ abstract class StreamComponent<R : StreamSubComponent,P : StreamSubComponent> : 
 
     fun updateLoop(){
         push(FRAME_FETCH)
+    }
+
+    override fun getInitialStatus(): ComponentStatus {
+        return ComponentStatus.STABLE
     }
 
     override fun getType(): ComponentType {

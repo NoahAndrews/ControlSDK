@@ -68,6 +68,10 @@ abstract class Component : IComponent {
     protected abstract fun enableInternal()
     protected abstract fun disableInternal()
 
+    open fun getInitialStatus() : ComponentStatus{
+        return ComponentStatus.STABLE
+    }
+
     override fun setEventListener(listener: ComponentEventListener?) {
         log.d{
             "setEventListener"
@@ -98,7 +102,7 @@ abstract class Component : IComponent {
             "enable"
         }
         if(enabled.getAndSet(true)) return@async false
-        status = ComponentStatus.CONNECTING
+        status = getInitialStatus()
         awaitCallback<Boolean> { enableWithCallback(it) }
         return@async true
     }
