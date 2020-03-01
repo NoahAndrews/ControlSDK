@@ -5,6 +5,7 @@ import android.content.Context
 import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.os.Build
+import android.os.Bundle
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.runBlocking
 import org.btelman.controlsdk.enums.ComponentStatus
@@ -21,12 +22,8 @@ import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2Component
 open class CameraCompatRetriever : BaseVideoRetriever(){
     private var retriever : BaseVideoRetriever? = null
 
-    override fun grabImageData(): ImageDataPacket? {
-        return retriever?.grabImageData()
-    }
-
-    override fun enableInternal() {
-        super.enableInternal()
+    override fun onInitializeComponent(applicationContext: Context, bundle: Bundle?) {
+        super.onInitializeComponent(applicationContext, bundle)
         val cameraInfo = streamInfo!!.deviceInfo
         val cameraId = cameraInfo.getCameraId()
         retriever = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
@@ -37,6 +34,15 @@ open class CameraCompatRetriever : BaseVideoRetriever(){
             log.d("Using Camera1 API. Device API too low or LIMITED capabilities")
             createCamera1()
         }
+        retriever?.onInitializeComponent(applicationContext, bundle)
+    }
+
+    override fun grabImageData(): ImageDataPacket? {
+        return retriever?.grabImageData()
+    }
+
+    override fun enableInternal() {
+        super.enableInternal()
         runBlocking {
             retriever?.setEventListener(eventDispatcher)
             retriever?.enable()?.await()
