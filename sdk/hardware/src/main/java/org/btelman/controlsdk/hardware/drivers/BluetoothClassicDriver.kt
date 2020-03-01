@@ -130,9 +130,9 @@ class BluetoothClassicDriver : HardwareDriver {
     }
 
     companion object {
-        val BLUETOOTH_ADDR = "addr"
-        val BLUETOOTH_NAME = "name"
-        val CONFIG_PREFS = "BluetoothClassicConfig"
-        val RESULT_CODE = 312
+        const val BLUETOOTH_ADDR = "addr"
+        const val BLUETOOTH_NAME = "name"
+        const val CONFIG_PREFS = "BluetoothClassicConfig"
+        const val RESULT_CODE = 312
     }
 }

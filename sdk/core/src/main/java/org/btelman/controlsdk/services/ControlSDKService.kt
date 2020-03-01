@@ -25,6 +25,7 @@ import org.btelman.logutil.kotlin.LogUtil
 import org.btelman.logutil.kotlin.LogUtilInstance
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.system.exitProcess
 
 /**
  * The main ControlSDK control service.
@@ -55,7 +56,7 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
                 "User requested service stop"
             }
             stopService()
-            System.exit(0)
+            exitProcess(0)
         }.also {
             it.register(this)
         }

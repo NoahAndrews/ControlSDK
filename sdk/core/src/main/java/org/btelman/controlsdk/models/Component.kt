@@ -35,7 +35,7 @@ abstract class Component : IComponent {
             javaClass.simpleName
     ).also { it.start() }
 
-    protected val log = LogUtil("ControlSDKComponent : ${getName()}", ControlSDKService.loggerID)
+    protected val log = LogUtil("ControlSDKComponent : ${javaClass.name}", ControlSDKService.loggerID)
 
     /**
      * Constructor that the service will use to start the component. For custom actions, please use onInitializeComponent

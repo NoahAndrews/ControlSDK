@@ -8,7 +8,7 @@ import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.video.retrievers.SurfaceTextureVideoRetriever
 
 /**
- * Class that contains only the camera components for streaming to letsrobot.tv
+ * Class that contains only the camera components for streaming
  *
  * To make this functional, pass in cameraId and a valid SurfaceHolder to a Core.Builder instance
  *

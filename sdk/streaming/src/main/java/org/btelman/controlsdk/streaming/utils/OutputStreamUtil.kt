@@ -2,7 +2,6 @@ package org.btelman.controlsdk.streaming.utils
 
 import android.graphics.Bitmap
 import android.graphics.ImageFormat
-import android.graphics.YuvImage
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import java.io.IOException
 import java.io.OutputStream

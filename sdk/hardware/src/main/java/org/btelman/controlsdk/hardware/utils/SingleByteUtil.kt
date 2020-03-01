@@ -5,7 +5,7 @@ package org.btelman.controlsdk.hardware.utils
  */
 class SingleByteUtil {
     companion object {
-        val STOP_BYTE: Byte = 0
+        const val STOP_BYTE: Byte = 0
 
         fun getDriveSpeed(driveSpeed: Byte, motorNum: Int, scale : Float = 1f): Byte {
             return when (motorNum) {
