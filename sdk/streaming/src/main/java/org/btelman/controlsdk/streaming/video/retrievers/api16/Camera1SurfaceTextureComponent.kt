@@ -5,7 +5,6 @@ import android.graphics.Rect
 import android.hardware.Camera
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
-import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.SurfaceTextureVideoRetriever
 
 /**
@@ -52,7 +51,7 @@ open class Camera1SurfaceTextureComponent : SurfaceTextureVideoRetriever(), Came
         camera = null
     }
 
-    override fun setupCamera(streamInfo : StreamInfo?){
+    override fun setupCamera(){
         val cameraId = streamInfo?.deviceInfo?.getCameraId() ?: 0
         camera ?: run {
             if(cameraId+1 > Camera.getNumberOfCameras()){

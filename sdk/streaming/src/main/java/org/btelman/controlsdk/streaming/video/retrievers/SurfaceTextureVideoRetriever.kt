@@ -1,6 +1,5 @@
 package org.btelman.controlsdk.streaming.video.retrievers
 
-import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.utils.EglCore
 import org.btelman.controlsdk.streaming.utils.SurfaceTextureUtils
 import javax.microedition.khronos.egl.EGLSurface
@@ -11,7 +10,7 @@ import javax.microedition.khronos.egl.EGLSurface
  * Compatible down to API16
  */
 abstract class SurfaceTextureVideoRetriever : BaseVideoRetriever() {
-    protected abstract fun setupCamera(streamInfo: StreamInfo? = null)
+    protected abstract fun setupCamera()
     protected abstract fun releaseCamera()
     protected var eglCore: EglCore? = null
     protected var eglSurface: EGLSurface? = null
@@ -26,7 +25,7 @@ abstract class SurfaceTextureVideoRetriever : BaseVideoRetriever() {
         eglSurface = eglCore?.createOffscreenSurface(streamInfo!!.width, streamInfo!!.height)
         eglCore?.makeCurrent(eglSurface)
         mStManager = SurfaceTextureUtils.SurfaceTextureManager()
-        setupCamera(streamInfo)
+        setupCamera()
     }
 
     override fun disableInternal() {
