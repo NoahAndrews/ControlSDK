@@ -6,8 +6,9 @@ import android.hardware.camera2.CameraCharacteristics
 import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import kotlinx.coroutines.runBlocking
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
-import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.api16.Camera1SurfaceTextureComponent
 import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2SurfaceTextureComponent
 
@@ -17,28 +18,39 @@ import org.btelman.controlsdk.streaming.video.retrievers.api21.Camera2SurfaceTex
  * still supported, but may not work on every device
  * ex. Samsung Galaxy S4
  */
-class CameraCompatRetriever : BaseVideoRetriever(){
+open class CameraCompatRetriever : BaseVideoRetriever(){
     private var retriever : BaseVideoRetriever? = null
 
     override fun grabImageData(): ImageDataPacket? {
         return retriever?.grabImageData()
     }
 
-    override fun enable(context: Context, streamInfo: StreamInfo) {
-        super.enable(context, streamInfo)
-        val cameraInfo = streamInfo.deviceInfo
+    override fun enableInternal() {
+        super.enableInternal()
+        val cameraInfo = streamInfo!!.deviceInfo
         val cameraId = cameraInfo.getCameraId()
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
-            && validateCamera2Support(context, cameraId)){
+            && validateCamera2Support(context!!, cameraId)){
             Log.d("CameraRetriever", "Using Camera2 API")
-            retriever = Camera2SurfaceTextureComponent()
+            retriever = createCamera2()
         }
         else{
             Log.d("CameraRetriever",
                 "Using Camera1 API. Device API too low or LIMITED capabilities")
-            retriever = Camera1SurfaceTextureComponent()
+            retriever = createCamera1()
         }
-        retriever?.enable(context, streamInfo)
+        runBlocking {
+            retriever?.enable()?.await()
+        }
+    }
+
+    private fun createCamera1(): BaseVideoRetriever? {
+        return Camera1SurfaceTextureComponent()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    protected open fun createCamera2(): BaseVideoRetriever? {
+        return Camera2SurfaceTextureComponent()
     }
 
     override fun listenForFrame(func: () -> Unit) {
@@ -49,9 +61,11 @@ class CameraCompatRetriever : BaseVideoRetriever(){
         retriever?.removeListenerForFrame()
     }
 
-    override fun disable() {
-        super.disable()
-        retriever?.disable()
+    override fun disableInternal() {
+        super.disableInternal()
+        runBlocking {
+            retriever?.disable()?.await()
+        }
         retriever = null
     }
 

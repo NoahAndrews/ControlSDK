@@ -1,8 +1,6 @@
 package org.btelman.controlsdk.streaming.audio.retrievers
 
-import android.content.Context
 import org.btelman.controlsdk.streaming.models.AudioPacket
-import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.utils.AudioRecordingThread
 import org.btelman.controlsdk.streaming.utils.AudioUtil
 
@@ -15,13 +13,13 @@ open class BasicMicrophoneAudioRetriever : BaseAudioRetriever(), AudioRecordingT
 
     private var dataArray : AudioPacket? = null
 
-    override fun enable(context: Context, streamInfo: StreamInfo) {
-        super.enable(context, streamInfo)
+    override fun enableInternal() {
+        super.enableInternal()
         recordingThread.startRecording()
     }
 
-    override fun disable() {
-        super.disable()
+    override fun disableInternal() {
+        super.disableInternal()
         recordingThread.stopRecording()
     }
 

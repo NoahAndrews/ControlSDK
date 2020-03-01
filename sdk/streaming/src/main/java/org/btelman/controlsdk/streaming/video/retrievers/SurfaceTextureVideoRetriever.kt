@@ -1,6 +1,5 @@
 package org.btelman.controlsdk.streaming.video.retrievers
 
-import android.content.Context
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.utils.EglCore
 import org.btelman.controlsdk.streaming.utils.SurfaceTextureUtils
@@ -22,17 +21,16 @@ abstract class SurfaceTextureVideoRetriever : BaseVideoRetriever() {
         eglCore = EglCore()
     }
 
-    override fun enable(context: Context, streamInfo: StreamInfo) {
-        super.enable(context, streamInfo)
-
-        eglSurface = eglCore?.createOffscreenSurface(streamInfo.width, streamInfo.height)
+    override fun enableInternal() {
+        super.enableInternal()
+        eglSurface = eglCore?.createOffscreenSurface(streamInfo!!.width, streamInfo!!.height)
         eglCore?.makeCurrent(eglSurface)
         mStManager = SurfaceTextureUtils.SurfaceTextureManager()
         setupCamera(streamInfo)
     }
 
-    override fun disable() {
-        super.disable()
+    override fun disableInternal() {
+        super.disableInternal()
         releaseCamera()
         mStManager?.surfaceTexture?.release()
         eglCore?.releaseSurface(eglSurface)

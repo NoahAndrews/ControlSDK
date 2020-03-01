@@ -13,36 +13,37 @@ import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
-import org.btelman.controlsdk.streaming.video.retrievers.SurfaceTextureVideoRetriever
+import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
 
 
 /**
  * Camera retrieval via Camera2 API and an offscreen SurfaceTexture for rendering the preview
  */
+@Suppress("MemberVisibilityCanBePrivate")
 @RequiresApi(21)
-class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageReader.OnImageAvailableListener {
+open class Camera2SurfaceTextureComponent : BaseVideoRetriever(), ImageReader.OnImageAvailableListener {
 
     private var data: ByteArray? = null
-    private var width = 0
-    private var height = 0
+    protected var width = 0
+    protected var height = 0
 
     var reader : ImageReader? = null
 
-    private var mPreviewBuilder: CaptureRequest.Builder? = null
+    protected var mPreviewBuilder: CaptureRequest.Builder? = null
     /**
      * An additional thread for running tasks that shouldn't block the UI.
      */
-    private var mBackgroundThread: HandlerThread? = null
+    protected var mBackgroundThread: HandlerThread? = null
 
     /**
      * A [Handler] for running tasks in the background.
      */
-    private var mBackgroundHandler: Handler? = null
+    protected var mBackgroundHandler: Handler? = null
 
     /**
      * [CameraDevice.StateCallback] is called when [CameraDevice] changes its status.
      */
-    private val mStateCallback = object : CameraDevice.StateCallback() {
+    protected val mStateCallback = object : CameraDevice.StateCallback() {
 
         override fun onOpened(@NonNull cameraDevice: CameraDevice) {
             mCameraDevice = cameraDevice
@@ -63,8 +64,18 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
 
     }
 
+    override fun enableInternal() {
+        super.enableInternal()
+        setupCamera(streamInfo)
+    }
+
+    override fun disableInternal() {
+        super.disableInternal()
+        releaseCamera()
+    }
+
     @SuppressLint("MissingPermission") //Already handled. No way to call this
-    override fun setupCamera(streamInfo : StreamInfo?) {
+    protected open fun setupCamera(streamInfo : StreamInfo?) {
         startBackgroundThread()
         width = streamInfo?.width ?: 640
         height = streamInfo?.height ?: 640
@@ -91,7 +102,7 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
         }
     }
 
-    override fun releaseCamera() {
+    protected open fun releaseCamera() {
         stopBackgroundThread()
         reader?.close()
         closePreviewSession()
@@ -107,13 +118,13 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
     /**
      * A reference to the opened [android.hardware.camera2.CameraDevice].
      */
-    private var mCameraDevice: CameraDevice? = null
+    protected var mCameraDevice: CameraDevice? = null
 
     /**
      * A reference to the current [android.hardware.camera2.CameraCaptureSession] for
      * preview.
      */
-    private var mPreviewSession: CameraCaptureSession? = null
+    protected var mPreviewSession: CameraCaptureSession? = null
 
     override fun onImageAvailable(reader: ImageReader?) {
         var image: Image? = null
@@ -128,7 +139,7 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
         }
     }
 
-    fun convertYuv420888ToYuv(image: Image): ByteArray {
+    private fun convertYuv420888ToYuv(image: Image): ByteArray {
         val yPlane = image.planes[0]
         val ySize = yPlane.buffer.remaining()
 
@@ -169,14 +180,12 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
     /**
      * Start the camera preview.
      */
-    private fun startPreview() {
+    protected open fun startPreview() {
         if (null == mCameraDevice) {
             return
         }
         try {
             closePreviewSession()
-            val texture = mStManager?.surfaceTexture!!
-            texture.setDefaultBufferSize(height, width)
             mPreviewBuilder = mCameraDevice!!.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW)
             mPreviewBuilder!!.addTarget(reader?.surface!!)
 
@@ -201,7 +210,7 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
     /**
      * Update the camera preview. [.startPreview] needs to be called in advance.
      */
-    private fun updatePreview() {
+    protected open fun updatePreview() {
         if (null == mCameraDevice) {
             return
         }
@@ -218,11 +227,11 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
 
     }
 
-    private fun setUpCaptureRequestBuilder(builder: CaptureRequest.Builder) {
+    protected open fun setUpCaptureRequestBuilder(builder: CaptureRequest.Builder) {
         builder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO)
     }
 
-    private fun closePreviewSession() {
+    protected open fun closePreviewSession() {
         if (mPreviewSession != null) {
             mPreviewSession?.close()
             mPreviewSession = null
@@ -232,7 +241,7 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
     /**
      * Starts a background thread and its [Handler].
      */
-    private fun startBackgroundThread() {
+    protected open fun startBackgroundThread() {
         mBackgroundThread = HandlerThread("CameraBackground")
         mBackgroundThread?.start()
         mBackgroundHandler = Handler(mBackgroundThread?.looper)
@@ -241,7 +250,7 @@ class Camera2SurfaceTextureComponent : SurfaceTextureVideoRetriever(), ImageRead
     /**
      * Stops the background thread and its [Handler].
      */
-    private fun stopBackgroundThread() {
+    protected open fun stopBackgroundThread() {
         mBackgroundThread?.quitSafely()
         try {
             mBackgroundThread?.join()

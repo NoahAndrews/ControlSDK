@@ -3,6 +3,7 @@ package org.btelman.controlsdk.streaming.components
 import android.content.Context
 import android.os.Bundle
 import android.os.Message
+import kotlinx.coroutines.runBlocking
 import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.models.Component
 import org.btelman.controlsdk.streaming.models.StreamInfo
@@ -25,14 +26,25 @@ abstract class StreamComponent<R : StreamSubComponent,P : StreamSubComponent> : 
     }
 
     override fun enableInternal() {
-        processor.enable(context!!, streamInfo)
-        retriever.enable(context!!, streamInfo)
+        runBlocking {
+            processor.setEventListener(eventDispatcher)
+            processor.updateStreamInfo(streamInfo)
+            processor.enable().await()
+
+            retriever.updateStreamInfo(streamInfo)
+            retriever.setEventListener(eventDispatcher)
+            retriever.enable().await()
+        }
         push(DO_FRAME)
     }
 
     override fun disableInternal() {
-        retriever.disable()
-        processor.disable()
+        runBlocking {
+            retriever.disable().await()
+            retriever.setEventListener(null)
+            processor.disable().await()
+            processor.setEventListener(null)
+        }
     }
 
     override fun handleMessage(message: Message): Boolean {

@@ -15,7 +15,9 @@ open class AudioComponent : StreamComponent<BaseAudioRetriever, BaseAudioProcess
         super.onInitializeComponent(applicationContext, bundle)
         bundle!!
         processor = AudioProcessorFactory.findProcessor(bundle) ?: throw IllegalArgumentException("unable to resolve audio processor")
+        processor.onInitializeComponent(applicationContext, bundle)
         retriever = AudioRetrieverFactory.findRetriever(bundle) ?: throw IllegalArgumentException("unable to resolve audio retriever")
+        retriever.onInitializeComponent(applicationContext, bundle)
     }
 
     override fun doWorkLoop() {
