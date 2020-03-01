@@ -13,7 +13,6 @@ import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
-import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
 
 
@@ -71,7 +70,7 @@ open class Camera2Component : BaseVideoRetriever(), ImageReader.OnImageAvailable
 
     override fun enableInternal() {
         super.enableInternal()
-        setupCamera(streamInfo)
+        setupCamera()
     }
 
     override fun disableInternal() {
@@ -80,7 +79,7 @@ open class Camera2Component : BaseVideoRetriever(), ImageReader.OnImageAvailable
     }
 
     @SuppressLint("MissingPermission") //Already handled. No way to call this
-    protected open fun setupCamera(streamInfo : StreamInfo?) {
+    protected open fun setupCamera() {
         startBackgroundThread()
         width = streamInfo?.width ?: 640
         height = streamInfo?.height ?: 640
