@@ -1,8 +1,9 @@
 package org.btelman.controlsdk.hardware.translators
 
-import android.util.Log
 import org.btelman.controlsdk.hardware.interfaces.Translator
 import org.btelman.controlsdk.hardware.interfaces.TranslatorComponent
+import org.btelman.controlsdk.services.ControlSDKService
+import org.btelman.logutil.kotlin.LogUtil
 import java.nio.charset.Charset
 
 /**
@@ -11,6 +12,7 @@ import java.nio.charset.Charset
  */
 @TranslatorComponent(description = "Sends output String in lowercase format of \"{string}\\r\\n\" as a ByteArray")
 class ArduinoTranslator : Translator {
+    private val log = LogUtil("ArduinoTranslator", ControlSDKService.loggerID)
     override fun translateString(command: String): ByteArray {
         return getBytesArrayWithTerminator(command)
     }
@@ -25,7 +27,9 @@ class ArduinoTranslator : Translator {
 
     private fun getBytesArrayWithTerminator(string : String) : ByteArray{
         val messageWithTerminator = "$string\r\n"
-        Log.d(TAG, "message = $messageWithTerminator")
+        log.v{
+            "getBytesArrayWithTerminator : $messageWithTerminator"
+        }
         return messageWithTerminator.toLowerCase().toByteArray(Charset.forName("UTF-8"))
     }
 

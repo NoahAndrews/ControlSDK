@@ -6,12 +6,13 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
 import android.os.Message
-import android.util.Log
 import android.widget.Toast
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.hardware.drivers.libs.usb.UsbService
 import org.btelman.controlsdk.hardware.interfaces.DriverComponent
 import org.btelman.controlsdk.hardware.interfaces.HardwareDriver
+import org.btelman.controlsdk.services.ControlSDKService
+import org.btelman.logutil.kotlin.LogUtil
 import java.lang.ref.WeakReference
 
 /**
@@ -19,8 +20,8 @@ import java.lang.ref.WeakReference
  */
 @DriverComponent(description = "Send data over USB Serial at 9600 BAUD")
 class FelhrUsbSerialDriver : HardwareDriver {
-    private val TAG = "FelhrUsb"
     private var componentStatus = ComponentStatus.DISABLED
+    private val log = LogUtil("FelhrUsb", ControlSDKService.loggerID)
 
     override fun initConnection(context: Context) {
         setFilters(context)
@@ -28,11 +29,11 @@ class FelhrUsbSerialDriver : HardwareDriver {
     }
 
     override fun enable() {
-        Log.d(TAG, "enable")
+        log.d("enable")
     }
 
     override fun disable() {
-        Log.d(TAG, "disable")
+        log.d("disable")
     }
 
     override fun usesCustomSetup(): Boolean {
@@ -103,7 +104,11 @@ class FelhrUsbSerialDriver : HardwareDriver {
     }
 
     fun showMessageAndChangeState(context: Context, message: String?, status: ComponentStatus?){
+
         message?.let {
+            log.d{
+                message
+            }
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
         }
         status?.let {
@@ -147,13 +152,16 @@ class FelhrUsbSerialDriver : HardwareDriver {
      * This handler will be passed to UsbService. Data received from serial port is displayed through this handler
      */
     private class MyHandler(activity: Context) : Handler() {
+        private val log = LogUtil("FelhrUsbHandler", ControlSDKService.loggerID)
         private val mActivity: WeakReference<Context> = WeakReference(activity)
 
         override fun handleMessage(msg: Message) {
             val message : String? = when (msg.what) {
                 UsbService.MESSAGE_FROM_SERIAL_PORT -> {
                     val data = msg.obj as String
-                    Log.d("handleMessage", data)
+                    log.v{
+                        "handleMessage : $data"
+                    }
                     null
                 }
                 UsbService.CTS_CHANGE -> "CTS_CHANGE"
@@ -163,7 +171,9 @@ class FelhrUsbSerialDriver : HardwareDriver {
                 }
             }
             message?.let{
-                Toast.makeText(mActivity.get(), it, Toast.LENGTH_LONG).show()
+                log.d{
+                    "handleMessage : $it"
+                }
             }
         }
     }

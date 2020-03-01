@@ -46,8 +46,4 @@ class BluetoothClassic(val address : String){
     fun onStateChange(function: (state: Int) -> Unit){
         bluetoothService.onStateChange(function)
     }
-
-    companion object {
-        private const val TAG = "BluetoothClassic"
-    }
 }

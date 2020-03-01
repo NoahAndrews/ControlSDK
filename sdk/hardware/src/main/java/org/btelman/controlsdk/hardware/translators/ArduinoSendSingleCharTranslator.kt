@@ -27,8 +27,4 @@ class ArduinoSendSingleCharTranslator : Translator {
     private fun getFirstCharAsByteArray(string : String) : ByteArray{
         return "${string[0]}".toLowerCase().toByteArray(Charset.forName("UTF-8"))
     }
-
-    companion object {
-        const val TAG = "ArduinoProtocolSingleCh"
-    }
 }

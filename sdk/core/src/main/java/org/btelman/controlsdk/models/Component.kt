@@ -127,7 +127,6 @@ abstract class Component : IComponent {
             try {
                 enableInternal()
             } catch (e: Exception) {
-                e.printStackTrace()
                 throwError(e)
                 status = ComponentStatus.ERROR
             }
@@ -207,6 +206,7 @@ abstract class Component : IComponent {
     }
 
     open fun throwError(e : Exception){
+        log.e("Error", e)
         if(!ControlSDKService.allowNotificationForExceptions) return
         context?.let {
             val errorMessage = getType().toString().toLowerCase() +" "+ it.getString(R.string.componentCrashedText)
