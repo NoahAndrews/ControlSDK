@@ -11,6 +11,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
+import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
 import org.btelman.controlsdk.streaming.video.retrievers.BaseVideoRetriever
@@ -47,18 +48,22 @@ open class Camera2Component : BaseVideoRetriever(), ImageReader.OnImageAvailable
 
         override fun onOpened(@NonNull cameraDevice: CameraDevice) {
             mCameraDevice = cameraDevice
+            status = ComponentStatus.STABLE
             startPreview()
         }
 
         override fun onDisconnected(@NonNull cameraDevice: CameraDevice) {
             closePreviewSession()
             cameraDevice.close()
+            status = ComponentStatus.DISABLED
             mCameraDevice = null
         }
 
         override fun onError(@NonNull cameraDevice: CameraDevice, error: Int) {
             closePreviewSession()
             cameraDevice.close()
+            log.e("onError $error")
+            status = ComponentStatus.ERROR
             mCameraDevice = null
         }
 
@@ -86,17 +91,22 @@ open class Camera2Component : BaseVideoRetriever(), ImageReader.OnImageAvailable
             val list = manager.cameraIdList
             val requestedId = streamInfo?.deviceInfo?.getCameraId()?:0
             if(requestedId+1 > list.size){
-                throw java.lang.Exception("Attempted to open camera $requestedId. Only ${list.size} cameras exist! 0 is first camera")
+                val e = java.lang.Exception("Attempted to open camera $requestedId. Only ${list.size} cameras exist! 0 is first camera")
+                log.e("error starting camera", e)
+                throw e
             }
             manager.openCamera(list[requestedId], mStateCallback, null)
         } catch (e: CameraAccessException) {
-            e.printStackTrace()
+            status = ComponentStatus.ERROR
+            log.e("error starting camera", e)
             //TODO throw error and kill service?
         } catch (e: NullPointerException) {
-            e.printStackTrace()
+            status = ComponentStatus.ERROR
+            log.e("error starting camera", e)
             //TODO throw error and kill service?
         } catch (e: InterruptedException) {
-            e.printStackTrace()
+            status = ComponentStatus.ERROR
+            log.e("error starting camera", e)
             //TODO throw error and kill service?
             throw RuntimeException("Interrupted while trying to lock camera opening.")
         }
@@ -182,6 +192,8 @@ open class Camera2Component : BaseVideoRetriever(), ImageReader.OnImageAvailable
      */
     protected open fun startPreview() {
         if (null == mCameraDevice) {
+            status = ComponentStatus.ERROR
+            log.e("camera null!")
             return
         }
         try {
@@ -198,13 +210,13 @@ open class Camera2Component : BaseVideoRetriever(), ImageReader.OnImageAvailable
                         }
 
                         override fun onConfigureFailed(@NonNull session: CameraCaptureSession) {
-
+                            log.e("camera ConfigureFailed")
+                            status = ComponentStatus.ERROR
                         }
                     }, mBackgroundHandler)
         } catch (e: Exception) {
-            e.printStackTrace()
+            log.e("error starting preview", e)
         }
-
     }
 
     /**
@@ -222,9 +234,8 @@ open class Camera2Component : BaseVideoRetriever(), ImageReader.OnImageAvailable
                     ,null
                     , mBackgroundHandler)
         } catch (e: Exception) {
-            e.printStackTrace()
+            log.e("error updating preview", e)
         }
-
     }
 
     protected open fun setUpCaptureRequestBuilder(builder: CaptureRequest.Builder) {
@@ -257,7 +268,7 @@ open class Camera2Component : BaseVideoRetriever(), ImageReader.OnImageAvailable
             mBackgroundThread = null
             mBackgroundHandler = null
         } catch (e: InterruptedException) {
-            e.printStackTrace()
+            log.e("error stopping background thread", e)
         }
     }
 

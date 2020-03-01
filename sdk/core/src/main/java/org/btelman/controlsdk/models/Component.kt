@@ -103,6 +103,21 @@ abstract class Component : IComponent {
         return@async true
     }
 
+    /**
+     * Called when component should shut down
+     *
+     * Will return without action if already enabled
+     */
+    override fun disable() = GlobalScope.async{
+        if(!enabled.getAndSet(false)) return@async false
+        log.d{
+            "disable"
+        }
+        awaitCallback<Boolean> { disableWithCallback(it) }
+        status = ComponentStatus.DISABLED
+        return@async true
+    }
+
     fun enableWithCallback(callback: Callback<Boolean>){
         handler.post {
             try {
@@ -145,21 +160,6 @@ abstract class Component : IComponent {
                     }
                 })
             }
-
-    /**
-     * Called when component should shut down
-     *
-     * Will return without action if already enabled
-     */
-    override fun disable() = GlobalScope.async{
-        if(!enabled.getAndSet(false)) return@async false
-        log.d{
-            "disable"
-        }
-        awaitCallback<Boolean> { disableWithCallback(it) }
-        status = ComponentStatus.DISABLED
-        return@async true
-    }
 
     /**
      * Called when we have not received a response from the server in a while
