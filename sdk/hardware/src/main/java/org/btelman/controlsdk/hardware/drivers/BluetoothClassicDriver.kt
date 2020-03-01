@@ -15,6 +15,8 @@ import org.btelman.controlsdk.hardware.interfaces.HardwareDriver
 /**
  * communication class that works with bluetooth classic
  * and takes control data via EventManager.ROBOT_BYTE_ARRAY event
+ *
+ * TODO better error handling
  */
 @DriverComponent(description = "Send data over bluetooth classic (Serial) at 9600 BAUD", requiresSetup = true)
 class BluetoothClassicDriver : HardwareDriver {

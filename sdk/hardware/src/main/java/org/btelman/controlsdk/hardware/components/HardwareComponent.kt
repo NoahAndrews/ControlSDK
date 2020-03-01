@@ -27,6 +27,7 @@ class HardwareComponent : Component() {
         } ?: CommunicationDriverComponent()
         translatorComponent ?: return
         communicationDriverComponent?.onInitializeComponent(applicationContext, bundle)
+        communicationDriverComponent?.setEventListener(eventDispatcher)
     }
 
     override fun enableInternal() {

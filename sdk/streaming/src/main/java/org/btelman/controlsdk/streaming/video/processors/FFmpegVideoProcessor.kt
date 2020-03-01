@@ -1,6 +1,5 @@
 package org.btelman.controlsdk.streaming.video.processors
 
-import android.content.Context
 import android.graphics.Rect
 import android.util.Log
 import org.btelman.controlsdk.enums.ComponentStatus
@@ -14,17 +13,14 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Process frames via FFmpeg
  */
 open class FFmpegVideoProcessor : BaseVideoProcessor(){
-    private var status: ComponentStatus = ComponentStatus.DISABLED
     private val streaming = AtomicBoolean(false)
     private val ffmpegRunning = AtomicBoolean(false)
     private var successCounter = 0
-    private var streamInfo: StreamInfo? = null
     var process : Process? = null
 
-    override fun enable(context: Context, streamInfo: StreamInfo) {
-        super.enable(context, streamInfo)
-        this.streamInfo = streamInfo
-        FFmpegUtil.initFFmpeg(context){ success ->
+    override fun enableInternal() {
+        super.enableInternal()
+        FFmpegUtil.initFFmpeg(context!!){ success ->
             streaming.set(success)
             if(!success){
                 throw ExceptionInInitializerError("Unable to stream : FFMpeg Not Supported on this device")
@@ -32,8 +28,8 @@ open class FFmpegVideoProcessor : BaseVideoProcessor(){
         }
     }
 
-    override fun disable() {
-        super.disable()
+    override fun disableInternal() {
+        super.disableInternal()
         streamInfo = null
         streaming.set(false)
         FFmpegUtil.killFFmpeg(process)

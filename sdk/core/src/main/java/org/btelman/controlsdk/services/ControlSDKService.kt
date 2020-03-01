@@ -4,11 +4,13 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.*
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.runBlocking
+import org.btelman.controlsdk.BuildConfig
 import org.btelman.controlsdk.R
 import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.interfaces.ComponentEventListener
@@ -18,6 +20,9 @@ import org.btelman.controlsdk.models.ComponentEventObject
 import org.btelman.controlsdk.models.ComponentHolder
 import org.btelman.controlsdk.utils.InlineBroadcastReceiver
 import org.btelman.controlsdk.utils.NotificationUtil
+import org.btelman.logutil.kotlin.LogLevel
+import org.btelman.logutil.kotlin.LogUtil
+import org.btelman.logutil.kotlin.LogUtilInstance
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -29,6 +34,7 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
     private var running = false
     private val componentList = ArrayList<ComponentHolder<*>>()
     private val activeComponentList = ArrayList<IComponent>()
+    private val log = LogUtil("ControlSDKService", loggerID)
 
     /**
      * Target we publish for clients to send messages to MessageHandler.
@@ -41,7 +47,13 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
     private var stopListenerReceiver: InlineBroadcastReceiver? = null
 
     override fun onCreate() {
+        log.d{
+            "ControlSDK ${BuildConfig.VERSION_NAME} starting..."
+        }
         stopListenerReceiver = InlineBroadcastReceiver(SERVICE_STOP_BROADCAST){ _, _ ->
+            log.d {
+                "User requested service stop"
+            }
             stopService()
             System.exit(0)
         }.also {
@@ -60,23 +72,35 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
      * for sending messages to the service.
      */
     override fun onBind(intent: Intent): IBinder? {
-        Toast.makeText(applicationContext, "binding", Toast.LENGTH_SHORT).show()
+        log.d{
+            Toast.makeText(applicationContext, "binding", Toast.LENGTH_SHORT).show()
+            "onBind"
+        }
         emitState()
         return mMessenger.binder
     }
 
     override fun onRebind(intent: Intent?) {
-        Toast.makeText(applicationContext, "rebinding", Toast.LENGTH_SHORT).show()
+        log.d{
+            Toast.makeText(applicationContext, "rebinding", Toast.LENGTH_SHORT).show()
+            "onRebind"
+        }
         emitState()
         super.onRebind(intent)
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        Toast.makeText(applicationContext, "unbinding", Toast.LENGTH_SHORT).show()
+        log.d{
+            Toast.makeText(applicationContext, "unbinding", Toast.LENGTH_SHORT).show()
+            "onUnbind"
+        }
         return true
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
+        log.d{
+            "onTaskRemoved"
+        }
         stopService()
         super.onTaskRemoved(rootIntent)
     }
@@ -86,21 +110,35 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
      */
     override fun handleMessage(msg: Message) : Boolean{
         when (msg.what) {
-            START ->
+            START -> {
                 enable()
-            STOP ->
+            }
+            STOP -> {
+                log.d{
+                    "handleMessage : STOP"
+                }
                 disable()
+            }
             ATTACH_COMPONENT -> {
+                log.v{
+                    "handleMessage ATTACH_COMPONENT ${(msg.obj as? ComponentHolder<*>)?.javaClass?.name}"
+                }
                 (msg.obj as? ComponentHolder<*>)?.let {
                     addToLifecycle(it)
                 }
             }
             DETACH_COMPONENT -> {
+                log.v{
+                    "handleMessage DETACH_COMPONENT ${(msg.obj as? ComponentHolder<*>)?.javaClass?.name}"
+                }
                 (msg.obj as? ComponentHolder<*>)?.let {
                     removeFromLifecycle(it)
                 }
             }
             RESET -> {
+                log.d{
+                    "handleMessage RESET"
+                }
                 reset()
             }
             EVENT_BROADCAST ->{
@@ -132,9 +170,18 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
             }
         }
 
+        log.v{
+            "handleMessage EVENT_BROADCAST FROM ${obj?.source?.javaClass?.name} : ${obj?.what} : ${obj?.data}"
+        }
+
         activeComponentList.forEach { component ->
             targetFilter?.takeIf { component.getType() != it }
-                ?: component.dispatchMessage(msg)
+                ?: run{
+                    component.dispatchMessage(msg)
+                    log.v{
+                        "handleMessage EVENT_BROADCAST send to ${component.javaClass.name}"
+                    }
+                }
         }
     }
 
@@ -157,12 +204,21 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
      * Instantiate all of the component holders on componentList and populate the cleared activeComponentList
      */
     private fun instantiateComponents() {
+        log.d{
+            "instantiateComponents"
+        }
         activeComponentList.clear()
         componentList.forEach { holder ->
             try {
                 val component = Component.instantiate(applicationContext, holder)
                 activeComponentList.add(component)
+                log.v{
+                    "instantiateComponents ${component.javaClass.name}"
+                }
             }catch (e : Exception){
+                log.e{
+                    "failed to instantiate ${holder.clazz.name}"
+                }
                 e.printStackTrace()
             }
         }
@@ -177,12 +233,18 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
     fun enable(){
         val componentListener : ComponentEventListener = this
         runBlocking {
-            Toast.makeText(applicationContext, "Starting ControlSDK", Toast.LENGTH_SHORT).show()
+            log.d{
+                Toast.makeText(applicationContext, "Starting ControlSDK", Toast.LENGTH_SHORT).show()
+                "enable"
+            }
             instantiateComponents()
             val list = ArrayList<Deferred<Boolean>>()
 
             //enable all of our components
             activeComponentList.forEach{
+                log.v{
+                    "enabling ${it.javaClass.name}"
+                }
                 it.setEventListener(componentListener)
                 val deferred = it.enable()
                 list.add(deferred) //add their deferred result to a list
@@ -190,6 +252,9 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
 
             //now wait for each one to complete
             list.forEach {
+                log.v{
+                    "waiting for ${it.javaClass.name} to complete enabling"
+                }
                 it.await()
             }
             setState(true)
@@ -200,9 +265,15 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
      * Disables components, blocking the service messaging thread until complete
      */
     fun disable(){
-        Toast.makeText(applicationContext, "Stopping ControlSDK", Toast.LENGTH_SHORT).show()
         runBlocking {
+            log.d{
+                Toast.makeText(applicationContext, "Stopping ControlSDK", Toast.LENGTH_SHORT).show()
+                "disable"
+            }
             activeComponentList.forEach{
+                log.v{
+                    "disabling ${it.javaClass.name}"
+                }
                 it.disable().await()
                 it.setEventListener(null)
             }
@@ -268,6 +339,9 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
      * Setup the foreground service notification
      */
     private fun setupForeground() {
+        log.d{
+            "Start foreground service"
+        }
         val intentHide = Intent(SERVICE_STOP_BROADCAST)
         intentHide.setPackage(packageName)
         val hide = PendingIntent.getBroadcast(this,
@@ -291,5 +365,12 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
         const val CONTROL_SERVICE = "control_service"
         const val SERVICE_STATUS_BROADCAST = "org.btelman.controlsdk.ServiceStatus"
         const val SERVICE_STOP_BROADCAST = "org.btelman.controlsdk.request.stop"
+        val loggerID: String = ControlSDKService::class.java.name.also {
+            LogUtilInstance(CONTROL_SERVICE, LogLevel.ERROR).also {
+                Log.d("ControlSDKService", "Setup logger")
+                if(!LogUtil.customLoggers.containsKey(ControlSDKService::class.java.name))
+                    LogUtil.addCustomLogUtilInstance(ControlSDKService::class.java.name, it)
+            }
+        }
     }
 }
