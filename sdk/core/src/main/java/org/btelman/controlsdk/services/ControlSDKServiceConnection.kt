@@ -12,6 +12,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import org.btelman.controlsdk.enums.Operation
 import org.btelman.controlsdk.interfaces.ControlSdkApi
 import org.btelman.controlsdk.models.ComponentHolder
+import org.btelman.logutil.kotlin.LogUtil
 
 /**
  * Binder for ControlSDK Service that allows us to put all of the communication code in one class
@@ -20,6 +21,7 @@ class ControlSDKServiceConnection private constructor(
         val context: Context
 ) : ServiceConnection, ControlSdkApi {
 
+    private val log = LogUtil("ControlSDKServiceConnection", ControlSDKService.loggerID)
     /**
      * LiveData object for whether or not the service has the components enabled
      */
@@ -44,37 +46,58 @@ class ControlSDKServiceConnection private constructor(
         // representation of that from the raw IBinder object.
         mService = Messenger(service)
         serviceBoundObserver.postValue(Operation.OK)
+        log.d{
+            "onServiceConnected"
+        }
     }
 
     override fun onServiceDisconnected(className: ComponentName) {
         // This is called when the connection with the service has been
         // unexpectedly disconnected -- that is, its process crashed.
+        log.d{
+            "onServiceDisconnected"
+        }
         mService = null
         serviceBoundObserver.postValue(Operation.NOT_OK)
     }
 
     @Throws(IllegalStateException::class)
     override fun enable() {
+        log.d{
+            "enable"
+        }
         serviceStateObserver.value = Operation.LOADING
         sendStateUnsafe(ControlSDKService.START)
     }
 
     @Throws(IllegalStateException::class)
     override fun disable(){
+        log.d{
+            "disable"
+        }
         serviceStateObserver.value = Operation.LOADING
         sendStateUnsafe(ControlSDKService.STOP)
     }
 
     @Throws(IllegalStateException::class)
     override fun reset() {
+        log.d{
+            "reset"
+        }
         sendStateUnsafe(ControlSDKService.RESET)
     }
 
     override fun attachToLifecycle(component: ComponentHolder<*>) {
+        log.v{
+            "attachToLifecycle ${component.clazz.name}"
+        }
         sendStateUnsafe(ControlSDKService.ATTACH_COMPONENT, component)
     }
 
     override fun detachFromLifecycle(component: ComponentHolder<*>) {
+        log.v{
+            "detachFromLifecycle ${component.clazz.name}"
+        }
         sendStateUnsafe(ControlSDKService.DETACH_COMPONENT, component)
     }
 
@@ -99,6 +122,9 @@ class ControlSDKServiceConnection private constructor(
     }
 
     override fun connectToService() {
+        log.d{
+            "connectToService"
+        }
         LocalBroadcastManager.getInstance(context).registerReceiver(receiver,
                 IntentFilter(ControlSDKService.SERVICE_STATUS_BROADCAST))
         Intent(context, ControlSDKService::class.java).also { intent ->
@@ -107,18 +133,28 @@ class ControlSDKServiceConnection private constructor(
     }
 
     override fun disconnectFromService() {
+        log.d{
+            "disconnectFromService"
+        }
         LocalBroadcastManager.getInstance(context).unregisterReceiver(receiver)
         context.unbindService(this)
     }
 
     class Receiver(val liveData: MutableLiveData<Operation>, val disconnectCallback : (() -> Unit)? = null) : BroadcastReceiver() {
+        private val log = LogUtil("ControlSDKServiceConnectionReceiver", ControlSDKService.loggerID)
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.let {
                 when(it.action){
                     ControlSDKService.SERVICE_STATUS_BROADCAST -> {
+                        log.d{
+                            "onReceive ControlSDKService.SERVICE_STATUS_BROADCAST : ${it.getBooleanExtra("value", false)}"
+                        }
                         setLiveData(it.getBooleanExtra("value", false))
                     }
                     ControlSDKService.SERVICE_STOP_BROADCAST -> {
+                        log.d{
+                            "onReceive ControlSDKService.SERVICE_STOP_BROADCAST"
+                        }
                         disconnectCallback?.invoke()
                     }
                     else ->{/*do nothing*/}

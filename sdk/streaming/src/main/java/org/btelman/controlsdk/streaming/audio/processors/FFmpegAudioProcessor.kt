@@ -2,7 +2,6 @@ package org.btelman.controlsdk.streaming.audio.processors
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.AudioPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
@@ -68,31 +67,39 @@ open class FFmpegAudioProcessor : BaseAudioProcessor() {
     val ffmpegListener = object : FFmpegUtil.FFmpegExecuteResponseHandler(){
         override fun onStart() {
             ffmpegRunning.set(true)
-            Log.d(TAG, "onStart")
+            log.d("FFMPEG : onStart")
         }
 
         override fun onProgress(message: String) {
             @Suppress("ConstantConditionIf")
-            Log.d(TAG, "onProgress : $message")
+            log.d{
+                "FFMPEG : onProgress : $message"
+            }
             successCounter++
             status = ComponentStatus.STABLE
         }
 
         override fun onError(message: String) {
             status = ComponentStatus.ERROR //TODO
-            Log.e(TAG, "progress : $message")
+            log.e{
+                "FFMPEG : onError : $message"
+            }
         }
 
         override fun onComplete(statusCode: Int?) {
             @Suppress("ConstantConditionIf")
-            Log.d(TAG, "onComplete : $statusCode")
+            log.d {
+                "FFMPEG : onComplete : $statusCode"
+            }
             status = ComponentStatus.DISABLED
             ffmpegRunning.set(false)
         }
 
         override fun onProcess(process: Process) {
             @Suppress("ConstantConditionIf")
-            Log.d(TAG, "onProcess")
+            log.v{
+                "FFMPEG : onProcess"
+            }
             this@FFmpegAudioProcessor.process = process
         }
     }
@@ -149,7 +156,6 @@ open class FFmpegAudioProcessor : BaseAudioProcessor() {
     }
 
     companion object {
-        const val TAG = "Audio"
         val UUID = java.util.UUID.randomUUID().toString()
     }
 }

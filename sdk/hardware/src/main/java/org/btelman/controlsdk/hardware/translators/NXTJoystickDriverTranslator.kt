@@ -78,8 +78,4 @@ class NXTJoystickDriverTranslator : Translator {
         bytePackage = concat(bluetoothPacket, bytePackage)
         return bytePackage
     }
-
-    companion object {
-        const val TAG = "NXTProtocol"
-    }
 }

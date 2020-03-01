@@ -1,7 +1,6 @@
 package org.btelman.controlsdk.streaming.video.processors
 
 import android.graphics.Rect
-import android.util.Log
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.streaming.models.ImageDataPacket
 import org.btelman.controlsdk.streaming.models.StreamInfo
@@ -51,28 +50,30 @@ open class FFmpegVideoProcessor : BaseVideoProcessor(){
     val ffmpegListener = object : FFmpegUtil.FFmpegExecuteResponseHandler(){
         override fun onStart() {
             ffmpegRunning.set(true)
-            @Suppress("ConstantConditionIf")
-            if(shouldLog)
-                Log.d(LOGTAG, "onStart")
+            log.d{
+                "FFMPEG : onStart"
+            }
         }
 
         override fun onProgress(message: String) {
-            @Suppress("ConstantConditionIf")
-            if(shouldLog)
-                Log.d(LOGTAG, "onProgress : $message")
+            log.d{
+                "FFMPEG : onProgress : $message"
+            }
             successCounter++
             status = ComponentStatus.STABLE
         }
 
         override fun onError(message: String) {
-            Log.e(LOGTAG, "progress : $message")
+            log.e{
+                "FFMPEG : onError : $message"
+            }
             status = ComponentStatus.ERROR
         }
 
         override fun onComplete(statusCode: Int?) {
-            @Suppress("ConstantConditionIf")
-            if(shouldLog)
-                Log.d(LOGTAG, "onComplete : $statusCode")
+            log.d{
+                "FFMPEG : onComplete : $statusCode"
+            }
             ffmpegRunning.set(false)
             process?.destroy()
             process = null
@@ -80,9 +81,9 @@ open class FFmpegVideoProcessor : BaseVideoProcessor(){
         }
 
         override fun onProcess(process: Process) {
-            @Suppress("ConstantConditionIf")
-            if(shouldLog)
-                Log.d(LOGTAG, "onProcess")
+            log.v{
+                "FFMPEG : onProcess"
+            }
             this@FFmpegVideoProcessor.process = process
         }
     }
@@ -181,8 +182,6 @@ open class FFmpegVideoProcessor : BaseVideoProcessor(){
     }
 
     companion object{
-        const val shouldLog = true
-        const val LOGTAG = "FFmpeg"
         val UUID = java.util.UUID.randomUUID().toString()
     }
 }
