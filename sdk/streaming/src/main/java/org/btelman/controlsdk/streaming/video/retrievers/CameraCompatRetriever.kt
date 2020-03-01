@@ -44,7 +44,7 @@ open class CameraCompatRetriever : BaseVideoRetriever(){
         status = ComponentStatus.STABLE
     }
 
-    private fun createCamera1(): BaseVideoRetriever? {
+    protected open fun createCamera1(): BaseVideoRetriever? {
         return Camera1SurfaceTextureComponent()
     }
 
