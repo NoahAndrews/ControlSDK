@@ -2,7 +2,7 @@ package org.btelman.controlsdk
 
 import androidx.test.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
-import org.btelman.controlsdk.services.ControlSDKService
+import org.btelman.controlsdk.models.Component
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,7 +19,7 @@ class IsolatedComponentTest {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getTargetContext()
         val holder = DummyComponent.Companion.Builder("foo", 123).build()
-        val component = ControlSDKService.instantiateComponent(appContext, holder) as DummyComponent
+        val component = Component.instantiate(appContext, holder) as DummyComponent
         Assert.assertEquals("foo", component.bundle?.getString(DummyComponent.ARG1_KEY))
         Assert.assertEquals(123, component.bundle?.getInt(DummyComponent.ARG2_KEY))
     }

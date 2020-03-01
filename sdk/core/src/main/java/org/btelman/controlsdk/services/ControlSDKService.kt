@@ -34,7 +34,7 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
     private var running = false
     private val componentList = ArrayList<ComponentHolder<*>>()
     private val activeComponentList = ArrayList<IComponent>()
-    private val log = LogUtil("ControlSDKService", ControlSDKService::class.java.name)
+    private val log = LogUtil("ControlSDKService", loggerID)
 
     /**
      * Target we publish for clients to send messages to MessageHandler.
@@ -365,10 +365,12 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
         const val CONTROL_SERVICE = "control_service"
         const val SERVICE_STATUS_BROADCAST = "org.btelman.controlsdk.ServiceStatus"
         const val SERVICE_STOP_BROADCAST = "org.btelman.controlsdk.request.stop"
-        private val logInstance = LogUtilInstance(CONTROL_SERVICE, LogLevel.ERROR).also {
-            Log.d("ControlSDKService", "Setup logger")
-            if(!LogUtil.customLoggers.containsKey(ControlSDKService::class.java.name))
-                LogUtil.addCustomLogUtilInstance(ControlSDKService::class.java.name, it)
+        val loggerID: String = ControlSDKService::class.java.name.also {
+            LogUtilInstance(CONTROL_SERVICE, LogLevel.ERROR).also {
+                Log.d("ControlSDKService", "Setup logger")
+                if(!LogUtil.customLoggers.containsKey(ControlSDKService::class.java.name))
+                    LogUtil.addCustomLogUtilInstance(ControlSDKService::class.java.name, it)
+            }
         }
     }
 }
