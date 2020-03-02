@@ -205,6 +205,7 @@ abstract class Component : IComponent {
         context = applicationContext
     }
 
+    //TODO send component errors upwards
     open fun throwError(e : Exception){
         log.e("Error", e)
         if(!ControlSDKService.allowNotificationForExceptions) return
@@ -231,7 +232,7 @@ abstract class Component : IComponent {
         const val MESSAGE_TIMEOUT = 2
 
         fun instantiate(applicationContext: Context, holder: ComponentHolder<*>) : Component {
-            val component : Component = holder.clazz.newInstance()
+            val component : Component = holder.clazz.newInstance() as Component
             component.onInitializeComponent(applicationContext, holder.data)
             return component
         }

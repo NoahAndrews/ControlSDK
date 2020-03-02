@@ -37,6 +37,7 @@ class DemoActivity : AppCompatActivity() {
     private var recording = false
     private var controlAPI : ControlSdkApi = ControlSDKServiceConnection.getNewInstance(this)
     private val arrayList = ArrayList<ComponentHolder<*>>()
+    private val listeners = ArrayList<ComponentHolder<*>>()
     val bt = BluetoothClassicDriver()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +63,7 @@ class DemoActivity : AppCompatActivity() {
         ContextCompat.startForegroundService(applicationContext, Intent(applicationContext, ControlSDKService::class.java))
 
         controlAPI.getServiceBoundObserver().observeAutoCreate(this){ connected ->
+            //Note that we do not add this to the arraylist. Instead we add it to the service right away
             handleServiceBoundState(connected)
         }
         controlAPI.getServiceStateObserver().observeAutoCreate(this){ serviceStatus ->
@@ -108,6 +110,16 @@ class DemoActivity : AppCompatActivity() {
 
     private fun handleServiceBoundState(connected: Operation) {
         powerButton.isEnabled = connected == Operation.OK
+        if(connected == Operation.OK){
+            listeners.forEach {
+                controlAPI.attachToLifecycle(it)
+            }
+        }
+        else if(connected == Operation.NOT_OK){
+            listeners.forEach {
+                controlAPI.detachFromLifecycle(it)
+            }
+        }
     }
 
     private fun handleServiceState(serviceStatus: Operation) {
@@ -158,6 +170,8 @@ class DemoActivity : AppCompatActivity() {
         arrayList.add(hardwareComponent)
         arrayList.add(dummyComponent)
         arrayList.add(ComponentHolder(UnstableComponent::class.java, Bundle()))
+
+        listeners.add(DummyListener.createHolder())
     }
 
     fun parseColorForOperation(state : Operation?) : Int{

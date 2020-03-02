@@ -12,9 +12,10 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.runBlocking
 import org.btelman.controlsdk.BuildConfig
 import org.btelman.controlsdk.R
+import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.enums.ComponentType
-import org.btelman.controlsdk.interfaces.ComponentEventListener
-import org.btelman.controlsdk.interfaces.IComponent
+import org.btelman.controlsdk.enums.ServiceStatus
+import org.btelman.controlsdk.interfaces.*
 import org.btelman.controlsdk.models.Component
 import org.btelman.controlsdk.models.ComponentEventObject
 import org.btelman.controlsdk.models.ComponentHolder
@@ -25,6 +26,7 @@ import org.btelman.logutil.kotlin.LogUtil
 import org.btelman.logutil.kotlin.LogUtilInstance
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 import kotlin.system.exitProcess
 
 /**
@@ -34,6 +36,8 @@ import kotlin.system.exitProcess
 class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
     private var running = false
     private val componentList = ArrayList<ComponentHolder<*>>()
+    private val listenerList = HashMap<String, IListener>()
+    private val controllerList = HashMap<String, IController>()
     private val activeComponentList = ArrayList<IComponent>()
     private val log = LogUtil("ControlSDKService", loggerID)
 
@@ -184,21 +188,58 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
                     }
                 }
         }
+
+        sendToListeners(msg, targetFilter)
+    }
+
+    private fun sendToListeners(msg: Message, targetFilter : ComponentType? = null) {
+        val eventObject = msg.obj as? ComponentEventObject ?: return
+        listenerList.forEach { listenerKeyValuePair->
+            val listener = listenerKeyValuePair.value
+            if(eventObject.what == Component.STATUS_EVENT){
+                listener.onComponentStatus(eventObject.source.javaClass, eventObject.data as ComponentStatus)
+            }
+            else if(listener.getComponentTypesForListening()?.contains(eventObject.type) != false){
+                listener.dispatchMessage(msg)
+            }
+        }
     }
 
     /**
      * Add a ComponentHolder to the service lifecycle. Will get instantiated into a Component when the service is enabled
      */
-    private fun addToLifecycle(component: ComponentHolder<*>) {
-        if(!componentList.contains(component))
-            componentList.add(component)
+    private fun <T : IControlSDKElement> addToLifecycle(component: ComponentHolder<T>) {
+        IListener.instantiate(applicationContext, component)?.let {
+            log.d("IListener addToLifecycle ${component.clazz.name}")
+            listenerList[component.clazz.name] = it
+        }?: IController.instantiate(applicationContext, component)?.let {
+            log.d("IController addToLifecycle ${component.clazz.name}")
+            controllerList[component.clazz.name] = it
+        }?: run{
+            log.d("Component addToLifecycle ${component.clazz.name}")
+            if(!componentList.contains(component)){
+                componentList.add(component)
+                listenerList.forEach { listener ->
+                    //nullify data to prevent some data leakage
+                    listener.value.onComponentAdded(ComponentHolder(component.clazz, null))
+                }
+            }
+        }
     }
 
     /**
      * Remove a ComponentHolder from the service. Only takes affect once the service is reset at the moment
      */
     private fun removeFromLifecycle(component: ComponentHolder<*>) {
-        componentList.remove(component)
+        if(!componentList.contains(component)){
+            componentList.remove(component)
+            listenerList.forEach { listener ->
+                //nullify data to prevent some data leakage
+                listener.value.onComponentRemoved(ComponentHolder(component.clazz, null))
+            }
+        }
+        listenerList.remove(component.clazz.name)
+        controllerList.remove(component.clazz.name)
     }
 
     /**
@@ -234,6 +275,7 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
     fun enable(){
         val componentListener : ComponentEventListener = this
         runBlocking {
+            setServiceState(ServiceStatus.ENABLING)
             log.d{
                 Toast.makeText(applicationContext, "Starting ControlSDK", Toast.LENGTH_SHORT).show()
                 "enable"
@@ -258,7 +300,7 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
                 }
                 it.await()
             }
-            setState(true)
+            setServiceState(ServiceStatus.ENABLED)
         }
     }
 
@@ -267,6 +309,7 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
      */
     fun disable(){
         runBlocking {
+            setServiceState(ServiceStatus.DISABLING)
             log.d{
                 Toast.makeText(applicationContext, "Stopping ControlSDK", Toast.LENGTH_SHORT).show()
                 "disable"
@@ -279,7 +322,7 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
                 it.setEventListener(null)
             }
             activeComponentList.clear()
-            setState(false)
+            setServiceState(ServiceStatus.DISABLED)
         }
     }
 
@@ -311,18 +354,24 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
         if(running)
             runBlocking { disable() }
         stopListenerReceiver?.unregister(this)
+        setServiceState(ServiceStatus.KILLED)
         stopForeground(true)
         stopSelf()
     }
 
-    /**
-     * TODO remove? Part of older code system
-     *
-     * Set the current state and broadcast it to other classes within this app
-     */
-    private fun setState(value : Boolean){
-        running = value
+    private fun setServiceState(status: ServiceStatus){
+        running = when(status){
+            ServiceStatus.ENABLING -> true
+            ServiceStatus.ENABLED -> true
+            ServiceStatus.DISABLING -> true
+            ServiceStatus.DISABLED -> false
+            ServiceStatus.KILLED -> false
+        }
         emitState()
+
+        listenerList.forEach{
+            it.value.onServiceStateChange(status)
+        }
     }
 
     /**
