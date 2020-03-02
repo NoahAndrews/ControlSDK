@@ -24,10 +24,8 @@ import org.btelman.controlsdk.services.ControlSDKServiceConnection
 import org.btelman.controlsdk.services.observeAutoCreate
 import org.btelman.controlsdk.streaming.components.AudioComponent
 import org.btelman.controlsdk.streaming.components.VideoComponent
-import org.btelman.controlsdk.streaming.factories.VideoRetrieverFactory
 import org.btelman.controlsdk.streaming.models.CameraDeviceInfo
 import org.btelman.controlsdk.streaming.models.StreamInfo
-import org.btelman.controlsdk.streaming.video.retrievers.api16.Camera1SurfaceTextureComponent
 import org.btelman.controlsdk.tts.SystemDefaultTTSComponent
 import org.btelman.logutil.kotlin.LogLevel
 import org.btelman.logutil.kotlin.LogUtil
@@ -136,13 +134,15 @@ class DemoActivity : AppCompatActivity() {
         val streamInfo = StreamInfo(
             "http://remo.tv:1567/transmit?name=chan-9c1d2981-4990-43ff-bd12-7a95ed221743-video", //TODO video url
             "http://remo.tv:1567/transmit?name=chan-9c1d2981-4990-43ff-bd12-7a95ed221743-audio",
+            width = 1280,
+            height = 720,
             deviceInfo = CameraDeviceInfo.fromCamera(0)
         )
         val bundle = Bundle()
         streamInfo.addToExistingBundle(bundle)
         //VideoRetrieverFactory.putClassInBundle(DummyCanvasRetriever::class.java, bundle)
         //VideoProcessorFactory.putClassInBundle(DummyVideoProcessor::class.java, bundle)
-        VideoRetrieverFactory.putClassInBundle(Camera1SurfaceTextureComponent::class.java, bundle)
+        //VideoRetrieverFactory.putClassInBundle(Camera1SurfaceTextureComponent::class.java, bundle)
         val videoComponent = ComponentHolder(VideoComponent::class.java, bundle)
         val audioComponent = ComponentHolder(AudioComponent::class.java, bundle)
 

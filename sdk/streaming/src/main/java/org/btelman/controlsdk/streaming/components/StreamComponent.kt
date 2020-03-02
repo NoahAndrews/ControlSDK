@@ -27,6 +27,7 @@ abstract class StreamComponent<R : StreamSubComponent,P : StreamSubComponent> : 
     }
 
     override fun enableInternal() {
+        log.d{"enableInternal"}
         runBlocking {
             processor.setEventListener(eventDispatcher)
             processor.updateStreamInfo(streamInfo)
