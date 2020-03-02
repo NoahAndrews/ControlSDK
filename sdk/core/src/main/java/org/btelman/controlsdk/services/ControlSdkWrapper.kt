@@ -55,6 +55,20 @@ open class ControlSdkWrapper : ControlSDKMessenger{
         sendStateUnsafe(ControlSDKService.DETACH_COMPONENT, component)
     }
 
+    override fun addListenerOrController(component: ComponentHolder<*>) {
+        log.v{
+            "attach listener or controller ${component.clazz.name}"
+        }
+        sendStateUnsafe(ControlSDKService.ATTACH_LISTENER_OR_CONTROLLER, component)
+    }
+
+    override fun removeListenerOrController(component: ComponentHolder<*>) {
+        log.v{
+            "detach listener or controller ${component.clazz.name}"
+        }
+        sendStateUnsafe(ControlSDKService.DETACH_LISTENER_OR_CONTROLLER, component)
+    }
+
     @Throws(IllegalStateException::class)
     private fun sendStateUnsafe(what : Int, obj : Any? = null) {
         val message = obj?.let {

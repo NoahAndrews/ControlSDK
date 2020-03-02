@@ -17,7 +17,7 @@ import org.btelman.controlsdk.hardware.interfaces.HardwareDriver
 import org.btelman.controlsdk.hardware.interfaces.TranslatorComponent
 import org.btelman.controlsdk.hardware.translators.ArduinoSendSingleCharTranslator
 import org.btelman.controlsdk.hardware.utils.HardwareFinder
-import org.btelman.controlsdk.interfaces.ControlSdkApi
+import org.btelman.controlsdk.interfaces.ControlSdkServiceWrapper
 import org.btelman.controlsdk.models.ComponentHolder
 import org.btelman.controlsdk.services.ControlSDKService
 import org.btelman.controlsdk.services.ControlSDKServiceConnection
@@ -35,7 +35,7 @@ class DemoActivity : AppCompatActivity() {
 
     private var request: Int = -1
     private var recording = false
-    private var controlAPI : ControlSdkApi = ControlSDKServiceConnection.getNewInstance(this)
+    private var controlServiceWrapper : ControlSdkServiceWrapper = ControlSDKServiceConnection.getNewInstance(this)
     private val arrayList = ArrayList<ComponentHolder<*>>()
     private val listeners = ArrayList<ComponentHolder<*>>()
     val bt = BluetoothClassicDriver()
@@ -62,29 +62,29 @@ class DemoActivity : AppCompatActivity() {
 
         ContextCompat.startForegroundService(applicationContext, Intent(applicationContext, ControlSDKService::class.java))
 
-        controlAPI.getServiceBoundObserver().observeAutoCreate(this){ connected ->
+        controlServiceWrapper.getServiceBoundObserver().observeAutoCreate(this){ connected ->
             //Note that we do not add this to the arraylist. Instead we add it to the service right away
             handleServiceBoundState(connected)
         }
-        controlAPI.getServiceStateObserver().observeAutoCreate(this){ serviceStatus ->
+        controlServiceWrapper.getServiceStateObserver().observeAutoCreate(this){ serviceStatus ->
             handleServiceState(serviceStatus)
         }
-        controlAPI.connectToService()
+        controlServiceWrapper.connectToService()
 
         powerButton?.setOnClickListener {
-            when(controlAPI.getServiceStateObserver().value){
+            when(controlServiceWrapper.getServiceStateObserver().value){
                 Operation.NOT_OK -> {
                     arrayList.forEach {
-                        controlAPI.attachToLifecycle(it)
+                        controlServiceWrapper.attachToLifecycle(it)
                     }
-                    controlAPI.enable()
+                    controlServiceWrapper.enable()
                 }
                 Operation.LOADING -> {} //do nothing
                 Operation.OK -> {
                     arrayList.forEach {
-                        controlAPI.detachFromLifecycle(it)
+                        controlServiceWrapper.detachFromLifecycle(it)
                     }
-                    controlAPI.disable()
+                    controlServiceWrapper.disable()
                 }
                 null -> powerButton.setTextColor(parseColorForOperation(null))
             }
@@ -104,7 +104,10 @@ class DemoActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        controlAPI.disconnectFromService()
+        controlServiceWrapper.disconnectFromService()
+        listeners.forEach {
+            controlServiceWrapper.removeListenerOrController(it)
+        }
         super.onDestroy()
     }
 
@@ -112,12 +115,12 @@ class DemoActivity : AppCompatActivity() {
         powerButton.isEnabled = connected == Operation.OK
         if(connected == Operation.OK){
             listeners.forEach {
-                controlAPI.attachToLifecycle(it)
+                controlServiceWrapper.addListenerOrController(it)
             }
         }
         else if(connected == Operation.NOT_OK){
             listeners.forEach {
-                controlAPI.detachFromLifecycle(it)
+                controlServiceWrapper.removeListenerOrController(it)
             }
         }
     }

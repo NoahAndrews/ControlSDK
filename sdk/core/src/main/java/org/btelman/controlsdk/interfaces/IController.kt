@@ -5,7 +5,7 @@ package org.btelman.controlsdk.interfaces
  */
 interface IController : IControlSDKElement{
 
-    fun onControlAPI(controlSdkApi: ControlSDKMessenger){
+    fun onControlAPI(controlSDKMessenger: ControlSDKMessenger){
 
     }
 

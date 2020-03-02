@@ -3,25 +3,35 @@ package org.btelman.control.sdk.demo
 import android.content.Context
 import android.os.Bundle
 import org.btelman.controlsdk.enums.ComponentStatus
+import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.enums.ServiceStatus
 import org.btelman.controlsdk.interfaces.ComponentEventListener
-import org.btelman.controlsdk.interfaces.ControlSdkApi
+import org.btelman.controlsdk.interfaces.ControlSDKMessenger
 import org.btelman.controlsdk.interfaces.IController
 import org.btelman.controlsdk.interfaces.IListener
+import org.btelman.controlsdk.models.Component
 import org.btelman.controlsdk.models.ComponentHolder
 import org.btelman.controlsdk.services.ControlSDKService
 import org.btelman.logutil.kotlin.LogUtil
 
 
 class DummyListener : IListener, IController {
-    private var controlSdkApi: ControlSdkApi? = null
+    private var controlSDKMessenger: ControlSDKMessenger? = null
     private val log = LogUtil("DummyListener", ControlSDKService.loggerID)
-
-    override fun onInitialize(context: Context, bundle: Bundle?) {
-        super<IListener>.onInitialize(context, bundle)
-        super<IController>.onInitialize(context, bundle)
+    val dummy = ComponentHolder(DummyDummyComponent::class.java, null)
+    override fun onInitializeComponent(applicationContext: Context, bundle: Bundle?) {
+        log.d{
+            "onInitializeComponent"
+        }
         if(bundle?.getString("test", null) != "test")
             log.e("Bundle does not contain test value")
+    }
+
+    override fun onRemoved() {
+        log.d{
+            "onRemoved"
+        }
+        controlSDKMessenger?.detachFromLifecycle(dummy)
     }
 
     override fun setEventListener(listener: ComponentEventListener?) {
@@ -30,9 +40,10 @@ class DummyListener : IListener, IController {
 
     }
 
-    override fun onControlAPI(controlSdkApi: ControlSdkApi) {
-        super.onControlAPI(controlSdkApi)
-        this.controlSdkApi = controlSdkApi
+    override fun onControlAPI(controlSDKMessenger: ControlSDKMessenger) {
+        super.onControlAPI(controlSDKMessenger)
+        this.controlSDKMessenger = controlSDKMessenger
+        controlSDKMessenger.attachToLifecycle(dummy)
     }
 
     override fun onServiceStateChange(status: ServiceStatus) {
@@ -67,6 +78,20 @@ class DummyListener : IListener, IController {
         fun createHolder(bundle: Bundle = Bundle()) : ComponentHolder<*>{
             bundle.putString("test", "test")
             return ComponentHolder(DummyListener::class.java, bundle)
+        }
+    }
+
+    class DummyDummyComponent : Component() {
+        override fun enableInternal() {
+
+        }
+
+        override fun disableInternal() {
+
+        }
+
+        override fun getType(): ComponentType {
+            return ComponentType.CUSTOM
         }
     }
 }

@@ -198,11 +198,17 @@ abstract class Component : IComponent {
     /**
      * Used to retrieve Context and provide an initialization bundle
      */
-    open fun onInitializeComponent(applicationContext: Context, bundle : Bundle?) {
+    override fun onInitializeComponent(applicationContext: Context, bundle : Bundle?) {
         log.d{
             "onInitializeComponent"
         }
         context = applicationContext
+    }
+
+    override fun onRemoved() {
+        log.d{
+            "onRemoved"
+        }
     }
 
     //TODO send component errors upwards

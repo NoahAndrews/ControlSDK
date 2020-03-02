@@ -36,8 +36,7 @@ import kotlin.system.exitProcess
 class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
     private var running = false
     private val componentList = ArrayList<ComponentHolder<*>>()
-    private val listenerList = HashMap<String, IListener>()
-    private val controllerList = HashMap<String, IController>()
+    private val listenerControllerList = HashMap<String, IControlSDKElement>()
     private val activeComponentList = ArrayList<IComponent>()
     private val log = LogUtil("ControlSDKService", loggerID)
 
@@ -140,6 +139,22 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
                     removeFromLifecycle(it)
                 }
             }
+            ATTACH_LISTENER_OR_CONTROLLER -> {
+                log.v{
+                    "handleMessage ATTACH_LISTENER_OR_CONTROLLER ${(msg.obj as? ComponentHolder<*>)?.clazz?.name}"
+                }
+                (msg.obj as? ComponentHolder<*>)?.let {
+                    addListenerOrController(it)
+                }
+            }
+            DETACH_LISTENER_OR_CONTROLLER -> {
+                log.v{
+                    "handleMessage DETACH_LISTENER_OR_CONTROLLER ${(msg.obj as? ComponentHolder<*>)?.clazz?.name}"
+                }
+                (msg.obj as? ComponentHolder<*>)?.let {
+                    removeListenerOrController(it)
+                }
+            }
             RESET -> {
                 log.d{
                     "handleMessage RESET"
@@ -194,13 +209,12 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
 
     private fun sendToListeners(msg: Message, targetFilter : ComponentType? = null) {
         val eventObject = msg.obj as? ComponentEventObject ?: return
-        listenerList.forEach { listenerKeyValuePair->
-            val listener = listenerKeyValuePair.value
+        forEachListener {
             if(eventObject.what == Component.STATUS_EVENT){
-                listener.onComponentStatus(eventObject.source.javaClass, eventObject.data as ComponentStatus)
+                it.onComponentStatus(eventObject.source.javaClass, eventObject.data as ComponentStatus)
             }
-            else if(listener.getComponentTypesForListening()?.contains(eventObject.type) != false){
-                listener.dispatchMessage(msg)
+            else if(it.getComponentTypesForListening()?.contains(eventObject.type) != false){
+                it.dispatchMessage(msg)
             }
         }
     }
@@ -212,30 +226,41 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
         log.d("Component addToLifecycle ${component.clazz.name}")
         if(!componentList.contains(component)){
             componentList.add(component)
-            listenerList.forEach { listener ->
-                //nullify data to prevent some data leakage
-                listener.value.onComponentAdded(ComponentHolder(component.clazz, null))
+            forEachListener {
+                it.onComponentAdded(ComponentHolder(component.clazz, null))
             }
         }
     }
 
     private fun addListenerOrController(component: ComponentHolder<*>){
+        if(listenerControllerList[component.clazz.name] != null) return
         IControlSDKElement.instantiate(applicationContext, component)?.let {
-            log.d("IListener addToLifecycle ${component.clazz.name}")
-            if(it is IController) {
-                log.d("IController addToLifecycle ${component.clazz.name}")
-                controllerList[component.clazz.name] = it
+            log.d{
+
+                var message = "types: "
+                if(it is IController)
+                    message += "IController"
+                if(it is IListener)
+                    message += ",IListener"
+                "addListenerOrController ${component.clazz.name} $message"
             }
-            if(it is IListener) {
-                log.d("IListener addToLifecycle ${component.clazz.name}")
-                listenerList[component.clazz.name] = it
+            listenerControllerList[component.clazz.name] = it
+            if(it is IController) {
+                it.onControlAPI(ControlSdkWrapper().also {wrapper ->
+                    wrapper.onMessenger(Messenger(mMessenger.binder))
+                })
             }
         }
     }
 
     private fun removeListenerOrController(component: ComponentHolder<*>){
-        listenerList.remove(component.clazz.name)
-        controllerList.remove(component.clazz.name)
+        log.d{
+            "removeListenerOrController ${component.clazz.name}"
+        }
+        forEachControllerOrListener {
+            it.onRemoved()
+        }
+        listenerControllerList.remove(component.clazz.name)
     }
 
     /**
@@ -244,13 +269,10 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
     private fun removeFromLifecycle(component: ComponentHolder<*>) {
         if(!componentList.contains(component)){
             componentList.remove(component)
-            listenerList.forEach { listener ->
-                //nullify data to prevent some data leakage
-                listener.value.onComponentRemoved(ComponentHolder(component.clazz, null))
+            forEachListener {
+                it.onComponentRemoved(ComponentHolder(component.clazz, null))
             }
         }
-        listenerList.remove(component.clazz.name)
-        controllerList.remove(component.clazz.name)
     }
 
     /**
@@ -274,6 +296,28 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
                 }
                 e.printStackTrace()
             }
+        }
+    }
+
+    fun forEachListener(block : (IListener)->Unit){
+        listenerControllerList.filter {
+            it.value is IListener
+        }.forEach {
+            block(it.value as IListener)
+        }
+    }
+
+    fun forEachController(block : (IController)->Unit){
+        listenerControllerList.filter {
+            it.value is IController
+        }.forEach {
+            block(it.value as IController)
+        }
+    }
+
+    fun forEachControllerOrListener(block : (IControlSDKElement)->Unit){
+        listenerControllerList.forEach {
+            block(it.value)
         }
     }
 
@@ -378,10 +422,15 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
             ServiceStatus.DISABLED -> false
             ServiceStatus.KILLED -> false
         }
-        emitState()
 
-        listenerList.forEach{
-            it.value.onServiceStateChange(status)
+        when(status){
+            ServiceStatus.ENABLED -> emitState()
+            ServiceStatus.DISABLED -> emitState()
+            else -> {}
+        }
+
+        forEachListener {
+            it.onServiceStateChange(status)
         }
     }
 
@@ -423,6 +472,8 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
         const val ATTACH_COMPONENT = 5
         const val DETACH_COMPONENT = 6
         const val EVENT_BROADCAST = 7
+        const val ATTACH_LISTENER_OR_CONTROLLER = 8
+        const val DETACH_LISTENER_OR_CONTROLLER = 9
         const val CONTROL_SERVICE = "control_service"
         const val SERVICE_STATUS_BROADCAST = "org.btelman.controlsdk.ServiceStatus"
         const val SERVICE_STOP_BROADCAST = "org.btelman.controlsdk.request.stop"

@@ -33,5 +33,9 @@ interface ControlSDKMessenger {
      */
     fun detachFromLifecycle(component: ComponentHolder<*>)
 
+    fun addListenerOrController(component: ComponentHolder<*>)
+
+    fun removeListenerOrController(component: ComponentHolder<*>)
+
     fun onMessenger(messenger: Messenger?)
 }

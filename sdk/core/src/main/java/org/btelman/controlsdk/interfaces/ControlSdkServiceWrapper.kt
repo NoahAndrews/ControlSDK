@@ -6,7 +6,7 @@ import org.btelman.controlsdk.enums.Operation
 /**
  * Interface for communicating with the robot service
  */
-interface ControlSdkApi : ControlSDKMessenger{
+interface ControlSdkServiceWrapper : ControlSDKMessenger{
 
     /**
      * Subscribe to status events.

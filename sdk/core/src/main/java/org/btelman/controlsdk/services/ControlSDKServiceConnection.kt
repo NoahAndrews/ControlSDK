@@ -9,7 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import org.btelman.controlsdk.enums.Operation
-import org.btelman.controlsdk.interfaces.ControlSdkApi
+import org.btelman.controlsdk.interfaces.ControlSdkServiceWrapper
 import org.btelman.logutil.kotlin.LogUtil
 
 /**
@@ -17,7 +17,7 @@ import org.btelman.logutil.kotlin.LogUtil
  */
 class ControlSDKServiceConnection private constructor(
         val context: Context
-) : ControlSdkWrapper(), ServiceConnection, ControlSdkApi {
+) : ControlSdkWrapper(), ServiceConnection, ControlSdkServiceWrapper {
 
     private val log = LogUtil("ControlSDKServiceConnection", ControlSDKService.loggerID)
     /**
@@ -98,6 +98,7 @@ class ControlSDKServiceConnection private constructor(
         }
         LocalBroadcastManager.getInstance(context).unregisterReceiver(receiver)
         context.unbindService(this)
+        serviceBoundObserver.postValue(Operation.NOT_OK)
     }
 
     class Receiver(val liveData: MutableLiveData<Operation>, val disconnectCallback : (() -> Unit)? = null) : BroadcastReceiver() {
@@ -132,7 +133,7 @@ class ControlSDKServiceConnection private constructor(
     }
 
     companion object {
-        fun getNewInstance(context: Context) : ControlSdkApi{
+        fun getNewInstance(context: Context) : ControlSdkServiceWrapper{
             return ControlSDKServiceConnection(context)
         }
     }
