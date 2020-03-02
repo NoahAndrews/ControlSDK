@@ -31,7 +31,7 @@ ext{
     globalBuildToolsVersion = "28.0.3"
     buildNumber = BITRISE_BUILD_NUMBER
     gitHash = getGitHash()
-    versionSemantic = "0.12.0-beta1"
+    versionSemantic = "0.12.0-beta2"
 
     bintrayRepo = 'maven'
     bintrayName = 'ControlSDK'

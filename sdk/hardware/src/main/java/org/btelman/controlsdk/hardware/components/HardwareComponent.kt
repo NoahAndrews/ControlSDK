@@ -5,6 +5,7 @@ import android.os.Bundle
 import kotlinx.coroutines.runBlocking
 import org.btelman.controlsdk.enums.ComponentType
 import org.btelman.controlsdk.hardware.interfaces.Translator
+import org.btelman.controlsdk.interfaces.ComponentEventListener
 import org.btelman.controlsdk.models.Component
 import org.btelman.controlsdk.models.ComponentEventObject
 import org.btelman.controlsdk.utils.BundleUtil
@@ -27,7 +28,11 @@ class HardwareComponent : Component() {
         } ?: CommunicationDriverComponent()
         translatorComponent ?: return
         communicationDriverComponent?.onInitializeComponent(applicationContext, bundle)
-        communicationDriverComponent?.setEventListener(eventDispatcher)
+    }
+
+    override fun setEventListener(listener: ComponentEventListener?) {
+        super.setEventListener(listener)
+        communicationDriverComponent?.setEventListener(listener)
     }
 
     override fun enableInternal() {
