@@ -208,23 +208,34 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
     /**
      * Add a ComponentHolder to the service lifecycle. Will get instantiated into a Component when the service is enabled
      */
-    private fun <T : IControlSDKElement> addToLifecycle(component: ComponentHolder<T>) {
-        IListener.instantiate(applicationContext, component)?.let {
-            log.d("IListener addToLifecycle ${component.clazz.name}")
-            listenerList[component.clazz.name] = it
-        }?: IController.instantiate(applicationContext, component)?.let {
-            log.d("IController addToLifecycle ${component.clazz.name}")
-            controllerList[component.clazz.name] = it
-        }?: run{
-            log.d("Component addToLifecycle ${component.clazz.name}")
-            if(!componentList.contains(component)){
-                componentList.add(component)
-                listenerList.forEach { listener ->
-                    //nullify data to prevent some data leakage
-                    listener.value.onComponentAdded(ComponentHolder(component.clazz, null))
-                }
+    private fun addToLifecycle(component: ComponentHolder<*>) {
+        log.d("Component addToLifecycle ${component.clazz.name}")
+        if(!componentList.contains(component)){
+            componentList.add(component)
+            listenerList.forEach { listener ->
+                //nullify data to prevent some data leakage
+                listener.value.onComponentAdded(ComponentHolder(component.clazz, null))
             }
         }
+    }
+
+    private fun addListenerOrController(component: ComponentHolder<*>){
+        IControlSDKElement.instantiate(applicationContext, component)?.let {
+            log.d("IListener addToLifecycle ${component.clazz.name}")
+            if(it is IController) {
+                log.d("IController addToLifecycle ${component.clazz.name}")
+                controllerList[component.clazz.name] = it
+            }
+            if(it is IListener) {
+                log.d("IListener addToLifecycle ${component.clazz.name}")
+                listenerList[component.clazz.name] = it
+            }
+        }
+    }
+
+    private fun removeListenerOrController(component: ComponentHolder<*>){
+        listenerList.remove(component.clazz.name)
+        controllerList.remove(component.clazz.name)
     }
 
     /**

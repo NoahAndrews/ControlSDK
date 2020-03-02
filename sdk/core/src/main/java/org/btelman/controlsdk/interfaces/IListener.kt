@@ -1,7 +1,5 @@
 package org.btelman.controlsdk.interfaces
 
-import android.content.Context
-import android.os.Bundle
 import android.os.Message
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.enums.ComponentType
@@ -12,7 +10,6 @@ import org.btelman.controlsdk.models.ComponentHolder
  * Base methods that any listener requires
  */
 interface IListener : IControlSDKElement{
-    fun onInitializeListener(context: Context, bundle: Bundle?){}
 
     //TODO
     fun onError(origin : Class<*>?, exception: Exception){}
@@ -39,15 +36,5 @@ interface IListener : IControlSDKElement{
      */
     fun getComponentTypesForListening() : List<ComponentType>?{
         return null
-    }
-
-    companion object{
-        fun instantiate(context: Context, componentHolder: ComponentHolder<*>) : IListener?{
-            return runCatching {
-                return@runCatching (componentHolder.clazz.newInstance() as IListener).also {
-                    it.onInitializeListener(context, componentHolder.data)
-                }
-            }.getOrNull()
-        }
     }
 }

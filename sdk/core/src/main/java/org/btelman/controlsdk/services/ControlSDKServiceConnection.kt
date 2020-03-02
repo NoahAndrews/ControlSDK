@@ -2,7 +2,6 @@ package org.btelman.controlsdk.services
 
 import android.content.*
 import android.os.IBinder
-import android.os.Message
 import android.os.Messenger
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -11,7 +10,6 @@ import androidx.lifecycle.Observer
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import org.btelman.controlsdk.enums.Operation
 import org.btelman.controlsdk.interfaces.ControlSdkApi
-import org.btelman.controlsdk.models.ComponentHolder
 import org.btelman.logutil.kotlin.LogUtil
 
 /**
@@ -19,7 +17,7 @@ import org.btelman.logutil.kotlin.LogUtil
  */
 class ControlSDKServiceConnection private constructor(
         val context: Context
-) : ServiceConnection, ControlSdkApi {
+) : ControlSdkWrapper(), ServiceConnection, ControlSdkApi {
 
     private val log = LogUtil("ControlSDKServiceConnection", ControlSDKService.loggerID)
     /**
@@ -36,15 +34,13 @@ class ControlSDKServiceConnection private constructor(
         MutableLiveData<Operation>()
     }
 
-    private var mService: Messenger? = null
-
     override fun onServiceConnected(className: ComponentName, service: IBinder) {
         // This is called when the connection with the service has been
         // established, giving us the object we can use to
         // interact with the service.  We are communicating with the
         // service using a Messenger, so here we get a client-side
         // representation of that from the raw IBinder object.
-        mService = Messenger(service)
+        onMessenger(Messenger(service))
         serviceBoundObserver.postValue(Operation.OK)
         log.d{
             "onServiceConnected"
@@ -57,56 +53,20 @@ class ControlSDKServiceConnection private constructor(
         log.d{
             "onServiceDisconnected"
         }
-        mService = null
+        onMessenger(null)
         serviceBoundObserver.postValue(Operation.NOT_OK)
     }
 
     @Throws(IllegalStateException::class)
     override fun enable() {
-        log.d{
-            "enable"
-        }
+        super.enable()
         serviceStateObserver.value = Operation.LOADING
-        sendStateUnsafe(ControlSDKService.START)
     }
 
     @Throws(IllegalStateException::class)
     override fun disable(){
-        log.d{
-            "disable"
-        }
+        super.disable()
         serviceStateObserver.value = Operation.LOADING
-        sendStateUnsafe(ControlSDKService.STOP)
-    }
-
-    @Throws(IllegalStateException::class)
-    override fun reset() {
-        log.d{
-            "reset"
-        }
-        sendStateUnsafe(ControlSDKService.RESET)
-    }
-
-    override fun attachToLifecycle(component: ComponentHolder<*>) {
-        log.v{
-            "attachToLifecycle ${component.clazz.name}"
-        }
-        sendStateUnsafe(ControlSDKService.ATTACH_COMPONENT, component)
-    }
-
-    override fun detachFromLifecycle(component: ComponentHolder<*>) {
-        log.v{
-            "detachFromLifecycle ${component.clazz.name}"
-        }
-        sendStateUnsafe(ControlSDKService.DETACH_COMPONENT, component)
-    }
-
-    @Throws(IllegalStateException::class)
-    private fun sendStateUnsafe(what : Int, obj : Any? = null) {
-        val message = obj?.let {
-            Message.obtain(null, what, obj)
-        } ?: Message.obtain(null, what)
-        mService?.send(message) ?: throw IllegalStateException()
     }
 
     override fun getServiceStateObserver(): LiveData<Operation> {

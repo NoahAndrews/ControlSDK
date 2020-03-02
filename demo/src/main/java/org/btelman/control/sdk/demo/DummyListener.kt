@@ -4,19 +4,35 @@ import android.content.Context
 import android.os.Bundle
 import org.btelman.controlsdk.enums.ComponentStatus
 import org.btelman.controlsdk.enums.ServiceStatus
+import org.btelman.controlsdk.interfaces.ComponentEventListener
+import org.btelman.controlsdk.interfaces.ControlSdkApi
+import org.btelman.controlsdk.interfaces.IController
 import org.btelman.controlsdk.interfaces.IListener
 import org.btelman.controlsdk.models.ComponentHolder
 import org.btelman.controlsdk.services.ControlSDKService
 import org.btelman.logutil.kotlin.LogUtil
 
 
-class DummyListener : IListener {
+class DummyListener : IListener, IController {
+    private var controlSdkApi: ControlSdkApi? = null
     private val log = LogUtil("DummyListener", ControlSDKService.loggerID)
 
-    override fun onInitializeListener(context: Context, bundle: Bundle?) {
-        super.onInitializeListener(context, bundle)
+    override fun onInitialize(context: Context, bundle: Bundle?) {
+        super<IListener>.onInitialize(context, bundle)
+        super<IController>.onInitialize(context, bundle)
         if(bundle?.getString("test", null) != "test")
             log.e("Bundle does not contain test value")
+    }
+
+    override fun setEventListener(listener: ComponentEventListener?) {
+        super<IListener>.setEventListener(listener)
+        super<IController>.setEventListener(listener)
+
+    }
+
+    override fun onControlAPI(controlSdkApi: ControlSdkApi) {
+        super.onControlAPI(controlSdkApi)
+        this.controlSdkApi = controlSdkApi
     }
 
     override fun onServiceStateChange(status: ServiceStatus) {
