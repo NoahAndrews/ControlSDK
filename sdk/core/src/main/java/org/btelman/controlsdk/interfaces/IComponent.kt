@@ -7,7 +7,7 @@ import org.btelman.controlsdk.enums.ComponentType
 /**
  * Base methods that any component requires
  */
-interface IComponent{
+interface IComponent : IControlSDKElement{
 
     /**
      * Enables the component asynchronously, and will return the result to a listening co-routine
