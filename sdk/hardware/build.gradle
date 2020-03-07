@@ -16,6 +16,12 @@ android {
     compileOptions {
         kotlinOptions.freeCompilerArgs += ['-module-name', "$publishedGroupId.$artifact"]
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 28
@@ -47,7 +53,7 @@ dependencies {
 
     implementation project(':sdk:core')
 
-    api 'com.github.felHR85:UsbSerial:4.5.1'
+    api 'com.github.felHR85:UsbSerial:6.1.0'
 }
 repositories {
     google()

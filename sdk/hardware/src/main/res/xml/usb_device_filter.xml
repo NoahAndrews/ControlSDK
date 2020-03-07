@@ -734,4 +734,7 @@
     <usb-device vendor-id="6790" product-id="29987" />
     <usb-device vendor-id="6790" product-id="21795" />
     <usb-device vendor-id="6790" product-id="1093" />
+
+    <!--DFRobot Romeo BLE-->
+    <usb-device vendor-id="9025" product-id="67" />
 </resources>
