@@ -12,6 +12,7 @@ import org.btelman.android.ffmpeg.FFmpegRunner
 import org.btelman.controlsdk.enums.Operation
 import org.btelman.controlsdk.hardware.components.HardwareComponent
 import org.btelman.controlsdk.hardware.drivers.BluetoothClassicDriver
+import org.btelman.controlsdk.hardware.drivers.FelhrUsbSerialDriver
 import org.btelman.controlsdk.hardware.interfaces.DriverComponent
 import org.btelman.controlsdk.hardware.interfaces.HardwareDriver
 import org.btelman.controlsdk.hardware.interfaces.TranslatorComponent
@@ -162,7 +163,7 @@ class DemoActivity : AppCompatActivity() {
         val audioComponent = ComponentHolder(AudioComponent::class.java, bundle)
 
         val hardwareBundle = Bundle()
-        hardwareBundle.putSerializable(HardwareDriver.BUNDLE_ID, BluetoothClassicDriver::class.java)
+        hardwareBundle.putSerializable(HardwareDriver.BUNDLE_ID, FelhrUsbSerialDriver::class.java)
         hardwareBundle.putSerializable(HardwareComponent.HARDWARE_TRANSLATOR_BUNDLE_ID, ArduinoSendSingleCharTranslator::class.java)
         val hardwareComponent = ComponentHolder(HardwareComponent::class.java, hardwareBundle)
         val dummyComponent = ComponentHolder(DummyController::class.java, Bundle())
