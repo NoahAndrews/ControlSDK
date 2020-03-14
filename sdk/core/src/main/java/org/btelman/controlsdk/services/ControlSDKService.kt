@@ -267,7 +267,7 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
      * Remove a ComponentHolder from the service. Only takes affect once the service is reset at the moment
      */
     private fun removeFromLifecycle(component: ComponentHolder<*>) {
-        if(!componentList.contains(component)){
+        if(componentList.contains(component)){
             componentList.remove(component)
             forEachListener {
                 it.onComponentRemoved(ComponentHolder(component.clazz, null))
