@@ -2,10 +2,7 @@ package org.btelman.controlsdk.models
 
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Message
+import android.os.*
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -46,6 +43,19 @@ abstract class Component : IComponent {
     protected val handler = Handler(handlerThread.looper){
         handleMessage(it)
     }
+
+    private var _threadPriority : Int = Process.THREAD_PRIORITY_DEFAULT
+    private var threadPriority: Int
+        get() {
+            return _threadPriority
+        }
+        set(value) {
+            if(_threadPriority == value) return //Only set state if changed
+            _threadPriority = value
+            handler.post { //set thread priority of handlerThread
+                Process.setThreadPriority(threadPriority)
+            }
+        }
 
     private var _status: ComponentStatus = ComponentStatus.DISABLED_FROM_SETTINGS
     var status : ComponentStatus
@@ -239,6 +249,7 @@ abstract class Component : IComponent {
 
         fun instantiate(applicationContext: Context, holder: ComponentHolder<*>) : Component {
             val component : Component = holder.clazz.newInstance() as Component
+            component.threadPriority = holder.threadPriority
             component.onInitializeComponent(applicationContext, holder.data)
             return component
         }
