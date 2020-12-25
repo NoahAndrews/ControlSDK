@@ -1,6 +1,7 @@
 package org.btelman.controlsdk.models
 
 import android.os.Bundle
+import android.os.Process
 import org.btelman.controlsdk.interfaces.IControlSDKElement
 import java.util.*
 
@@ -20,5 +21,11 @@ data class ComponentHolder<T : IControlSDKElement>(
      * Unique tag for the component. If the service encounters a tag that already is active,
      * it will destroy the old tag
      */
-    val uniqueTag : String = UUID.randomUUID().toString()
+    val uniqueTag : String = UUID.randomUUID().toString(),
+
+    /**
+     * Set a priority for the given spawned thread
+     */
+    var threadPriority : Int = Process.THREAD_PRIORITY_DEFAULT,
+    var async : Boolean = true
 )

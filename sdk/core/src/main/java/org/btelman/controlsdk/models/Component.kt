@@ -2,10 +2,8 @@ package org.btelman.controlsdk.models
 
 import android.app.NotificationManager
 import android.content.Context
-import android.os.Bundle
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Message
+import android.os.*
+import androidx.annotation.CallSuper
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -31,9 +29,7 @@ import kotlin.random.Random
 abstract class Component : IComponent {
     protected var context: Context? = null
     protected var eventDispatcher : ComponentEventListener? = null
-    private var handlerThread = HandlerThread(
-            javaClass.simpleName
-    ).also { it.start() }
+    private var handlerThread : HandlerThread? = null
 
     protected val log = LogUtil("ControlSDKComponent : ${javaClass.name}", ControlSDKService.loggerID)
 
@@ -43,9 +39,11 @@ abstract class Component : IComponent {
     @Suppress("ConvertSecondaryConstructorToPrimary")
     constructor()
 
-    protected val handler = Handler(handlerThread.looper){
-        handleMessage(it)
-    }
+    protected lateinit var handler : Handler
+
+    private var async: Boolean = true
+
+    private var threadPriority : Int = Process.THREAD_PRIORITY_DEFAULT
 
     private var _status: ComponentStatus = ComponentStatus.DISABLED_FROM_SETTINGS
     var status : ComponentStatus
@@ -164,6 +162,12 @@ abstract class Component : IComponent {
                 })
             }
 
+    private fun createHandler(looper: Looper) : Handler{
+        return Handler(looper){
+            handleMessage(it)
+        }
+    }
+
     /**
      * Called when we have not received a response from the server in a while
      */
@@ -196,9 +200,23 @@ abstract class Component : IComponent {
     }
 
     /**
-     * Used to retrieve Context and provide an initialization bundle
+     * Used to retrieve Context and provide an initialization bundle. Must be called, preferably first
      */
+    @CallSuper
     override fun onInitializeComponent(applicationContext: Context, bundle : Bundle?) {
+        if(async){
+            handlerThread = HandlerThread(
+                javaClass.simpleName
+            ).also { it.start() }
+            handler = createHandler(handlerThread!!.looper)
+            handler.post { //set thread priority of handlerThread
+                Process.setThreadPriority(threadPriority)
+            }
+        }
+        else{
+            handler = createHandler(ControlSDKService.defaultLooper)
+        }
+
         log.d{
             "onInitializeComponent"
         }
@@ -239,6 +257,8 @@ abstract class Component : IComponent {
 
         fun instantiate(applicationContext: Context, holder: ComponentHolder<*>) : Component {
             val component : Component = holder.clazz.newInstance() as Component
+            component.threadPriority = holder.threadPriority
+            component.async = holder.async
             component.onInitializeComponent(applicationContext, holder.data)
             return component
         }
