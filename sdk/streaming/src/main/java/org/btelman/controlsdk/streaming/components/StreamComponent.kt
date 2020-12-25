@@ -77,11 +77,11 @@ abstract class StreamComponent<R : StreamSubComponent,P : StreamSubComponent> : 
     }
 
     fun push(what : Int, obj : Any? = null){
-        if(!handler.hasMessages(what)) {
+        if(handler?.hasMessages(what) == true) {
             val message = obj?.let {
-                handler.obtainMessage(what, it)
-            } ?: handler.obtainMessage(what)
-            message.sendToTarget()
+                handler?.obtainMessage(what, it)
+            } ?: handler?.obtainMessage(what)
+            message?.sendToTarget()
         }
     }
 

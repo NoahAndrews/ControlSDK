@@ -26,5 +26,6 @@ data class ComponentHolder<T : IControlSDKElement>(
     /**
      * Set a priority for the given spawned thread
      */
-    var threadPriority : Int = Process.THREAD_PRIORITY_DEFAULT
+    var threadPriority : Int = Process.THREAD_PRIORITY_DEFAULT,
+    var async : Boolean = true
 )

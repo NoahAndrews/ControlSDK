@@ -465,6 +465,14 @@ class ControlSDKService : Service(), ComponentEventListener, Handler.Callback {
     }
 
     companion object {
+        var defaultHandlerThread = HandlerThread(ControlSDKService::class.java.simpleName).also {
+            it.start()
+        }
+        val defaultLooper : Looper
+            get() {
+                return defaultHandlerThread.looper
+            }
+
         var allowNotificationForExceptions = true
         const val START = 1
         const val STOP = 2

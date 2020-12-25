@@ -145,8 +145,8 @@ class DemoActivity : AppCompatActivity() {
     }
 
     private fun createComponentHolders() {
-        val tts = ComponentHolder(SystemDefaultTTSComponent::class.java, null)
-        val demoComponent = ComponentHolder(DemoComponent::class.java, null)
+        val tts = ComponentHolder(SystemDefaultTTSComponent::class.java, null, async = false)
+        val demoComponent = ComponentHolder(DemoComponent::class.java, null, async = false)
         val streamInfo = StreamInfo(
             "http://remo.tv:1567/transmit?name=chan-9c1d2981-4990-43ff-bd12-7a95ed221743-video", //TODO video url
             "http://remo.tv:1567/transmit?name=chan-9c1d2981-4990-43ff-bd12-7a95ed221743-audio",
@@ -165,12 +165,12 @@ class DemoActivity : AppCompatActivity() {
         val hardwareBundle = Bundle()
         hardwareBundle.putSerializable(HardwareDriver.BUNDLE_ID, FelhrUsbSerialDriver::class.java)
         hardwareBundle.putSerializable(HardwareComponent.HARDWARE_TRANSLATOR_BUNDLE_ID, ArduinoSendSingleCharTranslator::class.java)
-        val hardwareComponent = ComponentHolder(HardwareComponent::class.java, hardwareBundle)
-        val dummyComponent = ComponentHolder(DummyController::class.java, Bundle())
+        val hardwareComponent = ComponentHolder(HardwareComponent::class.java, hardwareBundle, async = false)
+        val dummyComponent = ComponentHolder(DummyController::class.java, Bundle(), async = false)
         arrayList.add(tts) //noisy and potentially annoying due to dummyComponent giving it garbage, but good for testing
         arrayList.add(demoComponent)
-        arrayList.add(videoComponent)
-        arrayList.add(audioComponent)
+//        arrayList.add(videoComponent)
+//        arrayList.add(audioComponent)
         arrayList.add(hardwareComponent)
         arrayList.add(dummyComponent)
         arrayList.add(ComponentHolder(UnstableComponent::class.java, Bundle()))
