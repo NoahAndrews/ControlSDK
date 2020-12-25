@@ -13,7 +13,7 @@ class DemoComponent : Component() {
     //override fun onInitializeComponent available
 
     override fun enableInternal() {
-        handler?.post {
+        handler.post {
             eventDispatcher?.handleMessage(ComponentEventObject(ComponentType.TTS, EVENT_MAIN,
                 TTSBaseComponent.TTSObject(TTSBaseComponent.TTS_OK), this))
             eventDispatcher?.handleMessage(ComponentEventObject(ComponentType.TTS, EVENT_MAIN,

@@ -39,7 +39,7 @@ abstract class Component : IComponent {
     @Suppress("ConvertSecondaryConstructorToPrimary")
     constructor()
 
-    protected var handler : Handler? = null
+    protected lateinit var handler : Handler
 
     private var async: Boolean = true
 
@@ -121,7 +121,7 @@ abstract class Component : IComponent {
     }
 
     fun enableWithCallback(callback: Callback<Boolean>){
-        handler?.post {
+        handler.post {
             try {
                 enableInternal()
             } catch (e: Exception) {
@@ -133,7 +133,7 @@ abstract class Component : IComponent {
     }
 
     fun disableWithCallback(callback: Callback<Boolean>){
-        handler?.post {
+        handler.post {
             try {
                 disableInternal()
             }
@@ -142,7 +142,7 @@ abstract class Component : IComponent {
                 throwError(e)
                 status = ComponentStatus.ERROR
             }
-            handler?.removeCallbacksAndMessages(null)
+            handler.removeCallbacksAndMessages(null)
             callback.onComplete(true)
         }
     }
@@ -209,7 +209,7 @@ abstract class Component : IComponent {
                 javaClass.simpleName
             ).also { it.start() }
             handler = createHandler(handlerThread!!.looper)
-            handler!!.post { //set thread priority of handlerThread
+            handler.post { //set thread priority of handlerThread
                 Process.setThreadPriority(threadPriority)
             }
         }
